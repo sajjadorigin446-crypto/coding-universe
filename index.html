@@ -3,1642 +3,1888 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#03040a">
-<meta name="description" content="MAMUN CODING FANTASY — When Imagination Meets Python">
-<title>MAMUN CODING FANTASY</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05050a">
+<title>MAMUN CODING FANTASY — Digital Universe</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 
 <style>
 :root{
-  --black:#03040a;
-  --white:#f7f7fa;
-  --muted:rgba(255,255,255,.5);
+ --bg:#05050a;
+ --white:#f8f7ff;
+ --muted:#a3a1b3;
+ --violet:#a78bfa;
+ --cyan:#67e8f9;
+ --pink:#f0abfc;
+ --mono:"DM Mono",monospace;
+ --sans:"Space Grotesk",sans-serif;
 }
 *{box-sizing:border-box}
-html{
-  margin:0;
-  background:var(--black);
-  scroll-behavior:auto;
-  overflow-x:hidden;
-}
+html{background:var(--bg);scroll-behavior:auto}
 body{
-  margin:0;
-  background:var(--black);
-  color:var(--white);
-  font-family:Inter,Arial,sans-serif;
-  overflow-x:hidden;
+ margin:0;
+ background:var(--bg);
+ color:var(--white);
+ font-family:var(--sans);
+ overflow-x:hidden;
 }
-body.intro-lock{height:100vh;overflow:hidden}
+body.lock{height:100vh;overflow:hidden}
+button{font:inherit;color:inherit}
+button:focus-visible{outline:2px solid white;outline-offset:4px}
 
-#world{
-  position:fixed;
-  inset:0;
-  width:100%;
-  height:100%;
-  z-index:0;
-  pointer-events:none;
+/* BACKGROUND CANVAS */
+#universe{
+ position:fixed;
+ inset:0;
+ z-index:0;
+ overflow:hidden;
+ background:radial-gradient(ellipse at center,#111020,#05050a 70%);
 }
-#world canvas{
-  display:block;
-  width:100%;
-  height:100%;
+#universe canvas{
+ width:100%;
+ height:100%;
+ display:block;
 }
-#shade{
-  position:fixed;
-  inset:0;
-  z-index:2;
-  pointer-events:none;
-  background:
-    radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,.28) 100%),
-    linear-gradient(180deg,rgba(0,0,0,.12),transparent 25%,transparent 75%,rgba(0,0,0,.2));
+#fallback{
+ position:absolute;
+ inset:0;
+ display:grid;
+ place-items:center;
+ font:10px var(--mono);
+ letter-spacing:3px;
+ color:#aaa;
+ pointer-events:none;
 }
-#noise{
-  position:fixed;
-  inset:0;
-  z-index:3;
-  opacity:.08;
-  pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
-}
+
+/* INTRO */
 #intro{
-  position:fixed;
-  inset:0;
-  z-index:30;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  background:#03040a;
-  transition:opacity 1.5s ease,visibility 1.5s ease;
+ position:fixed;
+ inset:0;
+ z-index:30;
+ display:grid;
+ place-items:center;
+ overflow:hidden;
+ background:
+ radial-gradient(ellipse at 50% 48%,#241b40 0%,#0b0915 45%,#030307 85%);
+ transition:opacity 1.2s ease,visibility 1.2s ease;
 }
-#intro.exit{
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
+#intro.hide{
+ opacity:0;
+ visibility:hidden;
+ pointer-events:none;
 }
-.intro-bg{
-  position:absolute;
-  inset:0;
-  overflow:hidden;
-  background:
-    radial-gradient(ellipse at 50% 42%,rgba(72,46,148,.26),transparent 42%),
-    radial-gradient(ellipse at 50% 85%,rgba(0,155,210,.15),transparent 48%),
-    #03040a;
+.intro-grid{
+ position:absolute;
+ inset:-50%;
+ background-image:
+ linear-gradient(#b9a2ff16 1px,transparent 1px),
+ linear-gradient(90deg,#b9a2ff16 1px,transparent 1px);
+ background-size:58px 58px;
+ transform:perspective(700px) rotateX(65deg) scale(1.8);
+ mask-image:linear-gradient(transparent,black 25%,black 75%,transparent);
+ animation:gridmove 25s linear infinite;
 }
-.intro-bg:before{
-  content:"";
-  position:absolute;
-  width:min(100vw,900px);
-  aspect-ratio:1;
-  border-radius:50%;
-  border:1px solid rgba(150,130,255,.3);
-  top:42%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  box-shadow:
-    0 0 50px rgba(120,100,255,.16),
-    inset 0 0 80px rgba(0,220,255,.08);
-  animation:portalA 22s linear infinite;
+@keyframes gridmove{
+ to{background-position:0 58px,58px 0}
 }
-.intro-bg:after{
-  content:"";
-  position:absolute;
-  width:min(70vw,650px);
-  aspect-ratio:1;
-  border-radius:50%;
-  border:1px solid rgba(0,220,255,.3);
-  top:42%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  box-shadow:0 0 60px rgba(0,200,255,.13);
-  animation:portalB 16s linear infinite;
+.portal{
+ position:absolute;
+ width:min(85vw,650px);
+ aspect-ratio:1;
+ display:grid;
+ place-items:center;
+ pointer-events:none;
 }
-@keyframes portalA{
-  from{transform:translate(-50%,-50%) rotateX(68deg) rotateZ(0)}
-  to{transform:translate(-50%,-50%) rotateX(68deg) rotateZ(360deg)}
+.portal-ring{
+ position:absolute;
+ inset:5%;
+ border:1px solid #c4b5fd66;
+ border-radius:50%;
+ box-shadow:0 0 60px #8b5cf633,inset 0 0 60px #8b5cf622;
+ animation:spin 28s linear infinite;
 }
-@keyframes portalB{
-  from{transform:translate(-50%,-50%) rotateY(65deg) rotateZ(360deg)}
-  to{transform:translate(-50%,-50%) rotateY(65deg) rotateZ(0)}
+.portal-ring:nth-child(2){
+ inset:17%;
+ border-color:#67e8f966;
+ animation-duration:20s;
+ animation-direction:reverse;
+ transform:rotateX(65deg);
 }
-.portal-hole{
-  position:absolute;
-  left:50%;
-  top:42%;
-  width:min(35vw,330px);
-  aspect-ratio:1;
-  border-radius:50%;
-  transform:translate(-50%,-50%);
-  background:radial-gradient(circle,
-    #010107 0 20%,
-    #1d153b 27%,
-    #6942b6 32%,
-    #16c5e7 36%,
-    #17112e 42%,
-    transparent 68%);
-  filter:blur(2px);
-  box-shadow:0 0 110px rgba(0,194,255,.18),0 0 160px rgba(132,70,255,.22);
-  animation:holePulse 5s ease-in-out infinite alternate;
+.portal-ring:nth-child(3){
+ inset:28%;
+ border-color:#f0abfc77;
+ animation-duration:35s;
 }
-@keyframes holePulse{
-  from{transform:translate(-50%,-50%) scale(.9);filter:hue-rotate(0deg) blur(2px)}
-  to{transform:translate(-50%,-50%) scale(1.12);filter:hue-rotate(60deg) blur(5px)}
+.portal-core{
+ width:25%;
+ aspect-ratio:1;
+ border-radius:50%;
+ background:radial-gradient(circle,#fff 0%,#c4b5fd 8%,#8b5cf6 24%,#24133e 60%,transparent 75%);
+ box-shadow:0 0 100px #8b5cf6aa;
+ animation:pulse 4s ease-in-out infinite;
 }
-.orbit{
-  position:absolute;
-  width:min(105vw,950px);
-  aspect-ratio:1;
-  left:50%;top:42%;
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:50%;
-  transform:translate(-50%,-50%);
-  animation:orbitSpin 35s linear infinite;
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{50%{transform:scale(1.3);filter:blur(5px)}}
+
+.intro-content{
+ position:relative;
+ z-index:2;
+ width:min(94%,850px);
+ text-align:center;
+ padding:25px;
 }
-.orbit:before,.orbit:after{
-  content:"";
-  position:absolute;
-  width:7px;height:7px;
-  border-radius:50%;
-  background:#b49bff;
-  box-shadow:0 0 28px 8px rgba(140,100,255,.65);
-  left:16%;top:24%;
+.eyebrow{
+ font:10px var(--mono);
+ letter-spacing:5px;
+ color:#c4b5fd;
+ text-transform:uppercase;
 }
-.orbit:after{
-  left:78%;top:72%;
-  background:#63eaff;
-  box-shadow:0 0 25px 8px rgba(0,220,255,.55);
+.hero-title{
+ font-size:clamp(45px,10vw,112px);
+ font-weight:700;
+ line-height:.87;
+ letter-spacing:-.075em;
+ margin:25px 0;
+ background:linear-gradient(110deg,#fff,#c4b5fd 45%,#67e8f9 78%,#fff);
+ background-clip:text;
+ -webkit-background-clip:text;
+ color:transparent;
 }
-@keyframes orbitSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
-.intro-copy{
-  position:relative;
-  z-index:2;
-  width:100%;
-  text-align:center;
-  padding:20px;
-  margin-top:210px;
+.hero-sub{
+ font:11px var(--mono);
+ letter-spacing:4px;
+ color:#c8c4d7;
 }
-.intro-label{
-  font-size:9px;
-  letter-spacing:.48em;
-  color:rgba(255,255,255,.52);
-  margin-bottom:23px;
-}
-.intro-title{
-  margin:0;
-  font-size:clamp(36px,8vw,96px);
-  line-height:.94;
-  font-weight:800;
-  letter-spacing:-.075em;
-  background:linear-gradient(110deg,#fff 5%,#a5efff 35%,#c0a4ff 65%,#fff 95%);
-  color:transparent;
-  -webkit-background-clip:text;
-  background-clip:text;
-  text-shadow:0 0 60px rgba(130,130,255,.13);
-}
-.intro-tag{
-  margin:24px 0 34px;
-  font-size:10px;
-  letter-spacing:.4em;
-  color:rgba(255,255,255,.63);
+.intro-line{
+ width:90px;
+ height:1px;
+ background:linear-gradient(90deg,transparent,#c4b5fd,transparent);
+ margin:30px auto;
 }
 #enter{
-  padding:17px 30px;
-  border-radius:50px;
-  border:1px solid rgba(255,255,255,.4);
-  color:#fff;
-  background:rgba(255,255,255,.045);
-  backdrop-filter:blur(15px);
-  font-size:9px;
-  font-weight:600;
-  letter-spacing:.24em;
-  cursor:pointer;
-  transition:.4s;
+ position:relative;
+ border:1px solid #c4b5fd99;
+ background:#ffffff09;
+ padding:18px 30px;
+ min-height:55px;
+ font:10px var(--mono);
+ letter-spacing:2px;
+ cursor:pointer;
+ overflow:hidden;
+ backdrop-filter:blur(12px);
+ transition:.3s;
+}
+#enter:before{
+ content:"";
+ position:absolute;
+ inset:0;
+ background:linear-gradient(100deg,transparent,#a78bfa55,transparent);
+ transform:translateX(-110%);
+ transition:transform .7s;
 }
 #enter:hover{
-  color:#08080d;
-  background:white;
-  transform:translateY(-4px);
-  box-shadow:0 0 50px rgba(130,170,255,.3);
+ transform:translateY(-3px);
+ border-color:white;
+ box-shadow:0 0 35px #a78bfa66;
 }
-.intro-footer{
-  position:absolute;
-  bottom:28px;
-  left:0;right:0;
-  text-align:center;
-  font-size:8px;
-  letter-spacing:.35em;
-  color:rgba(255,255,255,.34);
+#enter:hover:before{transform:translateX(110%)}
+.intro-note{
+ margin-top:25px;
+ font:9px var(--mono);
+ letter-spacing:2px;
+ color:#777488;
 }
-#experience{
-  position:relative;
-  z-index:1;
-  opacity:0;
-  transition:opacity 1.4s ease;
+
+/* HUD */
+#topbar{
+ position:fixed;
+ z-index:12;
+ top:0;
+ left:0;
+ right:0;
+ padding:20px 25px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ opacity:0;
+ pointer-events:none;
+ transition:opacity .6s;
 }
-#experience.visible{opacity:1}
-.scene{
-  position:relative;
-  height:125svh;
-  min-height:650px;
-  width:100%;
-}
-.hud{
-  position:fixed;
-  z-index:8;
-  top:24px;left:25px;right:25px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  opacity:0;
-  transition:opacity .8s;
-  pointer-events:none;
-}
-.hud.show{opacity:1}
+#topbar.show{opacity:1}
 .brand{
-  font-size:9px;
-  font-weight:600;
-  letter-spacing:.25em;
-  color:rgba(255,255,255,.6);
+ font:10px var(--mono);
+ letter-spacing:2px;
 }
-.hud-right{
-  display:flex;
-  align-items:center;
-  gap:17px;
+#world-status{
+ color:#c4b5fd;
+ font:9px var(--mono);
+ letter-spacing:2px;
 }
-#counter{
-  font-size:10px;
-  letter-spacing:.2em;
-  color:rgba(255,255,255,.6);
+#progress{
+ position:fixed;
+ z-index:16;
+ top:0;
+ left:0;
+ height:2px;
+ width:0;
+ background:linear-gradient(90deg,#a78bfa,#67e8f9,#f0abfc);
+ box-shadow:0 0 15px #a78bfa;
 }
-#sound{
-  pointer-events:auto;
-  border:1px solid rgba(255,255,255,.22);
-  border-radius:50px;
-  padding:9px 13px;
-  color:white;
-  background:rgba(0,0,0,.25);
-  font-size:9px;
-  letter-spacing:.15em;
-  cursor:pointer;
-  backdrop-filter:blur(12px);
+.hud-button{
+ position:fixed;
+ z-index:15;
+ top:60px;
+ right:18px;
+ display:none;
+ padding:10px 13px;
+ background:#0b0b14dd;
+ border:1px solid #ffffff35;
+ backdrop-filter:blur(12px);
+ font:9px var(--mono);
+ letter-spacing:1px;
+ cursor:pointer;
 }
+.hud-button.show{display:block}
 #scroll-hint{
-  position:fixed;
-  z-index:8;
-  bottom:24px;
-  left:50%;
-  transform:translateX(-50%);
-  font-size:8px;
-  letter-spacing:.3em;
-  color:rgba(255,255,255,.42);
-  text-align:center;
-  opacity:0;
-  transition:opacity .8s;
-  pointer-events:none;
+ position:fixed;
+ z-index:10;
+ bottom:20px;
+ left:50%;
+ transform:translateX(-50%);
+ color:#ffffff88;
+ font:9px var(--mono);
+ letter-spacing:3px;
+ opacity:0;
+ transition:opacity .5s;
+ pointer-events:none;
+ white-space:nowrap;
 }
 #scroll-hint.show{opacity:1}
-#scroll-hint:after{
-  content:"";
-  display:block;
-  width:1px;height:25px;
-  margin:12px auto 0;
-  background:linear-gradient(white,transparent);
+#scroll-hint span{
+ display:inline-block;
+ animation:bob 1.5s infinite;
 }
-.end-section{
-  height:100svh;
-  min-height:650px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+@keyframes bob{50%{transform:translateY(5px)}}
+
+/* SCENES */
+#experience{position:relative;z-index:2}
+.scene{
+ position:relative;
+ min-height:100svh;
+ height:100svh;
+ display:flex;
+ align-items:flex-end;
+ padding:clamp(25px,6vw,80px);
+ border-bottom:1px solid #ffffff09;
+ isolation:isolate;
 }
-.end-copy{
-  text-align:center;
-  position:relative;
-  z-index:2;
-  padding:25px;
+.scene:before{
+ content:"";
+ position:absolute;
+ inset:0;
+ background:linear-gradient(0deg,#05050ae8 0%,#05050a55 30%,transparent 75%);
+ pointer-events:none;
 }
-.end-copy h2{
-  font-size:clamp(36px,8vw,85px);
-  letter-spacing:-.07em;
-  margin:0 0 15px;
+.scene-copy{
+ position:relative;
+ z-index:2;
+ max-width:440px;
 }
-.end-copy p{
-  color:var(--muted);
-  font-size:10px;
-  letter-spacing:.3em;
+.scene-label{
+ font:10px var(--mono);
+ letter-spacing:3px;
+ color:var(--accent,#c4b5fd);
+ margin-bottom:14px;
 }
-@media(max-width:650px){
-  .intro-copy{margin-top:155px}
-  .intro-label{font-size:8px;letter-spacing:.3em}
-  .intro-title{font-size:clamp(36px,10vw,58px)}
-  .intro-tag{font-size:8px;letter-spacing:.24em}
-  #enter{padding:14px 22px;font-size:8px}
-  .hud{top:17px;left:14px;right:14px}
-  .brand{font-size:7px;letter-spacing:.14em}
-  .hud-right{gap:9px}
-  #counter{font-size:8px}
-  #sound{font-size:8px;padding:8px 10px}
-  .scene{height:110svh;min-height:580px}
+.scene h2{
+ font-size:clamp(30px,5vw,57px);
+ font-weight:500;
+ letter-spacing:-.06em;
+ line-height:1;
+ margin:0;
+}
+.scene p{
+ color:#aaa9b8;
+ font-size:12px;
+ line-height:1.8;
+ max-width:340px;
+ margin-top:13px;
+}
+.scene-index{
+ position:absolute;
+ right:clamp(25px,6vw,80px);
+ bottom:clamp(25px,6vw,80px);
+ font:9px var(--mono);
+ letter-spacing:2px;
+ color:#ffffff70;
+ z-index:2;
+}
+#chapter-nav{
+ position:fixed;
+ z-index:13;
+ right:18px;
+ top:50%;
+ transform:translateY(-50%);
+ display:none;
+ flex-direction:column;
+ gap:10px;
+}
+#chapter-nav.show{display:flex}
+.chapter-dot{
+ width:5px;
+ height:5px;
+ border:0;
+ border-radius:50%;
+ background:#ffffff55;
+ padding:0;
+ cursor:pointer;
+}
+.chapter-dot.active{
+ background:#d8ccff;
+ transform:scale(1.8);
+ box-shadow:0 0 10px #a78bfa;
+}
+
+/* END */
+.end{
+ min-height:100svh;
+ position:relative;
+ z-index:2;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ text-align:center;
+ padding:40px 20px;
+ background:radial-gradient(ellipse at center,#1c1633,#05050a 70%);
+}
+.end h2{
+ font-size:clamp(45px,10vw,110px);
+ line-height:.88;
+ letter-spacing:-.08em;
+ margin:25px 0;
+ background:linear-gradient(100deg,#fff,#a78bfa,#67e8f9);
+ background-clip:text;
+ -webkit-background-clip:text;
+ color:transparent;
+}
+.end p{
+ font:10px var(--mono);
+ letter-spacing:3px;
+ color:#aaa;
+}
+.end button{
+ margin-top:35px;
+ padding:15px 23px;
+ background:transparent;
+ border:1px solid #ffffff66;
+ font:10px var(--mono);
+ letter-spacing:2px;
+ cursor:pointer;
+}
+#loading{
+ position:fixed;
+ inset:0;
+ z-index:50;
+ background:#05050a;
+ display:grid;
+ place-items:center;
+ transition:opacity .6s,visibility .6s;
+}
+#loading.done{
+ opacity:0;
+ visibility:hidden;
+ pointer-events:none;
+}
+.loader{
+ font:10px var(--mono);
+ letter-spacing:3px;
+ color:#c4b5fd;
+ text-align:center;
+}
+.loader-line{
+ width:170px;
+ height:1px;
+ background:#ffffff22;
+ margin:18px auto;
+ overflow:hidden;
+}
+.loader-line:after{
+ content:"";
+ display:block;
+ width:35%;
+ height:100%;
+ background:#c4b5fd;
+ animation:loading 1s infinite;
+}
+@keyframes loading{
+ from{transform:translateX(-110%)}
+ to{transform:translateX(400%)}
+}
+
+@media(max-width:600px){
+ .scene{padding:25px 22px;min-height:620px}
+ .scene-index{right:22px;bottom:27px}
+ #topbar{padding:15px}
+ #chapter-nav{right:8px;gap:9px}
+ .hud-button{right:12px;top:53px}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
 </style>
-
-<script type="importmap">
-{
-  "imports":{
-    "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
 </head>
 
-<body class="intro-lock">
+<body class="lock">
 
-<div id="world"></div>
-<div id="shade"></div>
-<div id="noise"></div>
-
-<div id="intro">
-  <div class="intro-bg">
-    <div class="orbit"></div>
-    <div class="portal-hole"></div>
-  </div>
-  <div class="intro-copy">
-    <div class="intro-label">AN EXPERIMENTAL DIGITAL UNIVERSE</div>
-    <h1 class="intro-title">MAMUN<br>CODING FANTASY</h1>
-    <div class="intro-tag">WHEN IMAGINATION MEETS PYTHON</div>
-    <button id="enter">ENTER THE EXPERIENCE&nbsp; ↗</button>
-  </div>
-  <div class="intro-footer">A JOURNEY BEYOND ORDINARY DIMENSIONS</div>
+<div id="universe">
+ <div id="fallback">INITIALIZING THE DIGITAL UNIVERSE</div>
 </div>
 
-<div class="hud" id="hud">
-  <div class="brand">MAMUN / CODING FANTASY</div>
-  <div class="hud-right">
-    <div id="counter">01 / 25</div>
-    <button id="sound">SOUND ON</button>
-  </div>
+<div id="loading">
+ <div class="loader">
+  PREPARING YOUR UNIVERSE
+  <div class="loader-line"></div>
+  <span id="load-text">INITIALIZING GRAPHICS</span>
+ </div>
 </div>
-<div id="scroll-hint">SCROLL TO EXPLORE</div>
+
+<section id="intro">
+ <div class="intro-grid"></div>
+ <div class="portal">
+  <div class="portal-ring"></div>
+  <div class="portal-ring"></div>
+  <div class="portal-ring"></div>
+  <div class="portal-core"></div>
+ </div>
+ <div class="intro-content">
+  <div class="eyebrow">AN EXPERIMENTAL DIGITAL UNIVERSE</div>
+  <h1 class="hero-title">MAMUN<br>CODING<br>FANTASY</h1>
+  <div class="hero-sub">WHEN IMAGINATION MEETS PYTHON</div>
+  <div class="intro-line"></div>
+  <button id="enter" onclick="window.enterFantasy()">
+   ENTER THE EXPERIENCE ↗
+  </button>
+  <div class="intro-note">25 WORLDS · ONE CONTINUOUS JOURNEY</div>
+ </div>
+</section>
+
+<header id="topbar">
+ <div class="brand">MAMUN / CODING FANTASY</div>
+ <div id="world-status">WORLD 01 / 25</div>
+</header>
+
+<div id="progress"></div>
+<button class="hud-button" id="sound">♫ SOUND OFF</button>
+<nav id="chapter-nav"></nav>
+<div id="scroll-hint">SCROLL TO EXPLORE <span>↓</span></div>
 
 <audio id="music" src="music.mp3" loop preload="none"></audio>
 
 <main id="experience">
 
-  <section class="scene" data-name="Portal"></section>
-  <section class="scene" data-name="Bloom"></section>
-  <section class="scene" data-name="Liquid"></section>
-  <section class="scene" data-name="Singularity"></section>
-  <section class="scene" data-name="Wave"></section>
-  <section class="scene" data-name="Crystal"></section>
-  <section class="scene" data-name="Magnetic"></section>
-  <section class="scene" data-name="Dimension"></section>
-  <section class="scene" data-name="Aurora"></section>
-  <section class="scene" data-name="DNA"></section>
-  <section class="scene" data-name="Glass"></section>
-  <section class="scene" data-name="Fractal"></section>
-  <section class="scene" data-name="Organic"></section>
-  <section class="scene" data-name="Energy"></section>
-  <section class="scene" data-name="Geometry"></section>
-  <section class="scene" data-name="Monochrome"></section>
-  <section class="scene" data-name="Quantum"></section>
-  <section class="scene" data-name="Tunnel"></section>
-  <section class="scene" data-name="Orbit"></section>
-  <section class="scene" data-name="Architecture"></section>
-  <section class="scene" data-name="Metamorphosis"></section>
-  <section class="scene" data-name="Particle Rain"></section>
-  <section class="scene" data-name="Floating Worlds"></section>
-  <section class="scene" data-name="Vortex"></section>
-  <section class="scene" data-name="Infinity"></section>
+<section class="scene" data-world="0" style="--accent:#c4b5fd">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 01 / 25</div>
+  <h2>Dimensional Portal</h2>
+  <p>Cross the boundary between known space and impossible realities.</p>
+ </div>
+ <div class="scene-index">01 — THE GATE</div>
+</section>
 
-  <section class="end-section">
-    <div class="end-copy">
-      <h2>ENDLESS<br>IMAGINATION.</h2>
-      <p>WHEN IMAGINATION MEETS PYTHON</p>
-    </div>
-  </section>
+<section class="scene" data-world="1" style="--accent:#6ee7b7">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 02 / 25</div>
+  <h2>Digital Eden</h2>
+  <p>An artificial ecosystem where organic growth follows the language of code.</p>
+ </div>
+ <div class="scene-index">02 — EDEN</div>
+</section>
+
+<section class="scene" data-world="2" style="--accent:#67e8f9">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 03 / 25</div>
+  <h2>Liquid Dimension</h2>
+  <p>A fluid sculpture bending and reshaping its own surface.</p>
+ </div>
+ <div class="scene-index">03 — LIQUID</div>
+</section>
+
+<section class="scene" data-world="3" style="--accent:#d8b4fe">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 04 / 25</div>
+  <h2>Event Horizon</h2>
+  <p>Light curves around an invisible centre in a cosmic gravitational ballet.</p>
+ </div>
+ <div class="scene-index">04 — HORIZON</div>
+</section>
+
+<section class="scene" data-world="4" style="--accent:#fb7185">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 05 / 25</div>
+  <h2>Wave Symphony</h2>
+  <p>Mathematical waves become a living topography of light and motion.</p>
+ </div>
+ <div class="scene-index">05 — WAVES</div>
+</section>
+
+<section class="scene" data-world="5" style="--accent:#93c5fd">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 06 / 25</div>
+  <h2>Crystal Explosion</h2>
+  <p>Geometric fragments drift through a suspended field of refracted energy.</p>
+ </div>
+ <div class="scene-index">06 — CRYSTAL</div>
+</section>
+
+<section class="scene" data-world="6" style="--accent:#fbbf24">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 07 / 25</div>
+  <h2>Magnetic Field</h2>
+  <p>Invisible forces reveal themselves through charged lines and particles.</p>
+ </div>
+ <div class="scene-index">07 — MAGNETISM</div>
+</section>
+
+<section class="scene" data-world="7" style="--accent:#c4b5fd">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 08 / 25</div>
+  <h2>Infinite Dimension</h2>
+  <p>Repeating structures fold inward to create a hypnotic geometric continuum.</p>
+ </div>
+ <div class="scene-index">08 — INFINITY</div>
+</section>
+
+<section class="scene" data-world="8" style="--accent:#5eead4">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 09 / 25</div>
+  <h2>Aurora Ribbons</h2>
+  <p>Celestial ribbons flow through a quiet atmosphere of luminous colour.</p>
+ </div>
+ <div class="scene-index">09 — AURORA</div>
+</section>
+
+<section class="scene" data-world="9" style="--accent:#f9a8d4">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 10 / 25</div>
+  <h2>DNA Dimension</h2>
+  <p>The architecture of life becomes a kinetic sculpture.</p>
+ </div>
+ <div class="scene-index">10 — DNA</div>
+</section>
+
+<section class="scene" data-world="10" style="--accent:#a5f3fc">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 11 / 25</div>
+  <h2>Glass Planet</h2>
+  <p>A translucent world suspended inside delicate orbital structures.</p>
+ </div>
+ <div class="scene-index">11 — GLASS</div>
+</section>
+
+<section class="scene" data-world="11" style="--accent:#86efac">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 12 / 25</div>
+  <h2>Fractal Tree</h2>
+  <p>Simple recursive rules grow into a complex branching organism.</p>
+ </div>
+ <div class="scene-index">12 — FRACTAL</div>
+</section>
+
+<section class="scene" data-world="12" style="--accent:#bef264">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 13 / 25</div>
+  <h2>Organic Garden</h2>
+  <p>Procedural forms bloom, bend and breathe in a synthetic botanical space.</p>
+ </div>
+ <div class="scene-index">13 — ORGANIC</div>
+</section>
+
+<section class="scene" data-world="13" style="--accent:#fb923c">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 14 / 25</div>
+  <h2>Plasma Energy</h2>
+  <p>Electric filaments orbit a core of incandescent motion.</p>
+ </div>
+ <div class="scene-index">14 — PLASMA</div>
+</section>
+
+<section class="scene" data-world="14" style="--accent:#f0abfc">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 15 / 25</div>
+  <h2>Geometry Machine</h2>
+  <p>A mechanical system of rotating forms, interlocking planes and rhythm.</p>
+ </div>
+ <div class="scene-index">15 — MACHINE</div>
+</section>
+
+<section class="scene" data-world="15" style="--accent:#e5e7eb">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 16 / 25</div>
+  <h2>Monochrome World</h2>
+  <p>Shape, contrast and movement stripped down to their essential language.</p>
+ </div>
+ <div class="scene-index">16 — MONOCHROME</div>
+</section>
+
+<section class="scene" data-world="16" style="--accent:#f0abfc">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 17 / 25</div>
+  <h2>Quantum Garden</h2>
+  <p>A probabilistic cloud of points explores the beauty of uncertainty.</p>
+ </div>
+ <div class="scene-index">17 — QUANTUM</div>
+</section>
+
+<section class="scene" data-world="17" style="--accent:#60a5fa">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 18 / 25</div>
+  <h2>Infinite Tunnel</h2>
+  <p>Perspective collapses into a passage of endlessly receding geometry.</p>
+ </div>
+ <div class="scene-index">18 — TUNNEL</div>
+</section>
+
+<section class="scene" data-world="18" style="--accent:#fcd34d">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 19 / 25</div>
+  <h2>Celestial Orbits</h2>
+  <p>A miniature orbital system turns in a quiet field of stars.</p>
+ </div>
+ <div class="scene-index">19 — ORBITS</div>
+</section>
+
+<section class="scene" data-world="19" style="--accent:#c4b5fd">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 20 / 25</div>
+  <h2>Impossible Architecture</h2>
+  <p>Spatial illusions create structures that seem to contradict themselves.</p>
+ </div>
+ <div class="scene-index">20 — ARCHITECTURE</div>
+</section>
+
+<section class="scene" data-world="20" style="--accent:#fda4af">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 21 / 25</div>
+  <h2>Metamorphosis</h2>
+  <p>One shape dissolves into another through continuous transformation.</p>
+ </div>
+ <div class="scene-index">21 — CHANGE</div>
+</section>
+
+<section class="scene" data-world="21" style="--accent:#93c5fd">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 22 / 25</div>
+  <h2>Particle Rain</h2>
+  <p>A field of falling light creates depth, rhythm and scale.</p>
+ </div>
+ <div class="scene-index">22 — PARTICLES</div>
+</section>
+
+<section class="scene" data-world="22" style="--accent:#5eead4">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 23 / 25</div>
+  <h2>Floating Worlds</h2>
+  <p>Small isolated realities drift through an immense, silent cosmos.</p>
+ </div>
+ <div class="scene-index">23 — WORLDS</div>
+</section>
+
+<section class="scene" data-world="23" style="--accent:#e879f9">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 24 / 25</div>
+  <h2>Particle Vortex</h2>
+  <p>Thousands of points spiral between order and beautiful chaos.</p>
+ </div>
+ <div class="scene-index">24 — VORTEX</div>
+</section>
+
+<section class="scene" data-world="24" style="--accent:#a78bfa">
+ <div class="scene-copy">
+  <div class="scene-label">WORLD 25 / 25</div>
+  <h2>Infinity Core</h2>
+  <p>Every visual language converges into one final luminous structure.</p>
+ </div>
+ <div class="scene-index">25 — THE CORE</div>
+</section>
+
+<section class="end">
+ <div class="eyebrow">END OF THE JOURNEY / BEGINNING OF AN IDEA</div>
+ <h2>BEYOND<br>IMAGINATION.</h2>
+ <p>BUILT WITH CURIOSITY · POWERED BY CREATIVITY</p>
+ <button onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  RETURN TO THE BEGINNING ↑
+ </button>
+</section>
 
 </main>
 
+<script>
+/* =========================================================
+   INTRO FALLBACK
+   This function is deliberately independent of Three.js.
+========================================================= */
+window.enterFantasy=function(){
+ document.body.classList.remove("lock");
+ document.getElementById("intro").classList.add("hide");
+ document.getElementById("topbar").classList.add("show");
+ document.getElementById("sound").classList.add("show");
+ document.getElementById("chapter-nav").classList.add("show");
+ document.getElementById("scroll-hint").classList.add("show");
+
+ const audio=document.getElementById("music");
+ audio.volume=.4;
+ audio.play().then(()=>{
+  document.getElementById("sound").textContent="♫ SOUND ON";
+ }).catch(()=>{
+  document.getElementById("sound").textContent="♫ SOUND OFF";
+ });
+
+ window.scrollTo(0,0);
+};
+
+/* SOUND CONTROL */
+document.getElementById("sound").addEventListener("click",async()=>{
+ const audio=document.getElementById("music");
+ const button=document.getElementById("sound");
+
+ if(audio.paused){
+  try{
+   await audio.play();
+   button.textContent="♫ SOUND ON";
+  }catch(error){
+   button.textContent="♫ AUDIO UNAVAILABLE";
+  }
+ }else{
+  audio.pause();
+  button.textContent="♫ SOUND OFF";
+ }
+});
+
+window.addEventListener("scroll",()=>{
+ if(window.scrollY>100){
+  document.getElementById("scroll-hint").style.opacity="0";
+ }
+},{passive:true});
+</script>
+
 <script type="module">
-import * as THREE from 'three';
-import { gsap } from 'https://esm.sh/gsap@3.12.5';
-import { ScrollTrigger } from 'https://esm.sh/gsap@3.12.5/ScrollTrigger';
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js";
 
-gsap.registerPlugin(ScrollTrigger);
-
-/* =========================================
+/* =========================================================
    CORE ENGINE
-========================================= */
+========================================================= */
+const root=document.getElementById("universe");
+const loading=document.getElementById("loading");
+const loadText=document.getElementById("load-text");
+const status=document.getElementById("world-status");
 
-const host=document.querySelector('#world');
-const sections=[...document.querySelectorAll('.scene')];
-const counter=document.querySelector('#counter');
-const intro=document.querySelector('#intro');
-const experience=document.querySelector('#experience');
-const hud=document.querySelector('#hud');
-const hint=document.querySelector('#scroll-hint');
-const music=document.querySelector('#music');
-const soundButton=document.querySelector('#sound');
+const isMobile=window.matchMedia("(max-width:700px)").matches;
+const reduceMotion=window.matchMedia("(prefers-reduced-motion:reduce)").matches;
 
-const mobile=matchMedia('(max-width:700px)').matches;
-const quality=mobile?0.55:1;
-const particleScale=mobile?0.48:1;
+let renderer;
+let scene;
+let camera;
+let clock;
+let worlds=[];
+let activeWorld=-1;
+let starfield;
+let started=false;
+let pointer={x:0,y:0,tx:0,ty:0};
 
-const renderer=new THREE.WebGLRenderer({
-  antialias:!mobile,
-  alpha:false,
-  powerPreference:'high-performance'
-});
-renderer.setPixelRatio(Math.min(devicePixelRatio||1,mobile?1.35:1.8));
-renderer.setSize(innerWidth,innerHeight);
-renderer.outputColorSpace=THREE.SRGBColorSpace;
-renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.3;
-host.appendChild(renderer.domElement);
-
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x03040a);
-scene.fog=new THREE.FogExp2(0x03040a,.025);
-
-const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,180);
-camera.position.set(0,0,10);
-
-const ambient=new THREE.AmbientLight(0xffffff,1.2);
-scene.add(ambient);
-
-const lightA=new THREE.PointLight(0x8c76ff,100,60);
-lightA.position.set(5,6,8);
-scene.add(lightA);
-
-const lightB=new THREE.PointLight(0x00d9ff,90,60);
-lightB.position.set(-6,-3,-5);
-scene.add(lightB);
-
-const lightC=new THREE.PointLight(0xff8bc8,45,40);
-lightC.position.set(0,5,-7);
-scene.add(lightC);
-
-const world=new THREE.Group();
-scene.add(world);
-
-let active=-1;
-let clock=0;
-let progress=0;
-let updateScene=()=>{};
-let objects=[];
-let soundEnabled=true;
-let targetCamera=new THREE.Vector3(0,0,9.5);
-let targetLook=new THREE.Vector3(0,0,0);
-
-const palettes=[
- [0x8068ff,0x00dfff,0xe7dcff],
- [0xff75bb,0xffd2e9,0x9b72ff],
- [0x00d9ff,0x176dff,0xf0ffff],
- [0xff8c55,0xffcf76,0xff548c],
- [0x76e9ff,0x547bff,0xe8ffff],
- [0xb38bff,0x6c55ff,0xf3eaff],
- [0x7affc6,0x2d9d87,0xd6fff1],
- [0xffd0a0,0xff7c87,0xffffff],
- [0x7cfff2,0x6c9aff,0xffffff],
- [0xff86bd,0x76dcff,0xffffff],
- [0xa4cfff,0xffffff,0x9d91ff],
- [0xc5a1ff,0x6e4cff,0xffffff],
- [0xa6ff8e,0x4ad9a5,0xffffff],
- [0xffb06c,0xff647c,0xffe7a0],
- [0x9ca9ff,0x5b6bff,0xffffff],
- [0xe9e9ee,0x8b8d99,0xffffff],
- [0xffa8df,0x9276ff,0xffffff],
- [0x75eaff,0x6e7cff,0xffffff],
- [0xffd37a,0xff8a65,0xffffff],
- [0x90b7ff,0xd6efff,0xffffff],
- [0xff91ad,0xa47aff,0xffffff],
- [0x80edff,0xffd16c,0xffffff],
- [0xbaff8d,0x79baff,0xffffff],
- [0xff9c70,0xb78bff,0xffffff],
- [0x9baaff,0x52e6ff,0xffffff]
+const colors=[
+ ["#a78bfa","#67e8f9","#f0abfc"],
+ ["#34d399","#bef264","#60a5fa"],
+ ["#22d3ee","#818cf8","#f0abfc"],
+ ["#8b5cf6","#c084fc","#38bdf8"],
+ ["#fb7185","#fbbf24","#a78bfa"],
+ ["#93c5fd","#e0f2fe","#818cf8"],
+ ["#fbbf24","#fb923c","#fde68a"],
+ ["#c4b5fd","#818cf8","#67e8f9"],
+ ["#5eead4","#60a5fa","#a78bfa"],
+ ["#f9a8d4","#c084fc","#67e8f9"],
+ ["#a5f3fc","#e0e7ff","#93c5fd"],
+ ["#86efac","#bef264","#34d399"],
+ ["#bef264","#4ade80","#f0abfc"],
+ ["#fb923c","#f43f5e","#fbbf24"],
+ ["#f0abfc","#818cf8","#67e8f9"],
+ ["#f8fafc","#94a3b8","#cbd5e1"],
+ ["#f0abfc","#c084fc","#67e8f9"],
+ ["#60a5fa","#818cf8","#c4b5fd"],
+ ["#fcd34d","#f59e0b","#93c5fd"],
+ ["#c4b5fd","#e9d5ff","#67e8f9"],
+ ["#fda4af","#f0abfc","#a78bfa"],
+ ["#93c5fd","#67e8f9","#c4b5fd"],
+ ["#5eead4","#a5f3fc","#60a5fa"],
+ ["#e879f9","#a78bfa","#67e8f9"],
+ ["#a78bfa","#67e8f9","#f0abfc"]
 ];
 
-function register(obj){
-  world.add(obj);
-  objects.push(obj);
-  return obj;
+const rand=(a,b)=>a+Math.random()*(b-a);
+const color=(value)=>new THREE.Color(value);
+const material=(c,rough=.35,metal=.25)=>new THREE.MeshStandardMaterial({
+ color:c,roughness:rough,metalness:metal
+});
+
+function initializeRenderer(){
+ renderer=new THREE.WebGLRenderer({
+  antialias:!isMobile,
+  alpha:true,
+  powerPreference:"high-performance"
+ });
+
+ renderer.setPixelRatio(Math.min(devicePixelRatio||1,isMobile?1.3:1.8));
+ renderer.setSize(innerWidth,innerHeight);
+ renderer.outputColorSpace=THREE.SRGBColorSpace;
+ renderer.toneMapping=THREE.ACESFilmicToneMapping;
+ renderer.toneMappingExposure=1.15;
+ root.appendChild(renderer.domElement);
+
+ scene=new THREE.Scene();
+ scene.fog=new THREE.FogExp2(0x05050a,.012);
+
+ camera=new THREE.PerspectiveCamera(43,innerWidth/innerHeight,.1,2000);
+ camera.position.set(0,0,14.5);
+
+ clock=new THREE.Clock();
+
+ scene.add(new THREE.AmbientLight(0xffffff,.5));
+
+ const key=new THREE.PointLight(0xc4b5fd,65,100);
+ key.position.set(5,7,9);
+ scene.add(key);
+
+ const fill=new THREE.PointLight(0x67e8f9,35,100);
+ fill.position.set(-8,-4,-5);
+ scene.add(fill);
 }
-function material(color,metalness=.45,roughness=.22,emissive=0x000000){
-  return new THREE.MeshPhysicalMaterial({
-    color,
-    metalness,
-    roughness,
-    emissive,
-    emissiveIntensity:.45,
-    clearcoat:.9,
-    clearcoatRoughness:.12
+
+/* =========================================================
+   SHARED GEOMETRY HELPERS
+========================================================= */
+function addGlow(group,c,intensity=1){
+ const light=new THREE.PointLight(c,intensity*22,35);
+ light.position.set(0,0,1);
+ group.add(light);
+}
+
+function addStars(group,count=600,spread=60){
+ const positions=new Float32Array(count*3);
+ const geometry=new THREE.BufferGeometry();
+
+ for(let i=0;i<count;i++){
+  positions[i*3]=rand(-spread,spread);
+  positions[i*3+1]=rand(-spread,spread);
+  positions[i*3+2]=rand(-spread,spread);
+ }
+
+ geometry.setAttribute("position",new THREE.BufferAttribute(positions,3));
+
+ const points=new THREE.Points(
+  geometry,
+  new THREE.PointsMaterial({
+   color:0xffffff,
+   size:isMobile?.065:.09,
+   transparent:true,
+   opacity:.8,
+   sizeAttenuation:true
+  })
+ );
+
+ group.add(points);
+ return points;
+}
+
+function addParticles(group,count,c1,c2,spread=7){
+ const positions=new Float32Array(count*3);
+ const cols=new Float32Array(count*3);
+ const ca=color(c1);
+ const cb=color(c2);
+
+ for(let i=0;i<count;i++){
+  const k=i*3;
+  positions[k]=rand(-spread,spread);
+  positions[k+1]=rand(-spread,spread);
+  positions[k+2]=rand(-spread,spread);
+
+  const cc=ca.clone().lerp(cb,Math.random());
+  cols[k]=cc.r;
+  cols[k+1]=cc.g;
+  cols[k+2]=cc.b;
+ }
+
+ const geo=new THREE.BufferGeometry();
+ geo.setAttribute("position",new THREE.BufferAttribute(positions,3));
+ geo.setAttribute("color",new THREE.BufferAttribute(cols,3));
+
+ const points=new THREE.Points(
+  geo,
+  new THREE.PointsMaterial({
+   size:isMobile?.045:.06,
+   vertexColors:true,
+   transparent:true,
+   opacity:.85,
+   depthWrite:false
+  })
+ );
+
+ group.add(points);
+ return points;
+}
+
+function addTorus(group,r,tube,c){
+ const mesh=new THREE.Mesh(
+  new THREE.TorusGeometry(r,tube,12,120),
+  new THREE.MeshStandardMaterial({
+   color:c,
+   metalness:.65,
+   roughness:.25,
+   emissive:c,
+   emissiveIntensity:.12
+  })
+ );
+ group.add(mesh);
+ return mesh;
+}
+
+function addWireSphere(group,r,c,detail=2){
+ const mesh=new THREE.Mesh(
+  new THREE.IcosahedronGeometry(r,detail),
+  new THREE.MeshBasicMaterial({
+   color:c,
+   wireframe:true,
+   transparent:true,
+   opacity:.65
+  })
+ );
+ group.add(mesh);
+ return mesh;
+}
+
+function addTube(group,points,c,radius=.025){
+ const curve=new THREE.CatmullRomCurve3(points);
+ const mesh=new THREE.Mesh(
+  new THREE.TubeGeometry(curve,150,radius,8,false),
+  material(c,.25,.45)
+ );
+ group.add(mesh);
+ return mesh;
+}
+
+function addCrystal(group,x,y,z,size,c){
+ const mesh=new THREE.Mesh(
+  new THREE.OctahedronGeometry(size,0),
+  material(c,.16,.7)
+ );
+ mesh.position.set(x,y,z);
+ group.add(mesh);
+ return mesh;
+}
+
+function addKnot(group,c){
+ const mesh=new THREE.Mesh(
+  new THREE.TorusKnotGeometry(2,.055,240,12,2,3),
+  material(c,.2,.75)
+ );
+ group.add(mesh);
+ return mesh;
+}
+
+/* =========================================================
+   SHADER WORLDS
+========================================================= */
+function createLiquidShader(group,c1,c2){
+ const geometry=new THREE.IcosahedronGeometry(2.2,5);
+
+ const shader=new THREE.ShaderMaterial({
+  uniforms:{
+   time:{value:0},
+   ca:{value:color(c1)},
+   cb:{value:color(c2)}
+  },
+  vertexShader:`
+   uniform float time;
+   varying float wave;
+   varying vec3 normalView;
+
+   void main(){
+    vec3 p=position;
+    float n=
+      sin(p.x*2.2+time)*
+      cos(p.y*2.0-time*.8)*
+      sin(p.z*2.5+time*.5);
+
+    p+=normal*n*.17;
+    wave=n;
+    normalView=normalize(normalMatrix*normal);
+
+    gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);
+   }
+  `,
+  fragmentShader:`
+   uniform vec3 ca;
+   uniform vec3 cb;
+   varying float wave;
+   varying vec3 normalView;
+
+   void main(){
+    float edge=pow(1.0-abs(dot(normalize(normalView),vec3(0.,0.,1.))),2.0);
+    vec3 col=mix(ca,cb,clamp(wave*.6+.5,0.,1.));
+    col+=edge*.55;
+    gl_FragColor=vec4(col,1.0);
+   }
+  `
+ });
+
+ const mesh=new THREE.Mesh(geometry,shader);
+ group.add(mesh);
+ return mesh;
+}
+
+function createWavePlane(group,c1,c2){
+ const geometry=new THREE.PlaneGeometry(15,10,100,75);
+
+ const shader=new THREE.ShaderMaterial({
+  uniforms:{
+   time:{value:0},
+   ca:{value:color(c1)},
+   cb:{value:color(c2)}
+  },
+  vertexShader:`
+   uniform float time;
+   varying float wave;
+   varying vec2 uvPoint;
+
+   void main(){
+    uvPoint=uv;
+    vec3 p=position;
+    float a=sin(p.x*1.3+time)*.28;
+    float b=cos(p.y*1.7-time)*.22;
+    float c=sin((p.x+p.y)*.8+time*.7)*.18;
+    p.z+=a+b+c;
+    wave=a+b+c;
+    gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);
+   }
+  `,
+  fragmentShader:`
+   uniform vec3 ca;
+   uniform vec3 cb;
+   varying float wave;
+   varying vec2 uvPoint;
+
+   void main(){
+    vec3 col=mix(ca,cb,clamp(wave+0.5,0.,1.));
+    float lines=step(.96,fract(uvPoint.x*24.))*0.12;
+    col+=lines;
+    gl_FragColor=vec4(col,.83);
+   }
+  `,
+  transparent:true,
+  side:THREE.DoubleSide
+ });
+
+ const mesh=new THREE.Mesh(geometry,shader);
+ mesh.rotation.x=-.5;
+ mesh.position.y=-1.5;
+ group.add(mesh);
+ return mesh;
+}
+
+/* =========================================================
+   WORLD CONSTRUCTION
+========================================================= */
+function buildWorld(index){
+ const group=new THREE.Group();
+ group.visible=false;
+
+ const p=colors[index];
+ const a=p[0],b=p[1],c=p[2];
+ const animations=[];
+
+ group.userData.animations=animations;
+
+ switch(index){
+
+ case 0:{
+  addStars(group,500,65);
+  for(let i=0;i<11;i++){
+   const ring=addTorus(group,1.4+i*.38,.018+(i%3)*.008,[a,b,c][i%3]);
+   ring.rotation.set(i*.2,i*.4,i*.15);
+   animations.push(t=>{
+    ring.rotation.x+=.001;
+    ring.rotation.y+=.0018;
+   });
+  }
+  const core=new THREE.Mesh(new THREE.SphereGeometry(.9,48,48),new THREE.MeshBasicMaterial({color:a}));
+  group.add(core);
+  addGlow(group,a,1.5);
+  animations.push(t=>core.scale.setScalar(1+.06*Math.sin(t*1.5)));
+  break;
+ }
+
+ case 1:{
+  addStars(group,300,45);
+
+  function branch(start,length,angle,depth){
+   if(depth===0)return;
+
+   const end=start.clone().add(
+    new THREE.Vector3(Math.sin(angle)*length,length,Math.cos(angle)*length*.2)
+   );
+
+   const stem=new THREE.Mesh(
+    new THREE.CylinderGeometry(.008*depth,.025*depth,length,6),
+    material(depth<3?b:a)
+   );
+
+   stem.position.copy(start).add(end).multiplyScalar(.5);
+   stem.quaternion.setFromUnitVectors(
+    new THREE.Vector3(0,1,0),
+    end.clone().sub(start).normalize()
+   );
+   group.add(stem);
+
+   if(depth===1){
+    const leaf=new THREE.Mesh(new THREE.IcosahedronGeometry(.16,1),material(c));
+    leaf.position.copy(end);
+    group.add(leaf);
+   }
+
+   branch(end,length*.72,angle-.55,depth-1);
+   branch(end,length*.72,angle+.55,depth-1);
+  }
+
+  for(let i=0;i<5;i++){
+   branch(new THREE.Vector3((i-2)*1.4,-3,0),1.05,0,6);
+  }
+  break;
+ }
+
+ case 2:{
+  const orb=createLiquidShader(group,a,b);
+  addGlow(group,b,1.4);
+  animations.push(t=>{
+   orb.rotation.y=t*.16;
+   orb.rotation.x=t*.1;
+   orb.material.uniforms.time.value=t;
   });
-}
-function mesh(geometry,mat,x=0,y=0,z=0){
-  const m=new THREE.Mesh(geometry,mat);
-  m.position.set(x,y,z);
-  return register(m);
-}
-function line(points,color,opacity=.7){
-  const geometry=new THREE.BufferGeometry().setFromPoints(points);
-  const m=new THREE.Line(geometry,new THREE.LineBasicMaterial({
-    color,transparent:true,opacity
-  }));
-  return register(m);
-}
-function points(count,color,size=.03,spread=8,mode='random'){
-  count=Math.floor(count*particleScale);
-  const positions=new Float32Array(count*3);
-  const seeds=new Float32Array(count);
-  for(let i=0;i<count;i++){
-    let x,y,z;
-    if(mode==='sphere'){
-      const u=Math.random()*Math.PI*2;
-      const v=Math.acos(2*Math.random()-1);
-      const r=spread*(.55+Math.random()*.45);
-      x=r*Math.sin(v)*Math.cos(u);
-      y=r*Math.sin(v)*Math.sin(u);
-      z=r*Math.cos(v);
-    }else if(mode==='ring'){
-      const a=Math.random()*Math.PI*2;
-      const r=spread*(.65+Math.random()*.35);
-      x=Math.cos(a)*r;
-      y=(Math.random()-.5)*1.4;
-      z=Math.sin(a)*r;
-    }else if(mode==='rain'){
-      x=(Math.random()-.5)*spread;
-      y=(Math.random()-.5)*spread*2;
-      z=(Math.random()-.5)*spread;
-    }else{
-      x=(Math.random()-.5)*spread*2;
-      y=(Math.random()-.5)*spread*2;
-      z=(Math.random()-.5)*spread*2;
-    }
-    positions[i*3]=x;
-    positions[i*3+1]=y;
-    positions[i*3+2]=z;
-    seeds[i]=Math.random()*10;
-  }
-  const geometry=new THREE.BufferGeometry();
-  geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));
-  geometry.setAttribute('seed',new THREE.BufferAttribute(seeds,1));
-  const p=new THREE.Points(geometry,new THREE.PointsMaterial({
-    color,size,
-    transparent:true,
-    opacity:.88,
-    blending:THREE.AdditiveBlending,
-    depthWrite:false
-  }));
-  return register(p);
-}
-function clearWorld(){
-  while(world.children.length){
-    const obj=world.children[0];
-    world.remove(obj);
-    obj.traverse?.(child=>{
-      if(child.geometry)child.geometry.dispose();
-      if(child.material){
-        if(Array.isArray(child.material)){
-          child.material.forEach(m=>m.dispose());
-        }else child.material.dispose();
-      }
-    });
-  }
-  objects=[];
-}
-function setPalette(index){
-  const p=palettes[index];
-  lightA.color.setHex(p[0]);
-  lightB.color.setHex(p[1]);
-  lightC.color.setHex(p[2]);
-}
-function sphere(radius,color,detail=2){
-  return mesh(
-    new THREE.IcosahedronGeometry(radius,detail),
-    material(color,.65,.18,color)
-  );
-}
-function torus(radius,tube,color,rotation=[0,0,0]){
-  const m=mesh(
-    new THREE.TorusGeometry(radius,tube,12,160),
-    new THREE.MeshBasicMaterial({color,transparent:true,opacity:.85})
-  );
-  m.rotation.set(...rotation);
-  return m;
-}
-function setSceneCamera(z=9.5,x=0,y=0){
-  targetCamera.set(x,y,z);
-}
-
-/* =========================================
-   SCENE 01 — DIMENSIONAL PORTAL
-========================================= */
-
-function scene01(){
-  points(1800,0x9b9aff,.035,11,'sphere');
-  const core=sphere(1.25,0x8d7aff,3);
-  const wire=mesh(
-    new THREE.IcosahedronGeometry(2.1,2),
-    new THREE.MeshBasicMaterial({color:0x5ceaff,wireframe:true})
-  );
-  const rings=[];
-  for(let i=0;i<9;i++){
-    const r=torus(2.5+i*.17,.012,i%2?0x00dfff:0xa78bff);
-    r.rotation.set(i*.22,i*.35,i*.18);
-    rings.push(r);
-  }
-  setSceneCamera(10);
-  return t=>{
-    core.rotation.y=t*.25;
-    core.scale.setScalar(1+Math.sin(t*1.2)*.06);
-    wire.rotation.x=t*.18;
-    wire.rotation.y=-t*.2;
-    rings.forEach((r,i)=>{
-      r.rotation.z+=.0007*(i%2?1:-1);
-      r.rotation.x+=.0003;
-    });
-  };
-}
-
-/* =========================================
-   SCENE 02 — DIGITAL EDEN
-========================================= */
-
-function scene02(){
-  const petals=[];
-  for(let i=0;i<48;i++){
-    const a=i*Math.PI*2/48;
-    const p=mesh(
-      new THREE.SphereGeometry(1,24,18),
-      material(i%2?0xff82c3:0xb08cff,.28,.2,0x531b60)
-    );
-    p.scale.set(.27,1.05,.12);
-    p.position.set(Math.cos(a)*1.15,Math.sin(a)*1.15,Math.sin(i*.4)*.18);
-    p.rotation.z=a-Math.PI/2;
-    petals.push(p);
-  }
-  const center=mesh(
-    new THREE.SphereGeometry(.45,40,40),
-    material(0xffe1a8,.5,.18,0x9a5721)
-  );
-  points(700,0xffa8df,.025,5,'sphere');
-  setSceneCamera(9.5);
-  return t=>{
-    world.rotation.z=Math.sin(t*.2)*.15;
-    petals.forEach((p,i)=>{
-      const a=i*Math.PI*2/48;
-      p.scale.y=1.05+Math.sin(t*1.4+i*.15)*.16;
-      p.position.z=Math.sin(t+i*.2)*.16;
-      p.rotation.z=a-Math.PI/2+Math.sin(t*.4)*.08;
-    });
-    center.scale.setScalar(1+Math.sin(t*2)*.08);
-  };
-}
-
-/* =========================================
-   SCENE 03 — LIQUID DIMENSION
-========================================= */
-
-function scene03(){
-  const geometry=new THREE.SphereGeometry(2.1,100,80);
-  const shader=new THREE.ShaderMaterial({
-    uniforms:{
-      time:{value:0},
-      colorA:{value:new THREE.Color(0x00dfff)},
-      colorB:{value:new THREE.Color(0x825dff)}
-    },
-    vertexShader:`
-      uniform float time;
-      varying vec3 vPos;
-      varying vec3 vNormal;
-      void main(){
-        vPos=position;
-        vNormal=normal;
-        vec3 p=position;
-        float wave=sin(p.x*2.0+time)*0.09+
-                   cos(p.y*2.5-time*0.7)*0.1+
-                   sin(p.z*3.0+time*0.8)*0.07;
-        p+=normal*wave;
-        gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);
-      }
-    `,
-    fragmentShader:`
-      uniform float time;
-      uniform vec3 colorA;
-      uniform vec3 colorB;
-      varying vec3 vPos;
-      varying vec3 vNormal;
-      void main(){
-        float f=sin(vPos.x*2.5+time)*cos(vPos.y*2.0-time);
-        float edge=pow(1.0-abs(dot(normalize(vNormal),vec3(0.0,0.0,1.0))),2.0);
-        vec3 c=mix(colorA,colorB,smoothstep(-.6,.8,f));
-        c+=edge*.65;
-        gl_FragColor=vec4(c,1.0);
-      }
-    `
-  });
-  const liquid=mesh(geometry,shader);
-  points(900,0x62eaff,.025,7,'sphere');
-  setSceneCamera(8.5);
-  return t=>{
-    shader.uniforms.time.value=t;
-    liquid.rotation.y=t*.15;
-    liquid.rotation.x=Math.sin(t*.3)*.15;
-  };
-}
-
-/* =========================================
-   SCENE 04 — BLACK HOLE
-========================================= */
-
-function scene04(){
-  const hole=mesh(
-    new THREE.SphereGeometry(.85,48,48),
-    new THREE.MeshBasicMaterial({color:0x010105})
-  );
-  const disk=mesh(
-    new THREE.TorusGeometry(2.1,.45,32,220),
-    material(0xff8a58,.8,.12,0x8b2100)
-  );
-  disk.scale.y=.2;
-  const ringA=torus(2.5,.025,0xffd16c,[1.2,0,0]);
-  const ringB=torus(3,.015,0xff5b9b,[1.5,.3,.4]);
-  points(1800,0xffa76f,.025,8,'ring');
-  setSceneCamera(9);
-  return t=>{
-    disk.rotation.z=t*.3;
-    disk.rotation.x=Math.sin(t*.2)*.15;
-    ringA.rotation.z=t*.1;
-    ringB.rotation.y=t*.14;
-    hole.scale.setScalar(1+Math.sin(t)*.04);
-  };
-}
-
-/* =========================================
-   SCENE 05 — WAVE SYMPHONY
-========================================= */
-
-function scene05(){
-  const geometry=new THREE.PlaneGeometry(12,12,110,110);
-  const pos=geometry.attributes.position;
-  const base=pos.array.slice();
-  const wave=mesh(
-    geometry,
-    new THREE.MeshBasicMaterial({color:0x58dfff,wireframe:true})
-  );
-  wave.rotation.x=-Math.PI/2.6;
-  setSceneCamera(10,0,1);
-  return t=>{
-    for(let i=0;i<pos.count;i++){
-      const x=base[i*3],y=base[i*3+1];
-      const z=
-        Math.sin(x*1.1+t*1.2)*.38+
-        Math.cos(y*1.35-t*.9)*.32+
-        Math.sin((x+y)*.8+t)*.16;
-      pos.setZ(i,z);
-    }
-    pos.needsUpdate=true;
-    geometry.computeVertexNormals();
-    wave.rotation.z=Math.sin(t*.25)*.06;
-  };
-}
-
-/* =========================================
-   SCENE 06 — CRYSTAL EXPLOSION
-========================================= */
-
-function scene06(){
-  const shards=[];
-  for(let i=0;i<65;i++){
-    const m=mesh(
-      new THREE.OctahedronGeometry(.3+Math.random()*.65,0),
-      material(i%3===0?0x9eeaff:i%3===1?0xa88bff:0xffffff,.8,.08)
-    );
-    m.position.set(
-      (Math.random()-.5)*6,
-      (Math.random()-.5)*6,
-      (Math.random()-.5)*5
-    );
-    m.userData={
-      x:m.position.x,
-      y:m.position.y,
-      z:m.position.z,
-      phase:Math.random()*6
-    };
-    shards.push(m);
-  }
-  points(900,0xb8c9ff,.025,8);
-  setSceneCamera(11);
-  return t=>{
-    shards.forEach((m,i)=>{
-      const d=m.userData;
-      m.rotation.x=t*.15+d.phase;
-      m.rotation.y=t*.22+d.phase;
-      m.position.y=d.y+Math.sin(t*.6+d.phase)*.28;
-      m.position.x=d.x+Math.cos(t*.35+d.phase)*.12;
-    });
-    world.rotation.y=Math.sin(t*.2)*.18;
-  };
-}
-
-/* =========================================
-   SCENE 07 — MAGNETIC FIELD
-========================================= */
-
-function scene07(){
-  for(let i=0;i<22;i++){
-    const pts=[];
-    const a=i*Math.PI*2/22;
-    for(let j=0;j<160;j++){
-      const u=j/159;
-      const r=1.3+Math.sin(u*Math.PI)*2;
-      pts.push(new THREE.Vector3(
-        Math.cos(a+u*2.2)*r,
-        (u-.5)*5,
-        Math.sin(a+u*2.2)*r
-      ));
-    }
-    line(pts,i%2?0x65eaff:0xa48cff,.7);
-  }
-  const core=sphere(.55,0x9e9aff,2);
-  points(800,0x83eaff,.025,7);
-  setSceneCamera(10);
-  return t=>{
-    world.rotation.y=t*.12;
-    world.rotation.x=Math.sin(t*.2)*.12;
-    core.scale.setScalar(1+Math.sin(t*2)*.1);
-  };
-}
-
-/* =========================================
-   SCENE 08 — INFINITE DIMENSION
-========================================= */
-
-function scene08(){
   for(let i=0;i<24;i++){
-    const m=mesh(
-      new THREE.TorusKnotGeometry(1.3+i*.035,.012,120,8,2+i%4,3+i%5),
-      new THREE.MeshBasicMaterial({color:i%2?0x00dfff:0x9878ff})
-    );
-    m.rotation.set(i*.17,i*.21,i*.14);
+   const drop=new THREE.Mesh(new THREE.SphereGeometry(.08,12,12),material(c));
+   const angle=i*Math.PI*2/24;
+   drop.position.set(Math.cos(angle)*3.2,0,Math.sin(angle)*2.5);
+   group.add(drop);
+   animations.push(t=>drop.position.y=Math.sin(t+i)*.7);
   }
-  points(1200,0x9b91ff,.025,8,'ring');
-  setSceneCamera(9);
-  return t=>{
-    world.rotation.y=t*.14;
-    world.rotation.z=Math.sin(t*.25)*.15;
-  };
-}
+  break;
+ }
 
-/* =========================================
-   SCENE 09 — AURORA RIBBONS
-========================================= */
-
-function scene09(){
-  const ribbons=[];
-  for(let k=0;k<12;k++){
-    const pts=[];
-    for(let i=0;i<160;i++){
-      const x=(i/159-.5)*11;
-      pts.push(new THREE.Vector3(x,0,0));
-    }
-    const geometry=new THREE.BufferGeometry().setFromPoints(pts);
-    const l=new THREE.Line(
-      geometry,
-      new THREE.LineBasicMaterial({
-        color:k%3===0?0x70ffd8:k%3===1?0x65aaff:0xb18aff
-      })
-    );
-    register(l);
-    ribbons.push(l);
-  }
-  setSceneCamera(11);
-  return t=>{
-    ribbons.forEach((l,k)=>{
-      const a=l.geometry.attributes.position;
-      for(let i=0;i<a.count;i++){
-        const x=(i/159-.5)*11;
-        const y=Math.sin(x*.7+t+k*.3)*.7+
-                Math.cos(x*.35-t*.7+k*.4)*.4;
-        a.setY(i,y+(k-6)*.12);
-        a.setZ(i,Math.sin(x*.4+t*.6+k)*.8);
-      }
-      a.needsUpdate=true;
-    });
-    world.rotation.y=Math.sin(t*.2)*.12;
-  };
-}
-
-/* =========================================
-   SCENE 10 — DNA DIMENSION
-========================================= */
-
-function scene10(){
-  for(let i=0;i<170;i++){
-    const y=(i-85)*.045;
-    const a=i*.15;
-    const x=Math.cos(a)*1.25;
-    const z=Math.sin(a)*1.25;
-    const p=mesh(
-      new THREE.SphereGeometry(.05,12,12),
-      material(i%2?0x78eaff:0xff8fca,.35,.2)
-    );
-    p.position.set(x,y,z);
-    if(i%5===0){
-      const q=mesh(
-        new THREE.SphereGeometry(.045,10,10),
-        material(0xffffff)
-      );
-      q.position.set(-x,y,-z);
-      line([
-        new THREE.Vector3(x,y,z),
-        new THREE.Vector3(-x,y,-z)
-      ],0xaaaaff,.35);
-    }
-  }
-  setSceneCamera(8);
-  return t=>{
-    world.rotation.y=t*.5;
-    world.position.y=Math.sin(t*.7)*.2;
-  };
-}
-
-/* =========================================
-   SCENE 11 — GLASS PLANET
-========================================= */
-
-function scene11(){
-  const glass=mesh(
-    new THREE.IcosahedronGeometry(2,4),
-    new THREE.MeshPhysicalMaterial({
-      color:0x9ddfff,
-      metalness:.05,
-      roughness:.05,
-      transmission:.75,
-      thickness:2,
-      transparent:true,
-      opacity:.9,
-      clearcoat:1
-    })
+ case 3:{
+  const hole=new THREE.Mesh(
+   new THREE.SphereGeometry(1.25,48,48),
+   new THREE.MeshBasicMaterial({color:0x010104})
   );
-  const wire=mesh(
-    new THREE.IcosahedronGeometry(2.2,2),
+  group.add(hole);
+  for(let i=0;i<13;i++){
+   const ring=addTorus(group,1.5+i*.18,.024,[a,b,c][i%3]);
+   ring.scale.y=.25;
+   ring.rotation.x=i*.04;
+   animations.push(t=>ring.rotation.z+=.001*(i%2?1:-1));
+  }
+  addGlow(group,a,2);
+  addStars(group,500,70);
+  break;
+ }
+
+ case 4:{
+  const plane=createWavePlane(group,a,b);
+  animations.push(t=>plane.material.uniforms.time.value=t);
+  break;
+ }
+
+ case 5:{
+  addStars(group,450,55);
+  for(let i=0;i<90;i++){
+   const cr=addCrystal(group,rand(-7,7),rand(-4,4),rand(-6,3),rand(.12,.48),[a,b,c][i%3]);
+   animations.push(t=>{
+    cr.rotation.x+=.002;
+    cr.rotation.y+=.003;
+    cr.position.y+=Math.sin(t+i)*.0005;
+   });
+  }
+  break;
+ }
+
+ case 6:{
+  addGlow(group,a);
+  for(let i=0;i<35;i++){
+   const points=[];
+   const angle=i*Math.PI*2/35;
+
+   for(let j=0;j<=100;j++){
+    const u=j/100;
+    const r=.2+u*6;
+    points.push(new THREE.Vector3(
+     Math.cos(angle)*r,
+     Math.sin(angle)*r*.5+Math.sin(u*10+i)*.2,
+     Math.sin(angle)*r*.25
+    ));
+   }
+
+   const line=addTube(group,points,[a,b,c][i%3],.012);
+   animations.push(t=>line.rotation.z+=.0005);
+  }
+  addParticles(group,500,a,c,7);
+  break;
+ }
+
+ case 7:{
+  for(let i=0;i<17;i++){
+   const s=1.1+i*.34;
+   const cube=new THREE.Mesh(
+    new THREE.BoxGeometry(s,s,s),
     new THREE.MeshBasicMaterial({
-      color:0x9bdfff,
-      wireframe:true,
-      transparent:true,
-      opacity:.3
+     color:[a,b,c][i%3],
+     wireframe:true,
+     transparent:true,
+     opacity:.32
     })
-  );
-  points(700,0xb4edff,.025,7);
-  setSceneCamera(9);
-  return t=>{
-    glass.rotation.y=t*.2;
-    glass.rotation.x=t*.14;
-    wire.rotation.y=-t*.18;
-    glass.scale.setScalar(1+Math.sin(t*.8)*.025);
-  };
-}
-
-/* =========================================
-   SCENE 12 — FRACTAL TREE
-========================================= */
-
-function scene12(){
-  const branch=(x,y,z,length,angle,depth)=>{
-    if(depth<=0)return;
-    const endX=x+Math.sin(angle)*length;
-    const endY=y+Math.cos(angle)*length;
-    const start=new THREE.Vector3(x,y,z);
-    const end=new THREE.Vector3(endX,endY,z);
-    line([start,end],depth%2?0x9c83ff:0x68eaff,.75);
-    branch(endX,endY,z,length*.72,angle-.55,depth-1);
-    branch(endX,endY,z,length*.72,angle+.55,depth-1);
-    if(depth>2)branch(endX,endY,z,length*.58,angle+.08,depth-2);
-  };
-  branch(0,-2.7,0,1.25,0,7);
-  points(500,0xb4a4ff,.025,6);
-  setSceneCamera(10,0,.2);
-  return t=>{
-    world.rotation.z=Math.sin(t*.3)*.13;
-    world.rotation.y=Math.sin(t*.2)*.1;
-  };
-}
-
-/* =========================================
-   SCENE 13 — ORGANIC GARDEN
-========================================= */
-
-function scene13(){
-  const stems=[];
-  for(let i=0;i<32;i++){
-    const a=i*Math.PI*2/32;
-    const h=1.2+Math.random()*2.1;
-    const stem=mesh(
-      new THREE.CylinderGeometry(.025,.09,h,8),
-      material(i%2?0x7affbb:0x38b98c,.4,.3)
-    );
-    stem.position.set(Math.cos(a)*1.7,0,Math.sin(a)*1.7);
-    stem.rotation.z=Math.cos(a)*.4;
-    stem.rotation.x=Math.sin(a)*.4;
-    stems.push(stem);
+   );
+   group.add(cube);
+   animations.push(t=>{
+    cube.rotation.x=t*.08+i*.05;
+    cube.rotation.y=-t*.1+i*.04;
+   });
   }
-  points(800,0x9dffcd,.024,7);
-  setSceneCamera(9);
-  return t=>{
-    world.rotation.y=t*.2;
-    stems.forEach((m,i)=>{
-      m.rotation.z+=Math.sin(t+i)*.0008;
-      m.scale.y=1+Math.sin(t*.8+i)*.06;
-    });
-  };
-}
+  break;
+ }
 
-/* =========================================
-   SCENE 14 — PLASMA ENERGY
-========================================= */
+ case 8:{
+  for(let k=0;k<10;k++){
+   const points=[];
+   for(let i=0;i<100;i++){
+    const x=-7+i*.14;
+    points.push(new THREE.Vector3(
+     x,
+     Math.sin(i*.09+k*.5)*1.2+(k-4)*.4,
+     Math.cos(i*.07+k)*.8
+    ));
+   }
+   const ribbon=addTube(group,points,[a,b,c][k%3],.035);
+   animations.push(t=>ribbon.position.y=Math.sin(t*.4+k)*.2);
+  }
+  addStars(group,400,60);
+  break;
+ }
 
-function scene14(){
-  const plasma=mesh(
-    new THREE.SphereGeometry(1.6,90,80),
-    new THREE.ShaderMaterial({
-      uniforms:{time:{value:0}},
-      vertexShader:`
-        uniform float time;
-        varying vec3 v;
-        void main(){
-          v=position;
-          vec3 p=position;
-          p+=normal*(sin(position.x*3.0+time)*.1+
-                     cos(position.y*3.0-time)*.1);
-          gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);
-        }
-      `,
-      fragmentShader:`
-        uniform float time;
-        varying vec3 v;
-        void main(){
-          float a=sin(v.x*4.0+time)*cos(v.y*4.0-time);
-          vec3 c=mix(vec3(1.0,.28,.1),vec3(1.0,.8,.2),a*.5+.5);
-          gl_FragColor=vec4(c,1.0);
-        }
-      `
+ case 9:{
+  const left=[],right=[];
+  for(let i=0;i<220;i++){
+   const y=-4.8+i*.044;
+   const angle=i*.11;
+   left.push(new THREE.Vector3(Math.cos(angle)*1.3,y,Math.sin(angle)*1.3));
+   right.push(new THREE.Vector3(Math.cos(angle+Math.PI)*1.3,y,Math.sin(angle+Math.PI)*1.3));
+  }
+  const l=addTube(group,left,a,.05);
+  const r=addTube(group,right,b,.05);
+
+  for(let i=0;i<42;i++){
+   const y=-4.6+i*.22;
+   const angle=i*.5;
+   const one=new THREE.Vector3(Math.cos(angle)*1.3,y,Math.sin(angle)*1.3);
+   const two=new THREE.Vector3(Math.cos(angle+Math.PI)*1.3,y,Math.sin(angle+Math.PI)*1.3);
+   const geo=new THREE.BufferGeometry().setFromPoints([one,two]);
+   group.add(new THREE.Line(geo,new THREE.LineBasicMaterial({color:c})));
+  }
+  animations.push(t=>group.rotation.y=t*.2);
+  break;
+ }
+
+ case 10:{
+  const planet=new THREE.Mesh(
+   new THREE.SphereGeometry(2.1,64,64),
+   new THREE.MeshPhysicalMaterial({
+    color:a,
+    roughness:.08,
+    metalness:.15,
+    transmission:.5,
+    thickness:1,
+    clearcoat:1
+   })
+  );
+  group.add(planet);
+  for(let i=0;i<7;i++){
+   const ring=addTorus(group,2.8+i*.25,.012,[a,b,c][i%3]);
+   ring.rotation.set(.4+i*.18,.3+i*.2,.1);
+   animations.push(t=>ring.rotation.z+=.0008);
+  }
+  animations.push(t=>planet.rotation.y=t*.12);
+  addGlow(group,b);
+  break;
+ }
+
+ case 11:{
+  function grow(start,dir,len,depth){
+   if(depth===0)return;
+   const end=start.clone().add(dir.clone().multiplyScalar(len));
+   const branch=new THREE.Mesh(
+    new THREE.CylinderGeometry(.012*depth,.035*depth,len,5),
+    material(depth<3?b:a)
+   );
+   branch.position.copy(start).add(end).multiplyScalar(.5);
+   branch.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.clone().normalize());
+   group.add(branch);
+
+   if(depth===1){
+    const leaf=new THREE.Mesh(new THREE.OctahedronGeometry(.14),material(c));
+    leaf.position.copy(end);
+    group.add(leaf);
+   }
+
+   for(let j=0;j<3;j++){
+    const d=dir.clone()
+     .applyAxisAngle(new THREE.Vector3(0,0,1),(j-1)*.52)
+     .applyAxisAngle(new THREE.Vector3(0,1,0),j*.8-.8)
+     .normalize();
+    grow(end,d,len*.72,depth-1);
+   }
+  }
+  grow(new THREE.Vector3(0,-4,0),new THREE.Vector3(0,1,0),1.3,8);
+  animations.push(t=>group.rotation.y=Math.sin(t*.2)*.2);
+  break;
+ }
+
+ case 12:{
+  for(let i=0;i<24;i++){
+   const x=(i%6-2.5)*1.3;
+   const z=(Math.floor(i/6)-1.5)*1.1;
+   const h=rand(1.3,3.2);
+
+   const stem=new THREE.Mesh(
+    new THREE.CylinderGeometry(.02,.045,h,7),
+    material("#3b8c72")
+   );
+   stem.position.set(x,-1.8+h/2,z);
+   group.add(stem);
+
+   const bloom=new THREE.Mesh(
+    new THREE.IcosahedronGeometry(.28,2),
+    new THREE.MeshStandardMaterial({
+     color:[a,b,c][i%3],
+     emissive:[a,b,c][i%3],
+     emissiveIntensity:.35
     })
+   );
+   bloom.position.set(x,-1.8+h,z);
+   group.add(bloom);
+
+   animations.push(t=>{
+    bloom.scale.setScalar(1+.13*Math.sin(t*1.4+i));
+    stem.rotation.z=Math.sin(t*.5+i)*.08;
+   });
+  }
+  break;
+ }
+
+ case 13:{
+  const core=new THREE.Mesh(
+   new THREE.IcosahedronGeometry(1.05,4),
+   new THREE.MeshBasicMaterial({color:a,wireframe:true})
   );
-  const materialRef=plasma.material;
-  for(let i=0;i<6;i++){
-    const r=torus(2.2+i*.2,.012,i%2?0xff8b52:0xffd16a);
-    r.rotation.set(i*.3,i*.2,i*.4);
+  group.add(core);
+  addGlow(group,a,2);
+
+  for(let i=0;i<35;i++){
+   const points=[];
+   const angle=i*Math.PI*2/35;
+   for(let j=0;j<30;j++){
+    const r=1.1+j*.14;
+    const ang=angle+Math.sin(j*.9+i)*.17;
+    points.push(new THREE.Vector3(
+     Math.cos(ang)*r,
+     Math.sin(ang)*r,
+     Math.sin(j*.8+i)*.25
+    ));
+   }
+   const filament=addTube(group,points,[a,b,c][i%3],.012);
+   animations.push(t=>filament.rotation.z=Math.sin(t+i)*.18);
   }
-  points(1100,0xffad65,.025,7,'sphere');
-  setSceneCamera(9);
-  return t=>{
-    materialRef.uniforms.time.value=t;
-    plasma.rotation.y=t*.2;
-  };
-}
 
-/* =========================================
-   SCENE 15 — GEOMETRY MACHINE
-========================================= */
+  animations.push(t=>{
+   core.rotation.y=t*.3;
+   core.scale.setScalar(1+.08*Math.sin(t*2));
+  });
+  break;
+ }
 
-function scene15(){
-  const gears=[];
-  for(let i=0;i<18;i++){
-    const g=mesh(
-      new THREE.TorusGeometry(.65+Math.random()*.4,.045,8,12),
-      material(i%2?0x91a6ff:0x657aff,.8,.18)
-    );
-    g.position.set(
-      (Math.random()-.5)*5,
-      (Math.random()-.5)*4,
-      (Math.random()-.5)*3
-    );
-    g.rotation.x=Math.PI/2;
-    gears.push(g);
+ case 14:{
+  for(let i=0;i<8;i++){
+   const gear=addTorus(group,1.1+i*.2,.07,[a,b,c][i%3]);
+   gear.position.set(Math.cos(i*.8)*2.3,Math.sin(i*.8)*1.6,0);
+   gear.rotation.x=Math.PI/2;
+   animations.push(t=>gear.rotation.z=t*(i%2?1:-1)*.25);
   }
-  points(700,0xa6b5ff,.025,7);
-  setSceneCamera(10);
-  return t=>{
-    gears.forEach((g,i)=>g.rotation.z+=.004*(i%2?1:-1));
-    world.rotation.y=Math.sin(t*.2)*.12;
-  };
-}
+  const center=new THREE.Mesh(new THREE.DodecahedronGeometry(1.2,1),material(c,.2,.8));
+  group.add(center);
+  animations.push(t=>center.rotation.set(t*.2,t*.25,t*.13));
+  break;
+ }
 
-/* =========================================
-   SCENE 16 — MONOCHROME WORLD
-========================================= */
-
-function scene16(){
-  for(let i=0;i<16;i++){
-    const m=mesh(
-      new THREE.BoxGeometry(1.3+i*.12,1.3+i*.12,1.3+i*.12),
-      new THREE.MeshBasicMaterial({
-        color:i%2?0xffffff:0x888b9a,
-        wireframe:true,
-        transparent:true,
-        opacity:.48
-      })
-    );
-    m.rotation.set(i*.12,i*.18,i*.14);
+ case 15:{
+  for(let i=0;i<22;i++){
+   const mesh=new THREE.Mesh(
+    new THREE.IcosahedronGeometry(.6+i*.2,1),
+    new THREE.MeshBasicMaterial({
+     color:i%2?0xeeeeee:0x666677,
+     wireframe:true,
+     transparent:true,
+     opacity:.28
+    })
+   );
+   group.add(mesh);
+   animations.push(t=>{
+    mesh.rotation.x=t*.08+i*.08;
+    mesh.rotation.y=t*.1-i*.03;
+   });
   }
-  points(900,0xffffff,.022,8);
-  setSceneCamera(11);
-  return t=>{
-    world.rotation.x=t*.12;
-    world.rotation.y=t*.17;
-  };
-}
+  break;
+ }
 
-/* =========================================
-   SCENE 17 — QUANTUM GARDEN
-========================================= */
-
-function scene17(){
-  const particlesGroup=[];
-  for(let i=0;i<55;i++){
-    const a=i*2.399;
-    const r=.25+Math.sqrt(i)*.34;
-    const m=mesh(
-      new THREE.SphereGeometry(.1+Math.random()*.15,18,18),
-      material(i%2?0xff9fda:0x9b7aff,.45,.17)
-    );
-    m.position.set(Math.cos(a)*r,Math.sin(a)*r,(Math.random()-.5)*2);
-    m.userData={a,r,z:m.position.z};
-    particlesGroup.push(m);
+ case 16:{
+  addParticles(group,isMobile?1500:3200,a,c,5.5);
+  for(let i=0;i<5;i++){
+   const shell=addWireSphere(group,1.1+i*.58,[a,b,c][i%3],2);
+   shell.scale.set(1.25,.7+i*.12,1);
+   animations.push(t=>shell.rotation.set(t*.08+i,t*.12-i*.2,t*.06));
   }
-  points(900,0xffb6e4,.025,7);
-  setSceneCamera(9);
-  return t=>{
-    particlesGroup.forEach((m,i)=>{
-      const d=m.userData;
-      const a=d.a+t*.12;
-      m.position.x=Math.cos(a)*d.r;
-      m.position.y=Math.sin(a)*d.r;
-      m.position.z=d.z+Math.sin(t+i)*.3;
-    });
-    world.rotation.z=t*.08;
-  };
-}
+  addGlow(group,b);
+  break;
+ }
 
-/* =========================================
-   SCENE 18 — INFINITE TUNNEL
-========================================= */
-
-function scene18(){
-  const rings=[];
-  for(let i=0;i<38;i++){
-    const r=mesh(
-      new THREE.TorusGeometry(1.8,0.012,8,90),
-      new THREE.MeshBasicMaterial({
-        color:i%3===0?0x6ceaff:i%3===1?0x927aff:0xffffff,
-        transparent:true,
-        opacity:.6
-      })
-    );
-    r.position.z=-i*.5;
-    r.scale.setScalar(1+i*.035);
-    rings.push(r);
+ case 17:{
+  for(let i=0;i<45;i++){
+   const z=-i*.48;
+   const s=.35+i*.12;
+   const frame=new THREE.Mesh(
+    new THREE.BoxGeometry(s*1.5,s,.04),
+    new THREE.MeshBasicMaterial({
+     color:[a,b,c][i%3],
+     wireframe:true,
+     transparent:true,
+     opacity:.55-i*.008
+    })
+   );
+   frame.position.z=z;
+   group.add(frame);
+   animations.push(t=>frame.rotation.z=t*.08+i*.04);
   }
-  setSceneCamera(7);
-  return t=>{
-    rings.forEach((r,i)=>{
-      r.position.z=((i*.5+t*1.5)%19)-17;
-      r.rotation.z=t*.04+i*.02;
-    });
-  };
-}
+  break;
+ }
 
-/* =========================================
-   SCENE 19 — CELESTIAL ORBITS
-========================================= */
+ case 18:{
+  const sun=new THREE.Mesh(new THREE.SphereGeometry(.7,32,32),new THREE.MeshBasicMaterial({color:a}));
+  group.add(sun);
+  addGlow(group,a,2);
 
-function scene19(){
-  const center=sphere(.45,0xffd47a,2);
-  const orbiters=[];
-  for(let i=0;i<9;i++){
-    const r=1.2+i*.3;
-    const ring=torus(r,.012,i%2?0xffc96b:0xff8c79,[i*.3,i*.5,i*.2]);
-    const planet=mesh(
-      new THREE.SphereGeometry(.12+i*.025,20,20),
-      material(i%2?0xff9d77:0xffd68a,.65,.2)
+  for(let i=0;i<8;i++){
+   const r=1.25+i*.52;
+   const orbit=addTorus(group,r,.009,"#a9a5ba");
+   orbit.rotation.x=Math.PI/2;
+
+   const planet=new THREE.Mesh(
+    new THREE.SphereGeometry(.1+i*.02,20,20),
+    material([a,b,c][i%3],.2,.5)
+   );
+   group.add(planet);
+
+   animations.push(t=>{
+    const angle=t*(.3-i*.025)+i*1.2;
+    planet.position.set(
+     Math.cos(angle)*r,
+     Math.sin(angle*.7)*.25,
+     Math.sin(angle)*r*.55
     );
-    orbiters.push({ring,planet,r,phase:i});
+   });
   }
-  setSceneCamera(9);
-  return t=>{
-    center.scale.setScalar(1+Math.sin(t*2)*.08);
-    orbiters.forEach(o=>{
-      const a=t*(.3+o.phase*.025)+o.phase;
-      o.planet.position.set(
-        Math.cos(a)*o.r,
-        Math.sin(a*.6)*.4,
-        Math.sin(a)*o.r
-      );
-    });
-    world.rotation.y=t*.07;
-  };
-}
+  break;
+ }
 
-/* =========================================
-   SCENE 20 — IMPOSSIBLE ARCHITECTURE
-========================================= */
+ case 19:{
+  for(let i=0;i<7;i++){
+   const arch=new THREE.Mesh(
+    new THREE.TorusGeometry(1.9+i*.15,.055,10,100,Math.PI*1.5),
+    material([a,b,c][i%3],.25,.7)
+   );
+   arch.rotation.set(i*.8,i*.57,i*.33);
+   arch.position.set((i-3)*.2,0,(i%3-1)*.6);
+   group.add(arch);
+   animations.push(t=>arch.rotation.y+=.0008);
+  }
+  break;
+ }
 
-function scene20(){
-  const structures=[];
+ case 20:{
+  const orb=createLiquidShader(group,a,c);
+
   for(let i=0;i<12;i++){
-    const box=mesh(
-      new THREE.BoxGeometry(1.2,1.2,1.2),
-      new THREE.MeshBasicMaterial({
-        color:i%2?0x8dbaff:0xffffff,
-        wireframe:true,
-        transparent:true,
-        opacity:.55
-      })
+   const shape=new THREE.Mesh(
+    i%2?new THREE.TetrahedronGeometry(.25):new THREE.OctahedronGeometry(.25),
+    material([a,b,c][i%3])
+   );
+   group.add(shape);
+   animations.push(t=>{
+    const angle=t*.4+i*Math.PI/6;
+    shape.position.set(
+     Math.cos(angle)*3,
+     Math.sin(angle*1.3)*1.7,
+     Math.sin(angle)*2
     );
-    box.position.set(
-      Math.cos(i*.52)*2,
-      Math.sin(i*.52)*2,
-      (i-6)*.28
-    );
-    structures.push(box);
+    shape.rotation.set(t+i,t*.7+i,t*.4);
+   });
   }
-  points(700,0x9bc9ff,.024,7);
-  setSceneCamera(10);
-  return t=>{
-    world.rotation.y=t*.12;
-    world.rotation.x=Math.sin(t*.25)*.12;
-    structures.forEach((m,i)=>{
-      m.rotation.x=t*.1+i*.1;
-      m.rotation.y=-t*.1+i*.08;
-    });
-  };
-}
 
-/* =========================================
-   SCENE 21 — METAMORPHOSIS
-========================================= */
-
-function scene21(){
-  const geometry=new THREE.SphereGeometry(1.7,80,80);
-  const mat=new THREE.ShaderMaterial({
-    uniforms:{time:{value:0}},
-    vertexShader:`
-      uniform float time;
-      varying vec3 v;
-      void main(){
-        v=position;
-        vec3 p=position;
-        float a=sin(p.x*2.0+time)*cos(p.y*2.0-time);
-        float b=sin(p.z*3.0-time*.7);
-        p+=normal*(a+b)*.22;
-        gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);
-      }
-    `,
-    fragmentShader:`
-      uniform float time;
-      varying vec3 v;
-      void main(){
-        float f=sin(v.x*3.0+time)*cos(v.y*3.0-time);
-        vec3 a=vec3(1.0,.35,.65);
-        vec3 b=vec3(.45,.35,1.0);
-        gl_FragColor=vec4(mix(a,b,f*.5+.5),1.0);
-      }
-    `
+  animations.push(t=>{
+   orb.material.uniforms.time.value=t;
+   orb.rotation.y=t*.16;
   });
-  const m=mesh(geometry,mat);
-  points(850,0xffb3d9,.024,7);
-  setSceneCamera(9);
-  return t=>{
-    mat.uniforms.time.value=t;
-    m.rotation.y=t*.18;
-    m.rotation.x=Math.sin(t*.2)*.2;
-  };
-}
+  break;
+ }
 
-/* =========================================
-   SCENE 22 — PARTICLE RAIN
-========================================= */
+ case 21:{
+  const count=isMobile?1000:2400;
+  const positions=new Float32Array(count*3);
+  const velocity=new Float32Array(count);
 
-function scene22(){
-  const rain=points(3500,0x77eaff,.035,10,'rain');
-  const p=rain.geometry.attributes.position;
-  setSceneCamera(10);
-  return t=>{
-    for(let i=0;i<p.count;i++){
-      let y=p.getY(i)-.025;
-      if(y<-7)y=7;
-      p.setY(i,y);
-      p.setX(i,p.getX(i)+Math.sin(t+i)*.0008);
-    }
-    p.needsUpdate=true;
-    world.rotation.y=Math.sin(t*.2)*.1;
-  };
-}
-
-/* =========================================
-   SCENE 23 — FLOATING WORLDS
-========================================= */
-
-function scene23(){
-  const islands=[];
-  for(let i=0;i<9;i++){
-    const island=mesh(
-      new THREE.DodecahedronGeometry(.8+Math.random()*.5,1),
-      material(i%2?0x8fcaff:0xb2ff9d,.35,.35)
-    );
-    island.position.set(
-      (Math.random()-.5)*6,
-      (Math.random()-.5)*5,
-      (Math.random()-.5)*4
-    );
-    island.userData={
-      y:island.position.y,
-      phase:Math.random()*6
-    };
-    islands.push(island);
+  for(let i=0;i<count;i++){
+   positions[i*3]=rand(-7,7);
+   positions[i*3+1]=rand(-6,7);
+   positions[i*3+2]=rand(-5,5);
+   velocity[i]=rand(.015,.06);
   }
-  points(1000,0xb4eaff,.025,9);
-  setSceneCamera(11);
-  return t=>{
-    islands.forEach(m=>{
-      m.position.y=m.userData.y+Math.sin(t*.5+m.userData.phase)*.3;
-      m.rotation.y=t*.08+m.userData.phase;
-    });
-    world.rotation.y=Math.sin(t*.15)*.12;
-  };
-}
 
-/* =========================================
-   SCENE 24 — PARTICLE VORTEX
-========================================= */
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.BufferAttribute(positions,3));
 
-function scene24(){
-  const vortex=points(2600,0xffa37a,.03,7,'ring');
-  const p=vortex.geometry.attributes.position;
-  const original=p.array.slice();
-  setSceneCamera(9);
-  return t=>{
-    for(let i=0;i<p.count;i++){
-      const x=original[i*3];
-      const y=original[i*3+1];
-      const z=original[i*3+2];
-      const a=t*.3+Math.atan2(z,x);
-      const r=Math.sqrt(x*x+z*z);
-      p.setXYZ(
-        i,
-        Math.cos(a)*r,
-        y+Math.sin(t+i*.01)*.06,
-        Math.sin(a)*r
-      );
-    }
-    p.needsUpdate=true;
-  };
-}
-
-/* =========================================
-   SCENE 25 — INFINITY CORE
-========================================= */
-
-function scene25(){
-  const core=mesh(
-    new THREE.IcosahedronGeometry(1.25,3),
-    material(0x9aabff,.85,.1,0x2d3080)
+  const points=new THREE.Points(
+   geo,
+   new THREE.PointsMaterial({color:a,size:.045,transparent:true,opacity:.85})
   );
-  const wire=mesh(
-    new THREE.IcosahedronGeometry(2.1,2),
-    new THREE.MeshBasicMaterial({
-      color:0x5ceaff,
-      wireframe:true,
-      transparent:true,
-      opacity:.4
+  group.add(points);
+
+  animations.push(t=>{
+   const p=geo.attributes.position;
+   for(let i=0;i<count;i++){
+    p.array[i*3+1]-=velocity[i];
+    if(p.array[i*3+1]<-6)p.array[i*3+1]=7;
+   }
+   p.needsUpdate=true;
+  });
+  break;
+ }
+
+ case 22:{
+  addStars(group,500,70);
+
+  for(let i=0;i<12;i++){
+   const orb=new THREE.Mesh(
+    new THREE.SphereGeometry(rand(.35,.8),32,32),
+    new THREE.MeshPhysicalMaterial({
+     color:[a,b,c][i%3],
+     metalness:.15,
+     roughness:.16,
+     transmission:.25,
+     clearcoat:1
     })
-  );
-  const rings=[];
-  for(let i=0;i<15;i++){
-    const r=torus(2.5+i*.1,.012,i%2?0x9c8aff:0x5ceaff);
-    r.rotation.set(i*.32,i*.24,i*.18);
-    rings.push(r);
+   );
+
+   const base=new THREE.Vector3(rand(-5,5),rand(-3,3),rand(-3,3));
+   orb.position.copy(base);
+   group.add(orb);
+
+   animations.push(t=>{
+    orb.position.y=base.y+Math.sin(t*.6+i)*.55;
+    orb.rotation.y=t*.1+i;
+   });
   }
-  points(1800,0xb2dfff,.027,9,'sphere');
-  setSceneCamera(10);
-  return t=>{
-    core.rotation.y=t*.35;
-    core.rotation.x=t*.2;
-    core.scale.setScalar(1+Math.sin(t)*.04);
-    wire.rotation.y=-t*.2;
-    wire.rotation.x=t*.12;
-    rings.forEach((r,i)=>{
-      r.rotation.z+=.0005*(i%2?1:-1);
-    });
-    world.rotation.z=Math.sin(t*.2)*.08;
-  };
+  break;
+ }
+
+ case 23:{
+  const count=isMobile?1600:3300;
+  const positions=new Float32Array(count*3);
+  const cols=new Float32Array(count*3);
+
+  for(let i=0;i<count;i++){
+   const angle=i*.16;
+   const r=.08+i*.0018;
+   positions[i*3]=Math.cos(angle)*r*4;
+   positions[i*3+1]=Math.sin(angle)*r*2.7;
+   positions[i*3+2]=rand(-3,3);
+
+   const cc=color([a,b,c][i%3]);
+   cols[i*3]=cc.r;
+   cols[i*3+1]=cc.g;
+   cols[i*3+2]=cc.b;
+  }
+
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.BufferAttribute(positions,3));
+  geo.setAttribute("color",new THREE.BufferAttribute(cols,3));
+
+  const points=new THREE.Points(
+   geo,
+   new THREE.PointsMaterial({size:.055,vertexColors:true,transparent:true,opacity:.9})
+  );
+  group.add(points);
+
+  animations.push(t=>{
+   points.rotation.z=t*.25;
+   points.rotation.y=t*.1;
+  });
+  break;
+ }
+
+ case 24:{
+  for(let i=0;i<7;i++){
+   const knot=addKnot(group,[a,b,c][i%3]);
+   knot.scale.setScalar(.48+i*.19);
+   knot.rotation.set(i*.4,i*.2,i*.3);
+   animations.push(t=>{
+    knot.rotation.x=t*.08+i*.2;
+    knot.rotation.y=-t*.1+i*.12;
+   });
+  }
+
+  const core=new THREE.Mesh(
+   new THREE.SphereGeometry(.42,32,32),
+   new THREE.MeshBasicMaterial({color:0xffffff})
+  );
+  group.add(core);
+  addGlow(group,a,2);
+  addStars(group,500,65);
+  break;
+ }
+ }
+
+ return group;
 }
 
-const builders=[
-  scene01,scene02,scene03,scene04,scene05,
-  scene06,scene07,scene08,scene09,scene10,
-  scene11,scene12,scene13,scene14,scene15,
-  scene16,scene17,scene18,scene19,scene20,
-  scene21,scene22,scene23,scene24,scene25
-];
+/* =========================================================
+   WORLD MANAGER
+========================================================= */
+function createWorlds(){
+ loadText.textContent="GENERATING 25 WORLDS";
 
-/* =========================================
-   SCENE MANAGER
-========================================= */
+ for(let i=0;i<25;i++){
+  const world=buildWorld(i);
+  worlds.push(world);
+  scene.add(world);
+ }
 
-function loadScene(index){
-  if(index===active)return;
-  active=index;
-  clearWorld();
-  setPalette(index);
-  progress=0;
+ starfield=addStars(scene,isMobile?350:700,100);
+ worlds[0].visible=true;
+ activeWorld=0;
 
-  const next=builders[index]();
-  updateScene=typeof next==='function'?next:()=>{};
+ const nav=document.getElementById("chapter-nav");
 
-  counter.textContent=
-    String(index+1).padStart(2,'0')+' / 25';
+ for(let i=0;i<25;i++){
+  const dot=document.createElement("button");
+  dot.className="chapter-dot";
+  dot.type="button";
+  dot.setAttribute("aria-label","Go to world "+(i+1));
 
-  gsap.fromTo(world.scale,
-    {x:.7,y:.7,z:.7},
-    {x:1,y:1,z:1,duration:1.4,ease:'power3.out'}
-  );
+  dot.addEventListener("click",()=>{
+   document.querySelector('[data-world="'+i+'"]').scrollIntoView({behavior:"smooth"});
+  });
 
-  gsap.fromTo(camera.position,
-    {z:12},
-    {z:9.5,duration:1.6,ease:'power3.out'}
-  );
+  nav.appendChild(dot);
+ }
+
+ updateWorldUI(0);
 }
 
-sections.forEach((section,index)=>{
-  ScrollTrigger.create({
-    trigger:section,
-    start:'top 55%',
-    end:'bottom 45%',
-    onEnter:()=>loadScene(index),
-    onEnterBack:()=>loadScene(index)
+function updateWorldUI(index){
+ status.textContent="WORLD "+String(index+1).padStart(2,"0")+" / 25";
+
+ document.querySelectorAll(".chapter-dot").forEach((dot,i)=>{
+  dot.classList.toggle("active",i===index);
+ });
+}
+
+function activateWorld(index){
+ index=Math.max(0,Math.min(24,index));
+ if(index===activeWorld)return;
+
+ if(worlds[activeWorld])worlds[activeWorld].visible=false;
+
+ activeWorld=index;
+ const next=worlds[index];
+ next.visible=true;
+
+ updateWorldUI(index);
+
+ if(window.gsap){
+  gsap.fromTo(next.scale,
+   {x:.85,y:.85,z:.85},
+   {x:1,y:1,z:1,duration:1.2,ease:"power3.out"}
+  );
+  gsap.to(camera.position,{
+   z:index===17?17:14.5,
+   duration:1.2,
+   ease:"power3.inOut"
+  });
+ }
+}
+
+/* =========================================================
+   SCROLL SYSTEM
+========================================================= */
+function setupScroll(){
+ const sections=[...document.querySelectorAll(".scene")];
+
+ const observer=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+   if(entry.isIntersecting){
+    activateWorld(Number(entry.target.dataset.world));
+   }
+  });
+ },{threshold:.45});
+
+ sections.forEach(section=>observer.observe(section));
+
+ if(window.gsap&&window.ScrollTrigger){
+  gsap.registerPlugin(ScrollTrigger);
+
+  gsap.utils.toArray(".scene").forEach(section=>{
+   gsap.fromTo(section.querySelector(".scene-copy"),
+    {y:35,opacity:.35},
+    {
+     y:0,
+     opacity:1,
+     duration:1,
+     ease:"power2.out",
+     scrollTrigger:{
+      trigger:section,
+      start:"top 75%",
+      end:"top 35%",
+      scrub:.6
+     }
+    }
+   );
   });
 
   ScrollTrigger.create({
-    trigger:section,
-    start:'top bottom',
-    end:'bottom top',
-    onUpdate:self=>{
-      if(index===active){
-        progress=self.progress;
-      }
-    }
+   trigger:"#experience",
+   start:"top top",
+   end:"bottom bottom",
+   onUpdate:self=>{
+    document.getElementById("progress").style.width=(self.progress*100)+"%";
+   }
   });
-});
-
-/* =========================================
-   SCROLL CAMERA CHOREOGRAPHY
-========================================= */
-
-sections.forEach((section,index)=>{
-  ScrollTrigger.create({
-    trigger:section,
-    start:'top bottom',
-    end:'bottom top',
-    onUpdate:self=>{
-      if(index!==active)return;
-      const p=self.progress;
-      targetCamera.z=9.5-p*.8;
-      targetCamera.x=Math.sin(p*Math.PI*2)*.55;
-      targetCamera.y=Math.cos(p*Math.PI*2)*.28;
-      targetLook.x=Math.sin(p*Math.PI)*.15;
-      targetLook.y=Math.cos(p*Math.PI)*.1;
-    }
-  });
-});
-
-/* =========================================
-   RENDER LOOP
-========================================= */
-
-let previous=0;
-function render(ms){
-  requestAnimationFrame(render);
-  const dt=Math.min((ms-previous)/1000,.05);
-  previous=ms;
-  clock+=dt;
-
-  if(active>=0){
-    updateScene(clock,progress);
-
-    camera.position.x=THREE.MathUtils.damp(
-      camera.position.x,targetCamera.x,2.4,dt
-    );
-    camera.position.y=THREE.MathUtils.damp(
-      camera.position.y,targetCamera.y,2.4,dt
-    );
-    camera.position.z=THREE.MathUtils.damp(
-      camera.position.z,targetCamera.z,2.4,dt
-    );
-
-    camera.lookAt(targetLook);
-    world.position.y=Math.sin(clock*.3)*.035;
-  }
-
-  renderer.render(scene,camera);
+ }else{
+  window.addEventListener("scroll",()=>{
+   const max=document.documentElement.scrollHeight-innerHeight;
+   const value=max>0?scrollY/max*100:0;
+   document.getElementById("progress").style.width=value+"%";
+  },{passive:true});
+ }
 }
-requestAnimationFrame(render);
 
-/* =========================================
-   INTRO & AUDIO
-========================================= */
-
-document.querySelector('#enter').addEventListener('click',async()=>{
-  intro.classList.add('exit');
-  document.body.classList.remove('intro-lock');
-  experience.classList.add('visible');
-  hud.classList.add('show');
-  hint.classList.add('show');
-
-  if(soundEnabled){
-    try{
-      music.volume=.55;
-      await music.play();
-      soundButton.textContent='SOUND ON';
-    }catch(error){
-      soundButton.textContent='SOUND OFF';
-    }
-  }
-
-  setTimeout(()=>{
-    window.scrollTo({top:0,behavior:'auto'});
-    ScrollTrigger.refresh();
-    loadScene(0);
-  },300);
-});
-
-soundButton.addEventListener('click',async()=>{
-  if(music.paused){
-    try{
-      await music.play();
-      soundButton.textContent='SOUND ON';
-    }catch(error){
-      soundButton.textContent='SOUND OFF';
-    }
-  }else{
-    music.pause();
-    soundButton.textContent='SOUND OFF';
-  }
-});
-
-/* =========================================
-   RESPONSIVE RESIZE
-========================================= */
+/* =========================================================
+   POINTER / CAMERA / RESIZE
+========================================================= */
+window.addEventListener("pointermove",event=>{
+ pointer.tx=(event.clientX/innerWidth-.5)*2;
+ pointer.ty=(event.clientY/innerHeight-.5)*2;
+},{passive:true});
 
 function resize(){
-  camera.aspect=innerWidth/innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setPixelRatio(
-    Math.min(devicePixelRatio||1,mobile?1.35:1.8)
-  );
-  renderer.setSize(innerWidth,innerHeight);
-  ScrollTrigger.refresh();
+ if(!renderer||!camera)return;
+
+ camera.aspect=innerWidth/innerHeight;
+ camera.updateProjectionMatrix();
+
+ renderer.setSize(innerWidth,innerHeight);
+ renderer.setPixelRatio(Math.min(devicePixelRatio||1,isMobile?1.3:1.8));
 }
-window.addEventListener('resize',resize);
 
-/* =========================================
-   KEYBOARD NAVIGATION
-========================================= */
+window.addEventListener("resize",resize,{passive:true});
 
-window.addEventListener('keydown',e=>{
-  if(document.body.classList.contains('intro-lock'))return;
+/* =========================================================
+   RENDER LOOP
+========================================================= */
+function animate(){
+ requestAnimationFrame(animate);
+ if(!started||!renderer)return;
 
-  if(e.key==='ArrowDown'||e.key==='PageDown'){
-    e.preventDefault();
-    window.scrollBy({top:innerHeight*.85,behavior:'smooth'});
+ const time=clock.getElapsedTime();
+
+ pointer.x+=(pointer.tx-pointer.x)*.025;
+ pointer.y+=(pointer.ty-pointer.y)*.025;
+
+ camera.position.x=pointer.x*(isMobile?.15:.4);
+ camera.position.y=-pointer.y*(isMobile?.1:.25);
+ camera.lookAt(0,0,0);
+
+ if(starfield){
+  starfield.rotation.y=time*.002;
+  starfield.rotation.x=time*.001;
+ }
+
+ const current=worlds[activeWorld];
+
+ if(current){
+  current.userData.animations.forEach(fn=>fn(time));
+  current.rotation.y+=.00035;
+ }
+
+ renderer.render(scene,camera);
+}
+
+/* =========================================================
+   BOOT
+========================================================= */
+async function boot(){
+ try{
+  loadText.textContent="INITIALIZING WEBGL";
+  initializeRenderer();
+
+  loadText.textContent="BUILDING WORLDS";
+  createWorlds();
+
+  loadText.textContent="PREPARING SCROLL SYSTEM";
+  setupScroll();
+
+  document.getElementById("fallback").remove();
+  loading.classList.add("done");
+
+ }catch(error){
+  console.error("Universe engine error:",error);
+  loadText.textContent="GRAPHICS ENGINE ERROR";
+  document.getElementById("fallback").textContent="3D ENGINE UNAVAILABLE — CHECK WEBGL / INTERNET";
+  loading.classList.add("done");
+ }
+}
+
+boot();
+
+/* Start rendering after the visitor enters. */
+const originalEnter=window.enterFantasy;
+window.enterFantasy=function(){
+ originalEnter();
+ if(!started){
+  started=true;
+  if(renderer){
+   clock.start();
+   animate();
   }
-  if(e.key==='ArrowUp'||e.key==='PageUp'){
-    e.preventDefault();
-    window.scrollBy({top:-innerHeight*.85,behavior:'smooth'});
-  }
-});
+ }
+};
 
-/* =========================================
-   END EXPERIENCE
-========================================= */
-
-const endSection=document.querySelector('.end-section');
-ScrollTrigger.create({
-  trigger:endSection,
-  start:'top 65%',
-  onEnter:()=>{
-    counter.textContent='25 / 25';
-    hint.textContent='THE JOURNEY CONTINUES';
-  },
-  onLeaveBack:()=>{
-    hint.textContent='SCROLL TO EXPLORE';
-  }
-});
 </script>
 </body>
 </html>
