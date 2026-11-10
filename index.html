@@ -1,876 +1,221 @@
-```html
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mamun Coding Fantasy - When imagination meets python</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Three.js Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;800&family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Tailwind Configuration -->
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        obsidian: '#040307',
-                        charcoal: '#0b0914',
-                        fantasyGold: '#dfa642',
-                        fantasyGoldGlow: '#ffd700',
-                        fantasyBlood: '#8b0000',
-                        fantasyNeon: '#00f0ff',
-                        fantasyPurple: '#6b21a8'
-                    },
-                    fontFamily: {
-                        cinzel: ['"Cinzel"', 'serif'],
-                        decorative: ['"Cinzel Decorative"', 'serif'],
-                        code: ['"Fira Code"', 'monospace'],
-                        sans: ['"Inter"', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+<title>MAMUN CODING FANTASY</title>
 
-    <style>
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #040307; }
-        ::-webkit-scrollbar-thumb { background: #dfa642; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #ffd700; }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-        body {
-            background-color: #040307;
-            color: #e2e8f0;
-            overflow-x: hidden;
-            user-select: none;
-        }
+<link rel="stylesheet" href="css/style.css">
 
-        /* Gothic Border Effect */
-        .gothic-border {
-            position: relative;
-            background: linear-gradient(145deg, rgba(11, 9, 20, 0.95), rgba(4, 3, 7, 0.98));
-            border: 1px solid rgba(223, 166, 66, 0.3);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), inset 0 0 15px rgba(223, 166, 66, 0.05);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .gothic-border:hover {
-            border-color: rgba(255, 215, 0, 0.7);
-            box-shadow: 0 15px 35px rgba(223, 166, 66, 0.2), inset 0 0 20px rgba(223, 166, 66, 0.15);
-        }
-
-        .gothic-corner {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            border-color: #dfa642;
-            pointer-events: none;
-        }
-        .corner-tl { top: -2px; left: -2px; border-top: 2px solid; border-left: 2px solid; }
-        .corner-tr { top: -2px; right: -2px; border-top: 2px solid; border-right: 2px solid; }
-        .corner-bl { bottom: -2px; left: -2px; border-bottom: 2px solid; border-left: 2px solid; }
-        .corner-br { bottom: -2px; right: -2px; border-bottom: 2px solid; border-right: 2px solid; }
-
-        /* Custom Shimmer Text */
-        .text-gold-shimmer {
-            background: linear-gradient(90deg, #dfa642 0%, #ffffff 50%, #dfa642 100%);
-            background-size: 200% auto;
-            color: transparent;
-            -webkit-background-clip: text;
-            animation: textShimmer 5s linear infinite;
-        }
-
-        @keyframes textShimmer {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Glow effects */
-        .glow-gold {
-            filter: drop-shadow(0 0 12px rgba(223, 166, 66, 0.6));
-        }
-
-        /* Custom Pointer Elements */
-        .cursor-dot, .cursor-ring {
-            pointer-events: none;
-            position: fixed;
-            top: 0; left: 0;
-            border-radius: 50%;
-            z-index: 9999;
-            transform: translate(-50%, -50%);
-        }
-        .cursor-dot {
-            width: 8px; height: 8px;
-            background-color: #ffd700;
-            box-shadow: 0 0 10px #ffd700;
-        }
-        .cursor-ring {
-            width: 34px; height: 34px;
-            border: 1px solid rgba(223, 166, 66, 0.6);
-            transition: transform 0.15s ease-out;
-        }
-    </style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js"
+  }
+}
+</script>
 </head>
-<body class="font-sans antialiased text-gray-200">
 
-    <!-- Custom Cursor -->
-    <div class="cursor-dot" id="cursorDot"></div>
-    <div class="cursor-ring" id="cursorRing"></div>
+<body>
 
-    <!-- AUDIO TOGGLE FLOATING BUTTON -->
-    <button onclick="toggleAmbience()" id="audioBtn" class="fixed bottom-6 right-6 z-50 px-4 py-3 gothic-border rounded-full flex items-center gap-3 text-fantasyGold hover:text-white transition-all bg-obsidian/90 backdrop-blur-md">
-        <i class="fa-solid fa-volume-xmark" id="audioIcon"></i>
-        <span class="font-cinzel text-xs font-bold tracking-widest hidden sm:inline" id="audioLabel">AUDIO: OFF</span>
-    </button>
+<div id="noise"></div>
 
-    <!-- ============================================================== -->
-    <!-- 1. OPENING / SPLASH SCREEN (LANDING GATE)                      -->
-    <!-- ============================================================== -->
-    <section id="splashScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-obsidian transition-opacity duration-1000">
-        <!-- 3D WebGL Background Canvas for Landing -->
-        <canvas id="splashCanvas" class="absolute inset-0 w-full h-full"></canvas>
+<!-- OPENING PAGE -->
 
-        <div class="relative z-10 text-center max-w-4xl px-6 pointer-events-auto">
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full gothic-border mb-6 border-fantasyGold/40 bg-obsidian/80">
-                <span class="w-2 h-2 rounded-full bg-fantasyGold animate-ping"></span>
-                <span class="font-code text-xs tracking-widest text-fantasyGold uppercase">Python 3.12 Motion Engine</span>
-            </div>
+<section id="opening" class="opening">
 
-            <!-- Title & Concept Tag -->
-            <h1 class="font-decorative text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-gold-shimmer tracking-wider uppercase mb-4 leading-none drop-shadow-[0_10px_25px_rgba(0,0,0,0.9)]">
-                Mamun Coding Fantasy
-            </h1>
+    <div id="openingCanvas"></div>
 
-            <p class="font-cinzel text-lg sm:text-2xl text-cyan-400 tracking-widest font-semibold mb-8 text-shadow-glow">
-                "When imagination meets python"
-            </p>
+    <div class="opening-content">
 
-            <p class="font-sans text-sm sm:text-base text-gray-400 max-w-xl mx-auto mb-10 leading-relaxed">
-                Step into a realm of 25 real-time 3D motion graphics scenes crafted with dark arcane geometry, glowing runes, and procedural python motion algorithms.
-            </p>
-
-            <!-- Enter Button -->
-            <button onclick="enterRealm()" class="group relative px-10 py-5 font-cinzel text-sm font-extrabold tracking-[0.3em] text-black bg-gradient-to-r from-fantasyGold via-yellow-400 to-fantasyGold rounded shadow-[0_0_30px_rgba(223,166,66,0.6)] hover:shadow-[0_0_50px_rgba(255,215,0,0.9)] hover:scale-105 transition-all duration-300">
-                <span class="relative z-10 flex items-center gap-3">
-                    ENTER THE FANTASY REALM
-                    <i class="fa-solid fa-arrow-right-long group-hover:translate-x-2 transition-transform"></i>
-                </span>
-            </button>
+        <div class="eyebrow">
+            CREATIVE CODE / DIGITAL UNIVERSE
         </div>
-    </section>
 
-    <!-- ============================================================== -->
-    <!-- 2. MAIN SHOWCASE REALM (AFTER ENTERING)                        -->
-    <!-- ============================================================== -->
-    <div id="mainRealm" class="min-h-screen relative z-10 opacity-0 transition-opacity duration-1000 pointer-events-none">
+        <h1>
+            MAMUN<br>
+            <span>CODING</span><br>
+            FANTASY
+        </h1>
 
-        <!-- HEADER / NAVIGATION -->
-        <header class="sticky top-0 z-40 backdrop-blur-md bg-obsidian/80 border-b border-fantasyGold/20 px-6 py-4">
-            <div class="max-w-7xl mx-auto flex items-center justify-between">
-                <div class="flex items-center gap-3 cursor-pointer" onclick="scrollToTop()">
-                    <div class="w-10 h-10 rounded border border-fantasyGold flex items-center justify-center bg-charcoal">
-                        <i class="fa-solid fa-cube text-fantasyGold text-xl"></i>
-                    </div>
-                    <div>
-                        <h2 class="font-decorative font-bold text-lg text-white tracking-widest">MAMUN<span class="text-fantasyGold"> CODING FANTASY</span></h2>
-                        <p class="font-code text-[10px] text-cyan-400">WHEN IMAGINATION MEETS PYTHON</p>
-                    </div>
-                </div>
+        <div class="tagline">
+            WHEN IMAGINATION MEETS PYTHON
+        </div>
 
-                <!-- Navigation Controls -->
-                <div class="flex items-center gap-4">
-                    <span class="font-code text-xs text-fantasyGold bg-charcoal border border-fantasyGold/30 px-3 py-1.5 rounded">
-                        <i class="fa-solid fa-film mr-1"></i> 25 3D SCENES ACTIVE
-                    </span>
-                </div>
-            </div>
-        </header>
+        <p>
+            Beyond the boundaries of ordinary imagination.
+            Enter a universe of living geometry,
+            impossible structures and cinematic motion.
+        </p>
 
-        <!-- HERO BANNER IN MAIN REALM -->
-        <section class="py-16 px-6 text-center max-w-4xl mx-auto">
-            <h2 class="font-decorative text-3xl sm:text-5xl font-bold text-white mb-4 tracking-wider">
-                3D MOTION GRAPHICS VAULT
-            </h2>
-            <p class="font-cinzel text-gray-400 text-sm sm:text-base leading-relaxed mb-6">
-                Explore 25 masterclass animated 3D motion scenes. Powered by real-time WebGL graphics & inspired by Python procedural generation.
-            </p>
-            <div class="w-32 h-1 bg-gradient-to-r from-transparent via-fantasyGold to-transparent mx-auto mb-10"></div>
-
-            <!-- FILTER BUTTONS -->
-            <div class="flex flex-wrap justify-center gap-2 sm:gap-4 font-cinzel text-xs tracking-widest" id="filterContainer">
-                <button onclick="filterScenes('all')" class="filter-btn active px-4 py-2 gothic-border text-fantasyGold rounded hover:bg-fantasyGold/20 transition-all">ALL (25)</button>
-                <button onclick="filterScenes('Geometry')" class="filter-btn px-4 py-2 gothic-border text-gray-400 rounded hover:text-fantasyGold transition-all">GEOMETRY</button>
-                <button onclick="filterScenes('Magic')" class="filter-btn px-4 py-2 gothic-border text-gray-400 rounded hover:text-fantasyGold transition-all">MAGIC</button>
-                <button onclick="filterScenes('Python')" class="filter-btn px-4 py-2 gothic-border text-gray-400 rounded hover:text-fantasyGold transition-all">PYTHON CODE</button>
-                <button onclick="filterScenes('Artifacts')" class="filter-btn px-4 py-2 gothic-border text-gray-400 rounded hover:text-fantasyGold transition-all">ARTIFACTS</button>
-                <button onclick="filterScenes('Cosmic')" class="filter-btn px-4 py-2 gothic-border text-gray-400 rounded hover:text-fantasyGold transition-all">COSMIC</button>
-            </div>
-        </section>
-
-        <!-- 25 SCENES GRID GALLERY -->
-        <section class="max-w-7xl mx-auto px-6 pb-24">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="scenesGrid">
-                <!-- 25 Cards populated dynamically by JS -->
-            </div>
-        </section>
-
-        <!-- FOOTER -->
-        <footer class="border-t border-fantasyGold/20 py-10 px-6 text-center font-cinzel text-xs text-gray-500 bg-obsidian">
-            <p class="mb-2 text-fantasyGold">MAMUN CODING FANTASY &bull; WHEN IMAGINATION MEETS PYTHON</p>
-            <p>&copy; 2026 All 25 3D Motion Scenes Rendered Live with Three.js WebGL Engine.</p>
-        </footer>
-    </div>
-
-    <!-- ============================================================== -->
-    <!-- 3. FULLSCREEN 3D SCENE INSPECTOR MODAL                         -->
-    <!-- ============================================================== -->
-    <div id="sceneModal" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl hidden flex flex-col lg:flex-row">
-        <!-- Close Button -->
-        <button onclick="closeSceneModal()" class="absolute top-6 right-6 z-50 w-12 h-12 gothic-border rounded-full text-fantasyGold hover:text-white flex items-center justify-center text-xl bg-obsidian">
-            <i class="fa-solid fa-xmark"></i>
+        <button id="enterButton">
+            ENTER THE FANTASY
+            <span>↗</span>
         </button>
 
-        <!-- Left: 3D Interactive WebGL Canvas -->
-        <div class="w-full lg:w-2/3 h-[50vh] lg:h-full relative">
-            <canvas id="modalCanvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
-            <div class="absolute bottom-6 left-6 font-code text-xs text-gray-400 bg-obsidian/80 backdrop-blur border border-fantasyGold/30 px-3 py-2 rounded pointer-events-none">
-                <i class="fa-solid fa-arrows-spin text-fantasyGold mr-2"></i>Drag to rotate 3D view | Scroll to zoom
-            </div>
+        <div class="opening-footer">
+            25 WORLDS &nbsp; · &nbsp;
+            INFINITE MOTION &nbsp; · &nbsp;
+            ONE IMAGINATION
         </div>
 
-        <!-- Right: Control Panel & Python Code Inspector -->
-        <div class="w-full lg:w-1/3 h-[50vh] lg:h-full gothic-border bg-charcoal/90 p-6 lg:p-8 overflow-y-auto flex flex-col justify-between">
-            <div>
-                <div class="flex items-center gap-2 mb-2">
-                    <span id="modalCategory" class="font-code text-[10px] text-fantasyGold border border-fantasyGold/40 px-2 py-0.5 rounded">Category</span>
-                    <span class="font-code text-[10px] text-cyan-400 border border-cyan-400/40 px-2 py-0.5 rounded">3D Scene #<span id="modalId">1</span></span>
-                </div>
-                <h3 id="modalTitle" class="font-decorative text-2xl font-bold text-white mb-3">Scene Title</h3>
-                <p id="modalDesc" class="font-sans text-xs text-gray-300 leading-relaxed mb-6">Scene description goes here.</p>
-
-                <!-- Interactive Controls -->
-                <div class="space-y-4 border-t border-b border-fantasyGold/20 py-4 mb-6">
-                    <h4 class="font-cinzel text-xs font-bold text-fantasyGold tracking-widest">REAL-TIME CONTROLS</h4>
-                    <div>
-                        <div class="flex justify-between font-code text-[11px] text-gray-400 mb-1">
-                            <span>ROTATION SPEED</span>
-                            <span id="speedVal">1.0x</span>
-                        </div>
-                        <input type="range" id="speedSlider" min="0" max="3" step="0.1" value="1" class="w-full accent-fantasyGold">
-                    </div>
-                    <div>
-                        <div class="flex justify-between font-code text-[11px] text-gray-400 mb-1">
-                            <span>ENERGY GLOW INTENSITY</span>
-                            <span id="glowVal">1.0</span>
-                        </div>
-                        <input type="range" id="glowSlider" min="0.2" max="3" step="0.1" value="1" class="w-full accent-fantasyGold">
-                    </div>
-                </div>
-
-                <!-- Python Motion Code Snippet -->
-                <div>
-                    <h4 class="font-cinzel text-xs font-bold text-fantasyGold tracking-widest mb-2 flex items-center justify-between">
-                        <span>HOW PYTHON POWERS THIS SCENE</span>
-                        <i class="fa-brands fa-python text-cyan-400 text-sm"></i>
-                    </h4>
-                    <pre class="bg-obsidian border border-fantasyGold/30 p-4 rounded font-code text-[11px] text-cyan-300 overflow-x-auto leading-relaxed"><code id="modalPythonCode"># Python Procedural Logic
-import math
-
-def calculate_motion(t):
-    return math.sin(t) * 2.5</code></pre>
-                </div>
-            </div>
-
-            <div class="mt-6 pt-4 border-t border-fantasyGold/20 flex justify-between items-center text-xs font-cinzel text-gray-400">
-                <span>MAMUN CODING FANTASY</span>
-                <button onclick="closeSceneModal()" class="text-fantasyGold hover:text-white font-bold">CLOSE INSPECTOR</button>
-            </div>
-        </div>
     </div>
 
+    <div class="opening-coordinate">
+        MCF / 001
+    </div>
 
-    <!-- ============================================================== -->
-    <!-- 4. JAVASCRIPT & THREE.JS REAL-TIME ENGINE                      -->
-    <!-- ============================================================== -->
-    <script>
-        /* -------------------------------------------------------------
-           DATA: DEFINITION OF THE 25 DARK FANTASY 3D SCENES
-        ------------------------------------------------------------- */
-        const SCENES_DATA = [
-            {
-                id: 1,
-                title: "3D Masterclass Animated Motion Cube",
-                category: "Geometry",
-                desc: "Hyper-cube structured with glowing gold inner matrix, pulsing magical energy lines, and floating dark mana embers.",
-                python: "import bpy\ndef generate_hypercube(t):\n    cube.rotation_euler = (t*0.5, t*0.8, t*0.2)\n    cube.scale = (1 + 0.15*math.sin(t*2),) * 3"
-            },
-            {
-                id: 2,
-                title: "3D Masterclass Animated Motion Flower",
-                category: "Nature",
-                desc: "Mystical glowing dark lotus/rose with dynamically expanding 3D crystalline petals and floating golden pollen lights.",
-                python: "def animate_petals(petal_list, t):\n    for i, p in enumerate(petal_list):\n        angle = math.sin(t + i * 0.5) * 0.3\n        p.rotation.z = angle"
-            },
-            {
-                id: 3,
-                title: "Dark Energy Orb / Portal",
-                category: "Magic",
-                desc: "Swirling dark matter core encircled by a blazing golden accretion disk emitting particle rays into the void.",
-                python: "def update_portal(particles, dt):\n    for p in particles:\n        p.orbit_around_center(speed=2.5 * dt)\n        p.pulse_intensity(freq=1.4)"
-            },
-            {
-                id: 4,
-                title: "Python Mystical Serpent / DNA Helix",
-                category: "Python",
-                desc: "Glowing gold and cyan python code streams wrapping in a double helix around an ethereal serpent backbone.",
-                python: "class PythonSerpent:\n    def helix_step(self, z):\n        x = math.cos(z * 0.5) * 2.0\n        y = math.sin(z * 0.5) * 2.0\n        return (x, y, z)"
-            },
-            {
-                id: 5,
-                title: "Floating Necromancer Rune Monogram",
-                category: "Artifacts",
-                desc: "A 3D morphing sigil carved out of dark obsidian emitting violet and crimson fantasy particles.",
-                python: "def morph_rune(sigil, t):\n    sigil.vertices = [v * (1 + 0.1*math.cos(t + v.y)) for v in sigil.base]"
-            },
-            {
-                id: 6,
-                title: "Alchemist Crystal Prism",
-                category: "Geometry",
-                desc: "Rotating refraction crystal casting golden beams of arcane light into dark atmospheric fog.",
-                python: "def refract_beam(prism, light_in):\n    light_out.color = prism.material.dispersion * 1.5\n    prism.rotate_y(0.015)"
-            },
-            {
-                id: 7,
-                title: "Ethereal Dragon Core",
-                category: "Magic",
-                desc: "Glowing pulsating spiked polyhedron surrounded by orbiting ember trails representing a dragon's heart.",
-                python: "def dragon_pulse(core, t):\n    scale = 1.0 + 0.2 * math.sin(t * 4.0) # Heartbeat\n    core.set_scale(scale)"
-            },
-            {
-                id: 8,
-                title: "Celestial Astrolabe",
-                category: "Cosmic",
-                desc: "Nested spinning gold rings with celestial indicators and glowing arcane glyphs tracking cosmic alignment.",
-                python: "def update_astrolabe(rings):\n    for idx, ring in enumerate(rings):\n        ring.rotation.x += 0.01 * (idx + 1)\n        ring.rotation.y += 0.005 * (idx + 1)"
-            },
-            {
-                id: 9,
-                title: "Python Code Vortex",
-                category: "Python",
-                desc: "Swirling 3D whirlpool of binary digits and Python keywords ('def', 'async', 'import', 'class') spiraling into infinity.",
-                python: "keywords = ['def', 'class', 'import', 'async']\ndef vortex_transform(token, radius, angle):\n    token.position.x = radius * math.cos(angle)\n    token.position.y = radius * math.sin(angle)"
-            },
-            {
-                id: 10,
-                title: "Cyberpunk Fantasy Spell Tome",
-                category: "Artifacts",
-                desc: "Floating 3D ancient spell book with pages suspended in zero gravity, glowing with golden runes.",
-                python: "def float_tome_pages(pages, t):\n    for i, page in enumerate(pages):\n        page.position.y = math.sin(t + i*0.2) * 0.1"
-            },
-            {
-                id: 11,
-                title: "Arcane Lightning Obelisk",
-                category: "Magic",
-                desc: "Dark stone pillar emitting dynamic electric arcs of golden and cyan energy across its carved runes.",
-                python: "def generate_lightning(p1, p2, displacement):\n    mid = (p1 + p2) / 2\n    mid += random_vector() * displacement\n    return [p1, mid, p2]"
-            },
-            {
-                id: 12,
-                title: "Shadow Phoenix Wings",
-                category: "Nature",
-                desc: "Animated 3D particle wings flexing in rhythmic motion, casting off ember trails with every flap.",
-                python: "def wing_flap(wing, t):\n    flap_angle = math.sin(t * 3.0) * 0.4\n    wing.left.rotation.z = flap_angle\n    wing.right.rotation.z = -flap_angle"
-            },
-            {
-                id: 13,
-                title: "Void Mirror",
-                category: "Cosmic",
-                desc: "Dark reflective plane displaying dynamic liquid noise textures and floating golden embers.",
-                python: "def mirror_distortion(mesh, u_time):\n    mesh.material.uniforms['u_time'].value = u_time\n    mesh.material.uniforms['u_distortion'].value = 0.45"
-            },
-            {
-                id: 14,
-                title: "Chronos Hourglass",
-                category: "Artifacts",
-                desc: "Gothic 3D hourglass where sand particles flow upward against gravity, bending temporal laws.",
-                python: "def reverse_gravity(particles):\n    for p in particles:\n        p.velocity.y += 0.05 # Upward float\n        if p.y > 5.0: p.y = -5.0"
-            },
-            {
-                id: 15,
-                title: "Quantum Python Grid",
-                category: "Python",
-                desc: "Deformable 3D terrain wireframe reacting to cursor wave functions and python logic vectors.",
-                python: "def deform_grid(grid, mouse_pos):\n    for v in grid.vertices:\n        dist = (v - mouse_pos).length()\n        v.z = math.exp(-dist * 0.5) * 2.0"
-            },
-            {
-                id: 16,
-                title: "Mystical Cauldron Bubble",
-                category: "Magic",
-                desc: "Swirling volumetric fluid particle sphere with inner glowing chemical reactions.",
-                python: "def fluid_bubble(particles, t):\n    for p in particles:\n        p.position += noise3d(p.position * 0.5 + t) * 0.05"
-            },
-            {
-                id: 17,
-                title: "Dark Solar Eclipse",
-                category: "Cosmic",
-                desc: "Black sun surrounded by a dynamic golden corona and solar prominence flare animations.",
-                python: "def eclipse_corona(corona_mesh, t):\n    corona_mesh.scale = (1.0 + 0.05*math.sin(t*5),) * 2\n    corona_mesh.rotation.z += 0.002"
-            },
-            {
-                id: 18,
-                title: "Rune Cyber Castle",
-                category: "Geometry",
-                desc: "Low-poly floating gothic fortress island with dynamic glowing beacon towers.",
-                python: "def hover_island(island, t):\n    island.position.y = math.sin(t * 0.8) * 0.3\n    island.rotation.y += 0.003"
-            },
-            {
-                id: 19,
-                title: "Astral Polyhedron Hive",
-                category: "Geometry",
-                desc: "Cluster of floating geometric crystals expanding and contracting in rhythmic harmonic alignment.",
-                python: "def expand_hive(crystals, t):\n    spacing = 1.5 + 0.4 * math.sin(t * 1.5)\n    for idx, c in enumerate(crystals):\n        c.position = c.base_dir * spacing"
-            },
-            {
-                id: 20,
-                title: "Cybernetic Soul Gem",
-                category: "Artifacts",
-                desc: "Pulsing ruby-gold octahedron wrapped in counter-rotating metallic rings.",
-                python: "def soul_gem_pulse(gem, ring1, ring2, t):\n    gem.material.emissiveIntensity = 0.5 + 0.5*math.sin(t*3)\n    ring1.rotation.x = t\n    ring2.rotation.y = -t"
-            },
-            {
-                id: 21,
-                title: "Enchanted Forest Wisps",
-                category: "Nature",
-                desc: "Dark wireframe ancient tree with dancing 3D wisp lights weaving through branches.",
-                python: "def orbit_wisps(wisps, branch_nodes, t):\n    for w, b in zip(wisps, branch_nodes):\n        w.position = b + Vector3(math.sin(t), math.cos(t), 0)"
-            },
-            {
-                id: 22,
-                title: "Python Matrix Rain Tunnel",
-                category: "Python",
-                desc: "Infinite 3D camera warp through a glowing tunnel formed of python code strings.",
-                python: "def camera_warp(camera, speed):\n    camera.position.z -= speed\n    if camera.position.z < -100:\n        camera.position.z = 0"
-            },
-            {
-                id: 23,
-                title: "Eldritch Eye of Providence",
-                category: "Magic",
-                desc: "Glowing dark fantasy eye enclosed inside a rotating golden pyramid structure.",
-                python: "def track_eye(eye, target):\n    eye.look_at(target)\n    pyramid.rotation.y += 0.005"
-            },
-            {
-                id: 24,
-                title: "Magic Ring Pulsar",
-                category: "Cosmic",
-                desc: "Concentric expanding energy rings creating shockwaves across 3D space.",
-                python: "def expand_rings(rings):\n    for r in rings:\n        r.scale += 0.02\n        if r.scale > 5.0: r.scale = 0.1"
-            },
-            {
-                id: 25,
-                title: "Master Mind Core",
-                category: "Python",
-                desc: "Complex interactive 3D mechanical-magical brain core representing Python AI imagination.",
-                python: "class MasterMind:\n    def sync_nodes(self, nodes, t):\n        for n in nodes:\n            n.glow = math.sin(t * n.freq) > 0.5"
-            }
-        ];
+</section>
 
-        /* -------------------------------------------------------------
-           CUSTOM CURSOR LOGIC
-        ------------------------------------------------------------- */
-        const cursorDot = document.getElementById('cursorDot');
-        const cursorRing = document.getElementById('cursorRing');
-        let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
 
-        window.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX; mouseY = e.clientY;
-            cursorDot.style.left = `${mouseX}px`;
-            cursorDot.style.top = `${mouseY}px`;
-        });
+<!-- MAIN PAGE -->
 
-        function animateCursor() {
-            ringX += (mouseX - ringX) * 0.15;
-            ringY += (mouseY - ringY) * 0.15;
-            cursorRing.style.left = `${ringX}px`;
-            cursorRing.style.top = `${ringY}px`;
-            requestAnimationFrame(animateCursor);
-        }
-        animateCursor();
+<main id="mainPage" class="hidden">
 
-        /* -------------------------------------------------------------
-           SPLASH CANVAS 3D BACKGROUND ENGINE
-        ------------------------------------------------------------- */
-        let splashScene, splashCamera, splashRenderer, splashMesh, splashParticles;
+    <header class="navbar">
 
-        function initSplash3D() {
-            const canvas = document.getElementById('splashCanvas');
-            splashScene = new THREE.Scene();
-            splashCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-            splashCamera.position.z = 7;
+        <div class="brand">
+            <span>M</span>
+            MAMUN CODING FANTASY
+        </div>
 
-            splashRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-            splashRenderer.setSize(window.innerWidth, window.innerHeight);
-            splashRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        <nav>
+            <a href="#home">HOME</a>
+            <a href="#worlds">WORLDS</a>
+            <a href="#about">ABOUT</a>
+        </nav>
 
-            // Central Arcane Geometry
-            const geo = new THREE.IcosahedronGeometry(2, 1);
-            const mat = new THREE.MeshBasicMaterial({
-                color: 0xdfa642,
-                wireframe: true,
-                transparent: true,
-                opacity: 0.4
-            });
-            splashMesh = new THREE.Mesh(geo, mat);
-            splashScene.add(splashMesh);
+        <button id="soundButton">♫</button>
 
-            // Inner Pulsing Core
-            const coreGeo = new THREE.OctahedronGeometry(1, 0);
-            const coreMat = new THREE.MeshBasicMaterial({ color: 0xffd700, wireframe: false });
-            const coreMesh = new THREE.Mesh(coreGeo, coreMat);
-            splashMesh.add(coreMesh);
+    </header>
 
-            // Particles
-            const partGeo = new THREE.BufferGeometry();
-            const count = 300;
-            const pos = new Float32Array(count * 3);
-            for(let i=0; i<count*3; i++) {
-                pos[i] = (Math.random() - 0.5) * 15;
-            }
-            partGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-            const partMat = new THREE.PointsMaterial({ size: 0.04, color: 0xdfa642, transparent: true, opacity: 0.8 });
-            splashParticles = new THREE.Points(partGeo, partMat);
-            splashScene.add(splashParticles);
 
-            animateSplash();
-        }
+    <section id="home" class="hero">
 
-        function animateSplash() {
-            requestAnimationFrame(animateSplash);
-            if (splashMesh) {
-                splashMesh.rotation.x += 0.003;
-                splashMesh.rotation.y += 0.006;
-            }
-            if (splashParticles) {
-                splashParticles.rotation.y -= 0.001;
-            }
-            splashRenderer.render(splashScene, splashCamera);
-        }
+        <div class="hero-content">
 
-        window.addEventListener('resize', () => {
-            if (splashCamera && splashRenderer) {
-                splashCamera.aspect = window.innerWidth / window.innerHeight;
-                splashCamera.updateProjectionMatrix();
-                splashRenderer.setSize(window.innerWidth, window.innerHeight);
-            }
-        });
+            <div class="eyebrow">
+                A NEW DIMENSION OF CREATIVITY
+            </div>
 
-        /* -------------------------------------------------------------
-           LANDING PAGE TO MAIN REALM TRANSITION
-        ------------------------------------------------------------- */
-        function enterRealm() {
-            const splash = document.getElementById('splashScreen');
-            const main = document.getElementById('mainRealm');
-            
-            splash.style.opacity = '0';
-            setTimeout(() => {
-                splash.style.display = 'none';
-                main.classList.remove('opacity-0', 'pointer-events-none');
-                main.classList.add('opacity-100');
-                renderScenesGrid();
-            }, 1000);
+            <h2>
+                When Imagination<br>
+                <span>Becomes Reality.</span>
+            </h2>
 
-            // Play ambient start audio if permitted
-            initAudio();
-        }
+            <p>
+                Explore 25 extraordinary 3D experimental
+                worlds powered by creative coding.
+            </p>
 
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+            <a href="#worlds" class="explore">
+                EXPLORE THE WORLDS ↓
+            </a>
 
-        /* -------------------------------------------------------------
-           POPULATE & RENDER 25 SCENES GRID
-        ------------------------------------------------------------- */
-        const activeRenderers = [];
+        </div>
 
-        function renderScenesGrid(filter = 'all') {
-            const grid = document.getElementById('scenesGrid');
-            grid.innerHTML = '';
+        <div class="hero-decoration"></div>
 
-            const filtered = filter === 'all' ? SCENES_DATA : SCENES_DATA.filter(s => s.category === filter);
+    </section>
 
-            filtered.forEach(data => {
-                const card = document.createElement('div');
-                card.className = "gothic-border rounded-xl overflow-hidden group bg-charcoal/80 flex flex-col justify-between hover:border-fantasyGold transition-all duration-300";
-                card.innerHTML = `
-                    <div class="corner-tl gothic-corner"></div>
-                    <div class="corner-tr gothic-corner"></div>
-                    <div class="corner-bl gothic-corner"></div>
-                    <div class="corner-br gothic-corner"></div>
 
-                    <div class="relative h-60 w-full bg-obsidian overflow-hidden cursor-pointer" onclick="openSceneModal(${data.id})">
-                        <canvas id="cardCanvas_${data.id}" class="w-full h-full"></canvas>
-                        <span class="absolute top-3 left-3 font-code text-[10px] bg-obsidian/90 border border-fantasyGold/40 px-2 py-1 text-fantasyGold rounded">
-                            #${data.id} &bull; ${data.category}
-                        </span>
-                        <div class="absolute inset-0 bg-gradient-to-t from-charcoal via-transparent to-transparent opacity-60"></div>
-                        <div class="absolute bottom-3 right-3 text-fantasyGold group-hover:scale-125 transition-transform">
-                            <i class="fa-solid fa-expand text-lg"></i>
-                        </div>
-                    </div>
+    <!-- 25 SCENES -->
 
-                    <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <h3 class="font-decorative text-base font-bold text-white group-hover:text-fantasyGold transition-colors mb-2">${data.title}</h3>
-                            <p class="font-sans text-xs text-gray-400 leading-relaxed mb-4 line-clamp-2">${data.desc}</p>
-                        </div>
-                        <button onclick="openSceneModal(${data.id})" class="w-full py-2.5 font-cinzel text-xs font-bold text-fantasyGold gothic-border rounded hover:bg-fantasyGold/20 transition-all flex items-center justify-center gap-2">
-                            <span>INSPECT 3D SCENE</span>
-                            <i class="fa-solid fa-eye"></i>
-                        </button>
-                    </div>
-                `;
-                grid.appendChild(card);
+    <section id="worlds" class="worlds">
 
-                // Initialize 3D scene inside card thumbnail canvas
-                setTimeout(() => initCard3DScene(data.id), 50);
-            });
-        }
+        <div class="section-title">
 
-        function filterScenes(category) {
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active', 'text-fantasyGold'));
-            event.target.classList.add('active', 'text-fantasyGold');
-            renderScenesGrid(category);
-        }
+            <div class="eyebrow">
+                THE COLLECTION / 01—25
+            </div>
 
-        /* -------------------------------------------------------------
-           3D CANVAS GENERATOR FOR EACH GRID CARD
-        ------------------------------------------------------------- */
-        function initCard3DScene(id) {
-            const canvas = document.getElementById(`cardCanvas_${id}`);
-            if (!canvas) return;
+            <h2>
+                Choose Your <span>Dimension.</span>
+            </h2>
 
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
-            camera.position.z = 3.5;
+        </div>
 
-            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-            renderer.setPixelRatio(1);
+        <div id="sceneGrid" class="scene-grid"></div>
 
-            // Generate specific 3D mesh based on scene ID
-            const mesh = createMeshForScene(id);
-            scene.add(mesh);
+    </section>
 
-            // Animation Loop
-            function animateCard() {
-                requestAnimationFrame(animateCard);
-                mesh.rotation.x += 0.008;
-                mesh.rotation.y += 0.012;
-                renderer.render(scene, camera);
-            }
-            animateCard();
-        }
 
-        // Helper to produce unique 3D geometries for each of the 25 scenes
-        function createMeshForScene(id) {
-            const group = new THREE.Group();
+    <section id="about" class="about">
 
-            if (id === 1) { // Animated Cube
-                const g = new THREE.BoxGeometry(1.5, 1.5, 1.5);
-                const m = new THREE.MeshBasicMaterial({ color: 0xdfa642, wireframe: true });
-                group.add(new THREE.Mesh(g, m));
-                const inner = new THREE.Mesh(new THREE.OctahedronGeometry(0.8), new THREE.MeshBasicMaterial({ color: 0xffd700 }));
-                group.add(inner);
-            } else if (id === 2) { // Motion Flower
-                for(let i=0; i<6; i++) {
-                    const petal = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1.5, 4), new THREE.MeshBasicMaterial({ color: 0xdfa642, wireframe: true }));
-                    petal.rotation.z = (i * Math.PI / 3);
-                    group.add(petal);
-                }
-            } else if (id === 3) { // Dark Energy Orb
-                const orb = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16), new THREE.MeshBasicMaterial({ color: 0x6b21a8, wireframe: true }));
-                const ring = new THREE.Mesh(new THREE.TorusGeometry(1.4, 0.05, 8, 32), new THREE.MeshBasicMaterial({ color: 0xdfa642 }));
-                group.add(orb); group.add(ring);
-            } else if (id === 4) { // Python Serpent / DNA
-                for(let i=0; i<12; i++) {
-                    const node = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 8), new THREE.MeshBasicMaterial({ color: i%2===0 ? 0x00f0ff : 0xdfa642 }));
-                    node.position.set(Math.cos(i)*1.2, (i-6)*0.2, Math.sin(i)*1.2);
-                    group.add(node);
-                }
-            } else { // Fallback / Other Geometries (5 through 25)
-                const geoms = [
-                    new THREE.DodecahedronGeometry(1.2),
-                    new THREE.TorusKnotGeometry(0.8, 0.2, 64, 8),
-                    new THREE.TetrahedronGeometry(1.4),
-                    new THREE.RingGeometry(0.6, 1.2, 8),
-                    new THREE.CylinderGeometry(0.8, 0.8, 1.5, 6),
-                    new THREE.IcosahedronGeometry(1.2, 0)
-                ];
-                const selectedGeom = geoms[id % geoms.length];
-                const mat = new THREE.MeshBasicMaterial({ color: (id % 2 === 0) ? 0xdfa642 : 0x00f0ff, wireframe: true });
-                group.add(new THREE.Mesh(selectedGeom, mat));
-            }
+        <div class="eyebrow">THE PHILOSOPHY</div>
 
-            return group;
-        }
+        <h2>
+            Not just code.<br>
+            <span>A universe of creation.</span>
+        </h2>
 
-        /* -------------------------------------------------------------
-           FULLSCREEN INSPECTOR MODAL & REAL-TIME CONTROLS
-        ------------------------------------------------------------- */
-        let modalScene, modalCamera, modalRenderer, modalMesh;
-        let currentAnimSpeed = 1.0;
-        let currentGlow = 1.0;
+        <p>
+            Where mathematics becomes art,
+            geometry learns to breathe,
+            and imagination takes shape.
+        </p>
 
-        function openSceneModal(id) {
-            const data = SCENES_DATA.find(s => s.id === id);
-            if (!data) return;
+    </section>
 
-            document.getElementById('modalId').innerText = data.id;
-            document.getElementById('modalTitle').innerText = data.title;
-            document.getElementById('modalCategory').innerText = data.category;
-            document.getElementById('modalDesc').innerText = data.desc;
-            document.getElementById('modalPythonCode').innerText = data.python;
 
-            document.getElementById('sceneModal').classList.remove('hidden');
+    <footer>
+        © MAMUN CODING FANTASY
+        <span>WHEN IMAGINATION MEETS PYTHON</span>
+    </footer>
 
-            // Setup Modal Canvas
-            const canvas = document.getElementById('modalCanvas');
-            modalScene = new THREE.Scene();
-            modalCamera = new THREE.PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
-            modalCamera.position.z = 4;
+</main>
 
-            modalRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-            modalRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
-            modalRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-            modalMesh = createMeshForScene(id);
-            modalMesh.scale.set(1.3, 1.3, 1.3);
-            modalScene.add(modalMesh);
+<!-- FULLSCREEN SCENE EXPERIENCE -->
 
-            // Simple Drag Rotation
-            let isDragging = false, prevMouseX = 0, prevMouseY = 0;
-            canvas.onmousedown = (e) => { isDragging = true; prevMouseX = e.clientX; prevMouseY = e.clientY; };
-            window.onmouseup = () => { isDragging = false; };
-            window.onmousemove = (e) => {
-                if (isDragging && modalMesh) {
-                    const deltaX = e.clientX - prevMouseX;
-                    const deltaY = e.clientY - prevMouseY;
-                    modalMesh.rotation.y += deltaX * 0.01;
-                    modalMesh.rotation.x += deltaY * 0.01;
-                    prevMouseX = e.clientX;
-                    prevMouseY = e.clientY;
-                }
-            };
+<section id="experience" class="hidden">
 
-            animateModalScene();
-        }
+    <div id="experienceCanvas"></div>
 
-        function animateModalScene() {
-            if (document.getElementById('sceneModal').classList.contains('hidden')) return;
-            requestAnimationFrame(animateModalScene);
-            if (modalMesh) {
-                modalMesh.rotation.y += 0.005 * currentAnimSpeed;
-                modalMesh.rotation.x += 0.003 * currentAnimSpeed;
-            }
-            modalRenderer.render(modalScene, modalCamera);
-        }
+    <div class="experience-navbar">
 
-        function closeSceneModal() {
-            document.getElementById('sceneModal').classList.add('hidden');
-        }
+        <button id="backButton">
+            ← ALL WORLDS
+        </button>
 
-        // Sliders Listeners
-        document.getElementById('speedSlider').addEventListener('input', (e) => {
-            currentAnimSpeed = parseFloat(e.target.value);
-            document.getElementById('speedVal').innerText = currentAnimSpeed.toFixed(1) + 'x';
-        });
+        <div id="sceneCounter">01 / 25</div>
 
-        document.getElementById('glowSlider').addEventListener('input', (e) => {
-            currentGlow = parseFloat(e.target.value);
-            document.getElementById('glowVal').innerText = currentGlow.toFixed(1);
-            if(modalMesh) {
-                modalMesh.traverse(child => {
-                    if(child.material) child.material.opacity = Math.min(currentGlow, 1.0);
-                });
-            }
-        });
+        <button id="fullscreenButton">⛶</button>
 
-        /* -------------------------------------------------------------
-           WEB AUDIO API - AMBIENT FANTASY DRONE
-        ------------------------------------------------------------- */
-        let audioCtx, isAudioOn = false, osc1, osc2, gainNode;
+    </div>
 
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-        }
+    <div class="experience-details">
 
-        function toggleAmbience() {
-            initAudio();
-            const label = document.getElementById('audioLabel');
-            const icon = document.getElementById('audioIcon');
+        <div class="eyebrow" id="sceneCategory">
+            MOTION STUDY / 01
+        </div>
 
-            if (!isAudioOn) {
-                osc1 = audioCtx.createOscillator();
-                osc2 = audioCtx.createOscillator();
-                gainNode = audioCtx.createGain();
+        <h2 id="sceneTitle"></h2>
 
-                osc1.type = 'sawtooth';
-                osc1.frequency.setValueAtTime(65.41, audioCtx.currentTime); // C2
+        <p id="sceneDescription"></p>
 
-                osc2.type = 'sine';
-                osc2.frequency.setValueAtTime(130.81, audioCtx.currentTime); // C3
+    </div>
 
-                const filter = audioCtx.createBiquadFilter();
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(180, audioCtx.currentTime);
+    <div class="scene-controls">
 
-                gainNode.gain.setValueAtTime(0.01, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.1, audioCtx.currentTime + 2);
+        <button id="previousButton">← PREVIOUS</button>
 
-                osc1.connect(filter);
-                osc2.connect(filter);
-                filter.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
+        <button id="replayButton">↻ REPLAY</button>
 
-                osc1.start(); osc2.start();
-                isAudioOn = true;
+        <button id="nextButton">NEXT →</button>
 
-                label.innerText = "AUDIO: ON";
-                icon.className = "fa-solid fa-volume-high text-fantasyGold";
-            } else {
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
-                setTimeout(() => {
-                    if (osc1) osc1.stop();
-                    if (osc2) osc2.stop();
-                    isAudioOn = false;
-                    label.innerText = "AUDIO: OFF";
-                    icon.className = "fa-solid fa-volume-xmark";
-                }, 1000);
-            }
-        }
+    </div>
 
-        // Initialize Splash Screen on Window Load
-        window.onload = () => {
-            initSplash3D();
-        };
-    </script>
+</section>
+
+
+<audio id="backgroundMusic" loop preload="auto"></audio>
+
+<script type="module" src="js/main.js"></script>
+
 </body>
-</html>
-```
+    </html>
