@@ -601,23 +601,367 @@ function worldCube(root){
 }
 
 /* 02 — MASTERCLASS FLOWER */
-function worldFlower(root){
- const flower=group(root,0,-.2,0);
- addBranch(flower,[0,-2.8,0],[0,-.1,0],.12,C.emerald);
- const petals=[];
- for(let i=0;i<20;i++)petals.push(addPetal(flower,i/20*TAU,
-  [C.rose,C.violet,C.gold,C.cyan][i%4],i));
- const center=sphere(flower,.43,C.gold,0,.15,40);
- center.userData.kind="pulseCore";
- for(let i=0;i<9;i++){
-  const leaf=mesh(flower,new THREE.SphereGeometry(.45,20,12),
-   materials.matte(C.emerald),Math.sin(i*2)*.55,-.9-i*.18,0);
-  leaf.scale.set(1.9,.32,.35);leaf.rotation.z=i*.6;
- }
- flower.userData.petals=petals;
- flower.userData.kind="flower";
- addRings(flower,3,2.3,C.rose,.014);
- particleCloud(flower,350,C.rose,5,.035);
+
+function worldFlower(root) {
+  const flower = group(root, 0, 0, 0);
+
+  flower.userData.kind = "flower";
+  flower.userData.time = Math.random() * 10;
+
+  // =====================================
+  // 1. COSMIC STEM
+  // =====================================
+
+  const stem = addBranch(
+    flower,
+    [0, -3.2, 0],
+    [0, 0, 0],
+    0.105,
+    C.emerald
+  );
+
+  // Floating roots
+  const roots = [];
+
+  for (let i = 0; i < 9; i++) {
+    const angle = i / 9 * TAU;
+
+    const rootMesh = addBranch(
+      flower,
+      [
+        Math.cos(angle) * 0.2,
+        -2.7,
+        Math.sin(angle) * 0.2
+      ],
+      [
+        Math.cos(angle) * (1.1 + Math.random()),
+        -3.8 - Math.random() * 1.2,
+        Math.sin(angle) * (1.1 + Math.random())
+      ],
+      0.025,
+      C.gold
+    );
+
+    roots.push(rootMesh);
+  }
+
+  flower.userData.roots = roots;
+
+  // =====================================
+  // 2. CRYSTAL COSMIC PETALS
+  // =====================================
+
+  const petals = [];
+
+  for (let i = 0; i < 24; i++) {
+    const angle = i / 24 * TAU;
+
+    const petal = addPetal(
+      flower,
+      angle,
+      [C.rose, C.violet, C.gold][i % 3],
+      i
+    );
+
+    petals.push(petal);
+
+    petal.userData.phase = angle;
+    petal.userData.openSpeed = 0.65 + Math.random() * 0.5;
+  }
+
+  flower.userData.petals = petals;
+
+  // =====================================
+  // 3. GOLDEN ENERGY CORE
+  // =====================================
+
+  const core = sphere(
+    flower,
+    0.48,
+    C.gold,
+    0,
+    0.15,
+    48
+  );
+
+  core.userData.kind = "pulseCore";
+
+  flower.userData.core = core;
+
+  // Inner energy sphere
+  const innerCore = sphere(
+    flower,
+    0.22,
+    C.rose,
+    0,
+    0.15,
+    32
+  );
+
+  innerCore.userData.kind = "pulseCore";
+
+  // =====================================
+  // 4. CRYSTAL LEAVES
+  // =====================================
+
+  const leaves = [];
+
+  for (let i = 0; i < 12; i++) {
+    const angle = i / 12 * TAU;
+
+    const leaf = mesh(
+      flower,
+      new THREE.SphereGeometry(0.42, 24, 16),
+      materials.matte(C.emerald),
+      Math.cos(angle) * 0.6,
+      -0.9 - (i % 4) * 0.25,
+      Math.sin(angle) * 0.6
+    );
+
+    leaf.scale.set(1.8, 0.22, 0.55);
+    leaf.rotation.z = angle;
+    leaf.rotation.y = angle;
+
+    leaves.push(leaf);
+  }
+
+  flower.userData.leaves = leaves;
+
+  // =====================================
+  // 5. GOLDEN FLOATING ORBS
+  // =====================================
+
+  const goldenOrbs = [];
+
+  for (let i = 0; i < 28; i++) {
+    const angle = Math.random() * TAU;
+    const radius = 2.2 + Math.random() * 2.5;
+
+    const orb = sphere(
+      flower,
+      0.045 + Math.random() * 0.085,
+      C.gold,
+      Math.cos(angle) * radius,
+      Math.random() * 4 - 1,
+      20
+    );
+
+    orb.position.z = Math.sin(angle) * radius;
+
+    orb.userData.orbit = {
+      angle,
+      radius,
+      speed: 0.25 + Math.random() * 0.65,
+      height: orb.position.y,
+      phase: Math.random() * TAU
+    };
+
+    goldenOrbs.push(orb);
+  }
+
+  flower.userData.goldenOrbs = goldenOrbs;
+
+  // =====================================
+  // 6. MAGICAL GOLDEN DUST
+  // =====================================
+
+  particleCloud(
+    flower,
+    650,
+    C.gold,
+    7,
+    0.045
+  );
+
+  // Rose and violet magical particles
+  particleCloud(
+    flower,
+    240,
+    C.rose,
+    5,
+    0.035
+  );
+
+  // =====================================
+  // 7. ENERGY RINGS
+  // =====================================
+
+  addRings(
+    flower,
+    4,
+    2.8,
+    C.gold,
+    0.018
+  );
+
+  addRings(
+    flower,
+    3,
+    3.5,
+    C.rose,
+    0.012
+  );
+
+  // =====================================
+  // 8. FLOATING MINI FLOWERS
+  // =====================================
+
+  const miniFlowers = [];
+
+  for (let i = 0; i < 7; i++) {
+    const angle = i / 7 * TAU;
+    const radius = 3.1 + Math.random() * 0.8;
+
+    const mini = group(
+      flower,
+      Math.cos(angle) * radius,
+      Math.random() * 2.5,
+      Math.sin(angle) * radius
+    );
+
+    const miniPetals = [];
+
+    for (let j = 0; j < 8; j++) {
+      miniPetals.push(
+        addPetal(
+          mini,
+          j / 8 * TAU,
+          j % 2 === 0 ? C.gold : C.rose,
+          j
+        )
+      );
+    }
+
+    const miniCore = sphere(
+      mini,
+      0.12,
+      C.gold,
+      0,
+      0,
+      16
+    );
+
+    mini.userData.kind = "miniFlower";
+    mini.userData.orbit = {
+      angle,
+      radius,
+      speed: 0.15 + Math.random() * 0.25,
+      height: mini.position.y,
+      phase: Math.random() * TAU
+    };
+
+    miniFlowers.push(mini);
+  }
+
+  flower.userData.miniFlowers = miniFlowers;
+
+  // =====================================
+  // 9. GOLDEN ENERGY SPIKES
+  // =====================================
+
+  const energyPoints = [];
+
+  for (let i = 0; i < 16; i++) {
+    const angle = i / 16 * TAU;
+
+    const point = sphere(
+      flower,
+      0.055,
+      C.gold,
+      Math.cos(angle) * 1.5,
+      0.2,
+      12
+    );
+
+    point.position.z = Math.sin(angle) * 1.5;
+
+    point.userData.phase = angle;
+
+    energyPoints.push(point);
+  }
+
+  flower.userData.energyPoints = energyPoints;
+
+  // =====================================
+  // 10. ANIMATION DATA
+  // =====================================
+
+  flower.userData.animate = function(time) {
+
+    // Golden core pulse
+    if (this.userData.core) {
+      const pulse = 1 + Math.sin(time * 2.2) * 0.12;
+
+      this.userData.core.scale.setScalar(pulse);
+    }
+
+    // Petal movement
+    this.userData.petals.forEach((petal, i) => {
+      if (!petal) return;
+
+      const phase = petal.userData.phase || i;
+
+      petal.rotation.z +=
+        Math.sin(time * 0.7 + phase) * 0.0008;
+    });
+
+    // Golden orbs orbit
+    this.userData.goldenOrbs.forEach(orb => {
+      const data = orb.userData.orbit;
+
+      const angle = data.angle + time * data.speed;
+
+      orb.position.x = Math.cos(angle) * data.radius;
+
+      orb.position.z = Math.sin(angle) * data.radius;
+
+      orb.position.y =
+        data.height +
+        Math.sin(time * 1.5 + data.phase) * 0.4;
+    });
+
+    // Mini flowers floating
+    this.userData.miniFlowers.forEach(mini => {
+      const data = mini.userData.orbit;
+
+      const angle = data.angle + time * data.speed;
+
+      mini.position.x = Math.cos(angle) * data.radius;
+
+      mini.position.z = Math.sin(angle) * data.radius;
+
+      mini.position.y =
+        data.height +
+        Math.sin(time + data.phase) * 0.35;
+
+      mini.rotation.y += 0.008;
+    });
+
+    // Energy points
+    this.userData.energyPoints.forEach(point => {
+      const phase = point.userData.phase;
+
+      point.scale.setScalar(
+        0.8 + Math.sin(time * 3 + phase) * 0.3
+      );
+    });
+
+    // Floating roots
+    this.userData.roots.forEach((rootMesh, i) => {
+      if (rootMesh) {
+        rootMesh.rotation.z =
+          Math.sin(time * 0.5 + i) * 0.035;
+      }
+    });
+
+    // Living flower movement
+    this.rotation.y = Math.sin(time * 0.15) * 0.08;
+
+    this.position.y =
+      Math.sin(time * 0.65) * 0.12;
+  };
+
+  return flower;
 }
 
 /* 03 — INFINITE KNOT */
