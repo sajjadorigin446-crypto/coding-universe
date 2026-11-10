@@ -4,11 +4,472 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#050505">
-<title>MAMUN CODING FANTASY — Beyond Imagination</title>
+<meta name="theme-color" content="#030303">
+
+<title>MAMUN CODING FANTASY — When Imagination Meets Python</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --black:#030303;
+  --gold:#c6a467;
+  --ivory:#eee8dc;
+}
+
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html {
+  background:var(--black);
+  scroll-behavior:smooth;
+  scrollbar-width:thin;
+  scrollbar-color:#8e7040 #030303;
+}
+
+body {
+  background:var(--black);
+  color:var(--ivory);
+  font-family:Inter,sans-serif;
+  overflow-x:hidden;
+}
+
+body.intro-open {
+  overflow:hidden;
+}
+
+button {
+  font:inherit;
+}
+
+/* 3D WORLD */
+
+#world {
+  position:fixed;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+}
+
+#world canvas {
+  display:block;
+  width:100%;
+  height:100%;
+}
+
+.vignette {
+  position:fixed;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse at center,transparent 35%,rgba(0,0,0,.38) 100%),
+    linear-gradient(180deg,rgba(0,0,0,.12),transparent 35%,rgba(0,0,0,.25));
+}
+
+/* INTRO */
+
+#intro {
+  position:fixed;
+  inset:0;
+  z-index:20;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  overflow:hidden;
+  background:#030303;
+  transition:opacity 1.2s ease,visibility 1.2s ease;
+}
+
+#intro.exit {
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+
+.intro-orbit {
+  position:absolute;
+  width:min(75vw,620px);
+  aspect-ratio:1;
+  border:1px solid rgba(198,164,103,.22);
+  border-radius:50%;
+  box-shadow:
+    0 0 80px rgba(198,164,103,.05),
+    inset 0 0 80px rgba(198,164,103,.035);
+  animation:orbit 35s linear infinite;
+}
+
+.intro-orbit::before,
+.intro-orbit::after {
+  content:"";
+  position:absolute;
+  inset:9%;
+  border:1px dashed rgba(198,164,103,.23);
+  border-radius:50%;
+}
+
+.intro-orbit::after {
+  inset:20%;
+  border-style:solid;
+  border-color:rgba(198,164,103,.13);
+  animation:orbit 20s linear infinite reverse;
+}
+
+.intro-light {
+  position:absolute;
+  width:60vw;
+  max-width:600px;
+  aspect-ratio:1;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(180,133,66,.13),transparent 68%);
+  filter:blur(25px);
+  animation:pulse 5s ease-in-out infinite;
+}
+
+.intro-content {
+  position:relative;
+  z-index:3;
+  padding:24px;
+}
+
+.intro-kicker {
+  font-size:9px;
+  letter-spacing:6px;
+  color:var(--gold);
+  margin-bottom:28px;
+}
+
+.intro-title {
+  font-family:Cinzel,serif;
+  font-size:clamp(32px,7vw,78px);
+  font-weight:400;
+  letter-spacing:3px;
+  line-height:1.25;
+}
+
+.intro-title span {
+  display:block;
+  color:var(--gold);
+}
+
+.intro-subtitle {
+  margin-top:20px;
+  font-size:10px;
+  letter-spacing:4px;
+  color:#898174;
+}
+
+.enter {
+  margin-top:48px;
+  padding:17px 35px;
+  border:1px solid rgba(198,164,103,.65);
+  background:rgba(198,164,103,.04);
+  color:#e5cb99;
+  letter-spacing:4px;
+  font-size:9px;
+  cursor:pointer;
+  transition:.4s;
+}
+
+.enter:hover {
+  background:var(--gold);
+  color:#080706;
+  box-shadow:0 0 40px rgba(198,164,103,.25);
+}
+
+.intro-footer {
+  position:absolute;
+  bottom:27px;
+  color:#655c4d;
+  font-size:8px;
+  letter-spacing:4px;
+}
+
+/* MAIN INTERFACE */
+
+#main {
+  position:relative;
+  z-index:3;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity 1.2s ease;
+}
+
+#main.show {
+  opacity:1;
+  visibility:visible;
+}
+
+.brand-mark {
+  position:fixed;
+  top:27px;
+  left:35px;
+  z-index:8;
+  font-family:Cinzel,serif;
+  font-size:12px;
+  letter-spacing:3px;
+  color:rgba(222,190,133,.85);
+  mix-blend-mode:screen;
+  pointer-events:none;
+}
+
+.scene-counter {
+  position:fixed;
+  right:35px;
+  bottom:32px;
+  z-index:8;
+  font-size:9px;
+  letter-spacing:3px;
+  color:rgba(220,194,149,.8);
+  pointer-events:none;
+}
+
+.scene-counter span {
+  color:#777064;
+}
+
+.sound {
+  position:fixed;
+  right:30px;
+  top:22px;
+  z-index:10;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:11px 13px;
+  color:#d5bb8b;
+  background:rgba(5,5,5,.55);
+  border:1px solid rgba(198,164,103,.25);
+  font-size:8px;
+  letter-spacing:2px;
+  cursor:pointer;
+  backdrop-filter:blur(10px);
+}
+
+.sound-bars {
+  display:flex;
+  align-items:center;
+  gap:3px;
+  height:12px;
+}
+
+.sound-bars i {
+  width:2px;
+  height:4px;
+  background:var(--gold);
+}
+
+.sound.playing .sound-bars i {
+  animation:bars .65s ease-in-out infinite alternate;
+}
+
+.sound-bars i:nth-child(2) {animation-delay:.15s}
+.sound-bars i:nth-child(3) {animation-delay:.3s}
+.sound-bars i:nth-child(4) {animation-delay:.1s}
+
+.scroll-hint {
+  position:fixed;
+  bottom:32px;
+  left:35px;
+  z-index:8;
+  color:rgba(205,190,164,.55);
+  font-size:8px;
+  letter-spacing:3px;
+  pointer-events:none;
+  writing-mode:vertical-rl;
+}
+
+.scroll-hint::after {
+  content:"";
+  display:block;
+  height:42px;
+  width:1px;
+  margin:15px auto 0;
+  background:linear-gradient(var(--gold),transparent);
+}
+
+/* SCROLL WORLD */
+
+.world-section {
+  height:100svh;
+  min-height:600px;
+  position:relative;
+  z-index:0;
+  pointer-events:none;
+}
+
+.world-section:first-child {
+  height:100svh;
+}
+
+.world-section:last-child {
+  height:100svh;
+}
+
+.end-mark {
+  position:relative;
+  z-index:4;
+  height:100svh;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  pointer-events:none;
+}
+
+.end-mark div {
+  font-family:Cinzel,serif;
+  font-size:clamp(20px,4vw,45px);
+  letter-spacing:5px;
+  color:rgba(204,170,112,.65);
+}
+
+.end-mark small {
+  display:block;
+  margin-top:22px;
+  font-family:Inter,sans-serif;
+  font-size:8px;
+  letter-spacing:5px;
+  color:#777064;
+}
+
+/* RESPONSIVE */
+
+@keyframes orbit {
+  to {transform:rotate(360deg)}
+}
+
+@keyframes pulse {
+  0%,100% {transform:scale(.85);opacity:.55}
+  50% {transform:scale(1.15);opacity:1}
+}
+
+@keyframes bars {
+  from {height:3px}
+  to {height:12px}
+}
+
+@media(max-width:700px) {
+  .brand-mark {
+    left:16px;
+    top:19px;
+    font-size:9px;
+    letter-spacing:2px;
+  }
+
+  .sound {
+    top:14px;
+    right:13px;
+    padding:9px;
+    font-size:7px;
+  }
+
+  .scene-counter {
+    right:17px;
+    bottom:18px;
+  }
+
+  .scroll-hint {
+    left:16px;
+    bottom:18px;
+  }
+
+  .intro-kicker {
+    letter-spacing:3px;
+  }
+
+  .intro-subtitle {
+    font-size:8px;
+    letter-spacing:2px;
+  }
+
+  .world-section {
+    min-height:500px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after {
+    scroll-behavior:auto!important;
+  }
+}
+</style>
+</head>
+
+<body class="intro-open">
+
+<div id="world"></div>
+<div class="vignette"></div>
+
+<!-- OPENING EXPERIENCE -->
+
+<div id="intro">
+  <div class="intro-light"></div>
+  <div class="intro-orbit"></div>
+
+  <div class="intro-content">
+    <div class="intro-kicker">AN EXPERIMENT IN CREATIVE CODING</div>
+
+    <h1 class="intro-title">
+      MAMUN
+      <span>CODING FANTASY</span>
+    </h1>
+
+    <div class="intro-subtitle">
+      WHEN IMAGINATION MEETS PYTHON
+    </div>
+
+    <button class="enter" id="enter">
+      ENTER THE EXPERIENCE
+    </button>
+  </div>
+
+  <div class="intro-footer">
+    A DIGITAL EXPERIMENT BY MAMUN
+  </div>
+</div>
+
+<!-- MAIN EXPERIENCE -->
+
+<main id="main">
+
+  <div class="brand-mark">MAMUN / CODING FANTASY</div>
+
+  <div class="scroll-hint">SCROLL TO EXPLORE</div>
+
+  <div class="scene-counter">
+    <span id="sceneNumber">01</span> / 08
+  </div>
+
+  <button class="sound" id="sound">
+    <span class="sound-bars">
+      <i></i><i></i><i></i><i></i>
+    </span>
+    <span id="soundLabel">SOUND ON</span>
+  </button>
+
+  <section class="world-section" data-scene="geometry"></section>
+  <section class="world-section" data-scene="bloom"></section>
+  <section class="world-section" data-scene="liquid"></section>
+  <section class="world-section" data-scene="singularity"></section>
+  <section class="world-section" data-scene="kinetic"></section>
+  <section class="world-section" data-scene="gravity"></section>
+  <section class="world-section" data-scene="waves"></section>
+  <section class="world-section" data-scene="fractal"></section>
+
+  <section class="end-mark">
+    <div>
+      BEYOND IMAGINATION
+      <small>THE EXPERIMENT NEVER ENDS</small>
+    </div>
+  </section>
+
+</main>
+
+<audio id="music" src="music.mp3" preload="auto" loop></audio>
 
 <script type="importmap">
 {
@@ -19,748 +480,6 @@
 }
 </script>
 
-<style>
-:root {
-  --bg:#050505;
-  --gold:#c9a45c;
-  --gold-light:#f0d69b;
-  --white:#eee9df;
-  --muted:#8b867c;
-}
-
-* {
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
-html {
-  scroll-behavior:smooth;
-  background:var(--bg);
-}
-
-body {
-  background:var(--bg);
-  color:var(--white);
-  font-family:'Inter',sans-serif;
-  overflow-x:hidden;
-}
-
-body.locked {
-  overflow:hidden;
-}
-
-button {
-  font:inherit;
-}
-
-/* GLOBAL CANVAS */
-
-#world {
-  position:fixed;
-  inset:0;
-  z-index:0;
-  pointer-events:none;
-}
-
-#world canvas {
-  width:100%;
-  height:100%;
-  display:block;
-}
-
-/* AMBIENT LIGHT */
-
-.ambient {
-  position:fixed;
-  inset:0;
-  z-index:1;
-  pointer-events:none;
-  background:
-    radial-gradient(ellipse at 50% 50%, transparent 15%, rgba(0,0,0,.35) 100%),
-    linear-gradient(180deg,rgba(0,0,0,.15),transparent 40%,rgba(0,0,0,.55));
-}
-
-/* INTRO */
-
-#intro {
-  position:fixed;
-  inset:0;
-  z-index:20;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  overflow:hidden;
-  background:#030303;
-  transition:opacity 1.1s ease,visibility 1.1s ease;
-}
-
-#intro.hide {
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-}
-
-.intro-glow {
-  position:absolute;
-  width:min(75vw,650px);
-  aspect-ratio:1;
-  border-radius:50%;
-  background:radial-gradient(circle,rgba(194,148,72,.13),transparent 68%);
-  filter:blur(20px);
-  animation:breathe 5s ease-in-out infinite;
-}
-
-.portal {
-  position:absolute;
-  width:min(65vw,440px);
-  aspect-ratio:1;
-  border:1px solid rgba(211,174,106,.3);
-  border-radius:50%;
-  box-shadow:
-    0 0 30px rgba(202,161,91,.08),
-    inset 0 0 35px rgba(202,161,91,.06);
-  animation:portalRotate 25s linear infinite;
-}
-
-.portal::before,
-.portal::after {
-  content:"";
-  position:absolute;
-  inset:18px;
-  border:1px dashed rgba(220,185,118,.35);
-  border-radius:50%;
-}
-
-.portal::after {
-  inset:42px;
-  border-style:solid;
-  border-color:rgba(220,185,118,.12);
-  animation:portalRotate 18s linear infinite reverse;
-}
-
-.intro-content {
-  position:relative;
-  z-index:2;
-  padding:25px;
-  animation:rise 1.4s ease both;
-}
-
-.intro-kicker {
-  font-size:10px;
-  letter-spacing:6px;
-  color:var(--gold);
-  text-transform:uppercase;
-  margin-bottom:28px;
-}
-
-.intro-title {
-  font-family:'Cinzel',serif;
-  font-size:clamp(34px,7vw,82px);
-  font-weight:500;
-  letter-spacing:4px;
-  line-height:1.18;
-  color:#eee7d9;
-  text-shadow:0 0 35px rgba(210,169,100,.18);
-}
-
-.intro-title span {
-  display:block;
-  color:var(--gold-light);
-}
-
-.intro-description {
-  color:#8f887b;
-  font-size:12px;
-  letter-spacing:2px;
-  margin-top:22px;
-}
-
-.enter-btn {
-  margin-top:48px;
-  padding:17px 34px;
-  border:1px solid rgba(210,173,105,.65);
-  background:rgba(190,145,67,.06);
-  color:var(--gold-light);
-  letter-spacing:4px;
-  font-size:10px;
-  cursor:pointer;
-  transition:.4s;
-  position:relative;
-  overflow:hidden;
-}
-
-.enter-btn:hover {
-  background:var(--gold);
-  color:#080808;
-  box-shadow:0 0 35px rgba(201,164,92,.25);
-}
-
-.intro-footer {
-  position:absolute;
-  bottom:28px;
-  left:0;
-  width:100%;
-  color:#514b41;
-  font-size:9px;
-  letter-spacing:3px;
-}
-
-/* MAIN */
-
-#main {
-  position:relative;
-  z-index:2;
-  opacity:0;
-  visibility:hidden;
-  transition:opacity 1.2s ease;
-}
-
-#main.visible {
-  opacity:1;
-  visibility:visible;
-}
-
-.topbar {
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:76px;
-  padding:0 6%;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  z-index:10;
-  border-bottom:1px solid rgba(255,255,255,.055);
-  background:linear-gradient(180deg,rgba(4,4,4,.85),transparent);
-  backdrop-filter:blur(8px);
-}
-
-.brand {
-  font-family:'Cinzel',serif;
-  letter-spacing:3px;
-  color:var(--gold-light);
-  font-size:13px;
-}
-
-.nav {
-  display:flex;
-  gap:27px;
-}
-
-.nav a {
-  color:#aaa397;
-  font-size:9px;
-  letter-spacing:2px;
-  text-decoration:none;
-  transition:.3s;
-}
-
-.nav a:hover {
-  color:var(--gold-light);
-}
-
-.sound-control {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  border:1px solid rgba(201,164,92,.3);
-  background:rgba(0,0,0,.45);
-  padding:10px 13px;
-  color:var(--gold-light);
-  font-size:9px;
-  letter-spacing:2px;
-  cursor:pointer;
-}
-
-.sound-bars {
-  display:flex;
-  align-items:center;
-  gap:3px;
-  height:13px;
-}
-
-.sound-bars i {
-  width:2px;
-  height:5px;
-  background:var(--gold);
-}
-
-.sound-control.playing .sound-bars i {
-  animation:musicBars .7s ease-in-out infinite alternate;
-}
-
-.sound-bars i:nth-child(2) {animation-delay:.2s}
-.sound-bars i:nth-child(3) {animation-delay:.4s}
-.sound-bars i:nth-child(4) {animation-delay:.1s}
-
-.hero {
-  min-height:100svh;
-  position:relative;
-  display:flex;
-  align-items:center;
-  padding:130px 10% 90px;
-}
-
-.hero-content {
-  position:relative;
-  z-index:3;
-  max-width:650px;
-  pointer-events:none;
-}
-
-.eyebrow {
-  color:var(--gold);
-  font-size:10px;
-  letter-spacing:5px;
-  margin-bottom:26px;
-}
-
-.hero h1 {
-  font-family:'Cinzel',serif;
-  font-size:clamp(42px,8vw,100px);
-  line-height:1.13;
-  font-weight:500;
-  letter-spacing:2px;
-}
-
-.hero h1 span {
-  display:block;
-  color:var(--gold-light);
-}
-
-.hero p {
-  color:#aaa397;
-  max-width:440px;
-  font-size:13px;
-  line-height:2;
-  margin-top:30px;
-}
-
-.hero-link {
-  display:inline-block;
-  margin-top:35px;
-  color:var(--gold-light);
-  font-size:10px;
-  letter-spacing:3px;
-  text-decoration:none;
-  border-bottom:1px solid rgba(201,164,92,.5);
-  padding-bottom:10px;
-  pointer-events:auto;
-}
-
-.scroll-indicator {
-  position:absolute;
-  bottom:35px;
-  left:10%;
-  display:flex;
-  align-items:center;
-  gap:14px;
-  color:#777064;
-  font-size:9px;
-  letter-spacing:3px;
-}
-
-.scroll-line {
-  height:1px;
-  width:45px;
-  background:var(--gold);
-  animation:linePulse 2s infinite;
-}
-
-/* SCENE SECTIONS */
-
-.scene-section {
-  position:relative;
-  min-height:100svh;
-  display:flex;
-  align-items:center;
-  padding:100px 10%;
-  border-top:1px solid rgba(255,255,255,.035);
-  overflow:hidden;
-}
-
-.scene-section:nth-of-type(even) {
-  justify-content:flex-end;
-}
-
-.scene-copy {
-  position:relative;
-  z-index:3;
-  max-width:390px;
-  padding:25px;
-  background:linear-gradient(90deg,rgba(5,5,5,.82),rgba(5,5,5,.25));
-  pointer-events:none;
-}
-
-.scene-number {
-  font-size:10px;
-  letter-spacing:4px;
-  color:var(--gold);
-  margin-bottom:20px;
-}
-
-.scene-copy h2 {
-  font-family:'Cinzel',serif;
-  font-weight:400;
-  font-size:clamp(30px,5vw,54px);
-  line-height:1.2;
-  color:#eee7da;
-}
-
-.scene-copy p {
-  color:#9c9589;
-  font-size:12px;
-  line-height:2;
-  margin-top:22px;
-}
-
-.scene-tag {
-  display:inline-block;
-  margin-top:27px;
-  border:1px solid rgba(201,164,92,.3);
-  color:var(--gold);
-  padding:9px 13px;
-  font-size:8px;
-  letter-spacing:2px;
-}
-
-.scene-hint {
-  position:absolute;
-  bottom:35px;
-  right:7%;
-  z-index:3;
-  color:#70695e;
-  font-size:9px;
-  letter-spacing:2px;
-}
-
-/* END */
-
-.final-section {
-  min-height:85svh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  position:relative;
-  padding:100px 20px;
-  border-top:1px solid rgba(255,255,255,.06);
-}
-
-.final-section h2 {
-  font-family:'Cinzel',serif;
-  font-size:clamp(35px,7vw,75px);
-  font-weight:400;
-  color:var(--gold-light);
-}
-
-.final-section p {
-  color:#888174;
-  font-size:11px;
-  letter-spacing:3px;
-  margin-top:25px;
-}
-
-footer {
-  position:relative;
-  z-index:3;
-  text-align:center;
-  padding:30px 15px;
-  border-top:1px solid rgba(255,255,255,.06);
-  color:#6f685d;
-  font-size:9px;
-  letter-spacing:2px;
-}
-
-/* ANIMATIONS */
-
-@keyframes breathe {
-  0%,100% {transform:scale(.85);opacity:.5}
-  50% {transform:scale(1.15);opacity:1}
-}
-
-@keyframes portalRotate {
-  to {transform:rotate(360deg)}
-}
-
-@keyframes rise {
-  from {opacity:0;transform:translateY(35px)}
-  to {opacity:1;transform:translateY(0)}
-}
-
-@keyframes musicBars {
-  from {height:3px}
-  to {height:13px}
-}
-
-@keyframes linePulse {
-  0%,100% {opacity:.3;transform:scaleX(.6);transform-origin:left}
-  50% {opacity:1;transform:scaleX(1)}
-}
-
-@media(max-width:700px) {
-  .topbar {height:65px;padding:0 5%}
-  .brand {font-size:10px;letter-spacing:2px}
-  .nav {display:none}
-  .sound-control {padding:9px;font-size:8px}
-  .hero {padding:110px 7% 100px}
-  .hero h1 {font-size:clamp(40px,12vw,65px)}
-  .hero p {font-size:12px}
-  .scroll-indicator {left:7%}
-  .scene-section {
-    padding:90px 5%;
-    align-items:flex-end;
-    padding-bottom:110px;
-  }
-  .scene-section:nth-of-type(even) {
-    justify-content:flex-start;
-  }
-  .scene-copy {
-    padding:18px;
-    background:linear-gradient(0deg,rgba(4,4,4,.93),rgba(4,4,4,.3));
-    max-width:100%;
-  }
-  .scene-copy h2 {font-size:35px}
-  .scene-copy p {font-size:11px}
-  .scene-hint {bottom:25px;right:5%;font-size:8px}
-  .intro-kicker {letter-spacing:3px}
-  .intro-description {line-height:2}
-}
-</style>
-</head>
-
-<body class="locked">
-
-<div id="world"></div>
-<div class="ambient"></div>
-
-<!-- OPENING PAGE -->
-
-<div id="intro">
-  <div class="intro-glow"></div>
-  <div class="portal"></div>
-
-  <div class="intro-content">
-    <div class="intro-kicker">AN EXPERIMENT BEYOND REALITY</div>
-
-    <h1 class="intro-title">
-      MAMUN
-      <span>CODING FANTASY</span>
-    </h1>
-
-    <div class="intro-description">
-      WHERE CODE BECOMES MAGIC
-    </div>
-
-    <button class="enter-btn" id="enterBtn">
-      ENTER THE EXPERIENCE
-    </button>
-  </div>
-
-  <div class="intro-footer">
-    A DIGITAL UNIVERSE BY MAMUN
-  </div>
-</div>
-
-<!-- MAIN WEBSITE -->
-
-<main id="main">
-
-  <header class="topbar">
-    <div class="brand">MAMUN / FANTASY</div>
-
-    <nav class="nav">
-      <a href="#home">HOME</a>
-      <a href="#cube">CUBE</a>
-      <a href="#flower">FLOWER</a>
-      <a href="#worlds">WORLDS</a>
-    </nav>
-
-    <button class="sound-control playing" id="soundBtn">
-      <span class="sound-bars">
-        <i></i><i></i><i></i><i></i>
-      </span>
-      <span id="soundText">SOUND ON</span>
-    </button>
-  </header>
-
-  <!-- HERO -->
-
-  <section class="hero" id="home">
-    <div class="hero-content">
-      <div class="eyebrow">WELCOME TO ANOTHER REALITY</div>
-
-      <h1>
-        MAMUN
-        <span>CODING FANTASY</span>
-      </h1>
-
-      <p>
-        Beyond the limits of imagination.
-        A world where geometry breathes,
-        matter transforms and impossible
-        creations come alive through code.
-      </p>
-
-      <a href="#cube" class="hero-link">
-        EXPLORE THE UNIVERSE ↓
-      </a>
-    </div>
-
-    <div class="scroll-indicator">
-      <span class="scroll-line"></span>
-      SCROLL TO DISCOVER
-    </div>
-  </section>
-
-  <!-- 01 -->
-
-  <section class="scene-section" id="cube" data-scene="cube">
-    <div class="scene-copy">
-      <div class="scene-number">01 / GEOMETRIC MATTER</div>
-      <h2>The Dark Cube</h2>
-      <p>
-        A mysterious geometric structure suspended in
-        the void. It fractures into countless fragments,
-        rotates through impossible dimensions and
-        reconstructs itself.
-      </p>
-      <span class="scene-tag">FRACTURE / REBUILD</span>
-    </div>
-    <div class="scene-hint">SCROLL TO TRANSFORM</div>
-  </section>
-
-  <!-- 02 -->
-
-  <section class="scene-section" id="flower" data-scene="flower">
-    <div class="scene-copy">
-      <div class="scene-number">02 / ORGANIC MAGIC</div>
-      <h2>The Eternal Bloom</h2>
-      <p>
-        An enchanted flower born from darkness.
-        Its petals unfold, float through the air
-        and dance around an ancient golden core.
-      </p>
-      <span class="scene-tag">BLOOM / DECAY / REBIRTH</span>
-    </div>
-    <div class="scene-hint">A NEW FORM OF LIFE</div>
-  </section>
-
-  <!-- 03 -->
-
-  <section class="scene-section" data-scene="liquid">
-    <div class="scene-copy">
-      <div class="scene-number">03 / LIQUID DIMENSION</div>
-      <h2>The Liquid Soul</h2>
-      <p>
-        A living metallic entity. Its surface
-        constantly changes, stretches and folds
-        into shapes that should not exist.
-      </p>
-      <span class="scene-tag">MORPHING MATTER</span>
-    </div>
-    <div class="scene-hint">MATTER WITHOUT LIMITS</div>
-  </section>
-
-  <!-- 04 -->
-
-  <section class="scene-section" data-scene="clock">
-    <div class="scene-copy">
-      <div class="scene-number">04 / MECHANICAL FANTASY</div>
-      <h2>The Time Machine</h2>
-      <p>
-        An ancient mechanism with rotating rings,
-        floating gears and a mysterious core.
-        Every component moves in its own rhythm.
-      </p>
-      <span class="scene-tag">TIME / MOTION / PRECISION</span>
-    </div>
-    <div class="scene-hint">BEYOND TIME</div>
-  </section>
-
-  <!-- 05 -->
-
-  <section class="scene-section" data-scene="butterfly">
-    <div class="scene-copy">
-      <div class="scene-number">05 / LIVING ENERGY</div>
-      <h2>The Shadow Butterfly</h2>
-      <p>
-        A supernatural creature with crystalline
-        wings. It opens, closes and dissolves into
-        a cloud of golden particles.
-      </p>
-      <span class="scene-tag">FLIGHT / PARTICLES</span>
-    </div>
-    <div class="scene-hint">BORN FROM SHADOW</div>
-  </section>
-
-  <!-- 06 -->
-
-  <section class="scene-section" data-scene="dimension">
-    <div class="scene-copy">
-      <div class="scene-number">06 / IMPOSSIBLE ARCHITECTURE</div>
-      <h2>The Impossible Dimension</h2>
-      <p>
-        Floating structures, rotating platforms
-        and architectural forms that challenge
-        gravity and ordinary perception.
-      </p>
-      <span class="scene-tag">GRAVITY / DIMENSIONS</span>
-    </div>
-    <div class="scene-hint">NOTHING IS IMPOSSIBLE</div>
-  </section>
-
-  <!-- 07 -->
-
-  <section class="scene-section" data-scene="eye">
-    <div class="scene-copy">
-      <div class="scene-number">07 / COSMIC INTELLIGENCE</div>
-      <h2>The All-Seeing Eye</h2>
-      <p>
-        A mysterious eye surrounded by rotating
-        metallic rings. Its gaze follows the
-        movement of your cursor.
-      </p>
-      <span class="scene-tag">OBSERVE / FOLLOW / AWAKEN</span>
-    </div>
-    <div class="scene-hint">IT SEES EVERYTHING</div>
-  </section>
-
-  <!-- 08 -->
-
-  <section class="scene-section" data-scene="dragon">
-    <div class="scene-copy">
-      <div class="scene-number">08 / ANCIENT CREATURES</div>
-      <h2>The Forgotten Dragon</h2>
-      <p>
-        An ancient skeletal dragon emerges
-        from the darkness. Its wings unfold
-        as its eyes awaken with golden energy.
-      </p>
-      <span class="scene-tag">ANCIENT / MYTH / POWER</span>
-    </div>
-    <div class="scene-hint">AWAKEN THE LEGEND</div>
-  </section>
-
-  <section class="final-section" id="worlds">
-    <div>
-      <div class="eyebrow">THE END IS ANOTHER BEGINNING</div>
-      <h2>IMAGINATION<br>HAS NO LIMITS.</h2>
-      <p>CREATED THROUGH CODE. BROUGHT TO LIFE BY FANTASY.</p>
-    </div>
-  </section>
-
-  <footer>
-    MAMUN CODING FANTASY · AN EXPERIMENT IN DIGITAL ART
-  </footer>
-
-</main>
-
-<audio id="backgroundMusic" src="music.mp3" loop preload="auto"></audio>
-
 <script type="module">
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
@@ -768,131 +487,137 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-/* ------------------------------------------------
-   BASIC THREE.JS SETUP
------------------------------------------------- */
+/* =========================================
+   RENDERER
+========================================= */
 
-const mount = document.getElementById('world');
+const container = document.getElementById('world');
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x050505);
-scene.fog = new THREE.FogExp2(0x050505,0.025);
+scene.background = new THREE.Color(0x030303);
+scene.fog = new THREE.FogExp2(0x030303,0.018);
 
 const camera = new THREE.PerspectiveCamera(
-  45,
+  42,
   innerWidth/innerHeight,
   0.1,
-  100
+  150
 );
 
-camera.position.set(0,0,9);
+camera.position.set(0,0,10);
 
 const renderer = new THREE.WebGLRenderer({
   antialias:true,
-  alpha:true,
+  alpha:false,
   powerPreference:'high-performance'
 });
 
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
 renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.15;
-
-mount.appendChild(renderer.domElement);
+container.appendChild(renderer.domElement);
 
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene,camera));
 
 const bloom = new UnrealBloomPass(
   new THREE.Vector2(innerWidth,innerHeight),
-  0.75,
-  0.55,
-  0.15
+  0.85,
+  0.65,
+  0.12
 );
 
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
 
-/* LIGHTS */
+/* =========================================
+   LIGHTING
+========================================= */
 
-scene.add(new THREE.AmbientLight(0x88765b,1.2));
+scene.add(new THREE.AmbientLight(0x8c795d,1.1));
 
-const goldLight = new THREE.PointLight(0xd7a85e,90,30);
-goldLight.position.set(3,3,5);
-scene.add(goldLight);
+const keyLight = new THREE.PointLight(0xe1b86f,100,40);
+keyLight.position.set(4,4,6);
+scene.add(keyLight);
 
-const rimLight = new THREE.PointLight(0x70523a,65,30);
-rimLight.position.set(-5,-2,-4);
+const rimLight = new THREE.PointLight(0x78532d,75,35);
+rimLight.position.set(-5,-3,-5);
 scene.add(rimLight);
 
-const frontLight = new THREE.PointLight(0xffd99b,40,20);
-frontLight.position.set(0,4,5);
-scene.add(frontLight);
+const topLight = new THREE.PointLight(0xffd9a0,35,25);
+topLight.position.set(0,6,2);
+scene.add(topLight);
 
-/* ------------------------------------------------
-   GLOBAL STATE
------------------------------------------------- */
+/* =========================================
+   MATERIALS
+========================================= */
+
+const gold = new THREE.MeshStandardMaterial({
+  color:0xb18a4e,
+  metalness:.95,
+  roughness:.19,
+  emissive:0x291706,
+  emissiveIntensity:.5
+});
+
+const blackMetal = new THREE.MeshStandardMaterial({
+  color:0x11100f,
+  metalness:.96,
+  roughness:.16
+});
+
+const bronze = new THREE.MeshStandardMaterial({
+  color:0x74552f,
+  metalness:.9,
+  roughness:.28
+});
+
+const crystal = new THREE.MeshPhysicalMaterial({
+  color:0x5b4932,
+  metalness:.55,
+  roughness:.1,
+  transmission:.15,
+  thickness:1.2,
+  clearcoat:1,
+  clearcoatRoughness:.08
+});
+
+const glow = new THREE.MeshBasicMaterial({
+  color:0xf0cb84
+});
+
+/* =========================================
+   HELPERS
+========================================= */
 
 let activeGroup = new THREE.Group();
 scene.add(activeGroup);
 
-let currentScene = '';
-let sceneTime = 0;
-let mouseX = 0;
-let mouseY = 0;
-let targetX = 0;
-let targetY = 0;
-let scrollProgress = 0;
+let activeScene = '';
+let elapsed = 0;
 
-const clock = new THREE.Clock();
+let pointerX = 0;
+let pointerY = 0;
+let smoothX = 0;
+let smoothY = 0;
 
-const gold = new THREE.MeshStandardMaterial({
-  color:0x98713b,
-  metalness:0.9,
-  roughness:0.23,
-  emissive:0x291806,
-  emissiveIntensity:0.6
-});
-
-const darkMetal = new THREE.MeshStandardMaterial({
-  color:0x171513,
-  metalness:0.95,
-  roughness:0.19
-});
-
-const crystal = new THREE.MeshPhysicalMaterial({
-  color:0x27201b,
-  metalness:0.45,
-  roughness:0.12,
-  transmission:0.25,
-  thickness:1,
-  transparent:true,
-  opacity:0.92
-});
-
-const glowMaterial = new THREE.MeshBasicMaterial({
-  color:0xe4bd76
-});
-
-/* HELPERS */
-
-function addMesh(parent,geometry,material,x=0,y=0,z=0) {
-  const mesh = new THREE.Mesh(geometry,material);
-  mesh.position.set(x,y,z);
-  parent.add(mesh);
-  return mesh;
+function mesh(parent,geometry,material,x=0,y=0,z=0) {
+  const object = new THREE.Mesh(geometry,material);
+  object.position.set(x,y,z);
+  parent.add(object);
+  return object;
 }
 
-function addRing(parent,radius,tube,x=0,y=0,z=0,material=gold) {
-  const mesh = addMesh(
+function torus(parent,radius,tube,material=gold) {
+  return mesh(
     parent,
-    new THREE.TorusGeometry(radius,tube,12,100),
-    material,x,y,z
+    new THREE.TorusGeometry(radius,tube,12,128),
+    material
   );
-  return mesh;
 }
 
-function addParticles(parent,count=500,spread=12) {
+function particles(parent,count,spread,size=.025) {
   const positions = new Float32Array(count*3);
 
   for(let i=0;i<count;i++) {
@@ -901,72 +626,84 @@ function addParticles(parent,count=500,spread=12) {
     positions[i*3+2]=(Math.random()-.5)*spread;
   }
 
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position',new THREE.BufferAttribute(positions,3));
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute(
+    'position',
+    new THREE.BufferAttribute(positions,3)
+  );
 
-  const mat = new THREE.PointsMaterial({
-    color:0xc7a064,
-    size:0.025,
+  const material = new THREE.PointsMaterial({
+    color:0xc6a467,
+    size,
     transparent:true,
-    opacity:0.65,
-    sizeAttenuation:true
+    opacity:.72,
+    sizeAttenuation:true,
+    depthWrite:false
   });
 
-  const points = new THREE.Points(geo,mat);
+  const points = new THREE.Points(geometry,material);
   parent.add(points);
+
   return points;
 }
 
-function clearScene() {
+function resetGroup() {
   scene.remove(activeGroup);
 
-  activeGroup.traverse(obj=>{
-    if(obj.geometry) obj.geometry.dispose();
+  activeGroup.traverse(object=>{
+    if(object.geometry) object.geometry.dispose();
+
+    if(object.material) {
+      if(Array.isArray(object.material)) {
+        object.material.forEach(m=>m.dispose());
+      } else {
+        object.material.dispose();
+      }
+    }
   });
 
   activeGroup = new THREE.Group();
   scene.add(activeGroup);
 }
 
-/* ------------------------------------------------
-   SCENE 01 - DARK CUBE
------------------------------------------------- */
+/* =========================================
+   01 — INFINITE GEOMETRY
+   Exploding procedural cube structure
+========================================= */
 
-function createCube() {
+function geometryScene() {
   const group = new THREE.Group();
 
-  const cubeGroup = new THREE.Group();
-  group.add(cubeGroup);
+  const core = new THREE.Group();
+  group.add(core);
 
-  const core = addMesh(
-    cubeGroup,
-    new THREE.BoxGeometry(2.1,2.1,2.1),
-    darkMetal
+  const central = mesh(
+    core,
+    new THREE.IcosahedronGeometry(.85,2),
+    blackMetal
   );
 
-  const edges = new THREE.EdgesGeometry(core.geometry);
-  const lines = new THREE.LineSegments(
-    edges,
-    new THREE.LineBasicMaterial({
-      color:0xe0b96d,
+  const wire = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(1.15,2),
+    new THREE.MeshBasicMaterial({
+      color:0xc6a467,
+      wireframe:true,
       transparent:true,
-      opacity:0.85
+      opacity:.55
     })
   );
 
-  cubeGroup.add(lines);
+  core.add(wire);
 
-  const fragments=[];
+  const blocks = [];
 
-  for(let i=0;i<24;i++) {
-    const piece=addMesh(
-      cubeGroup,
-      new THREE.BoxGeometry(
-        .22+Math.random()*.35,
-        .22+Math.random()*.35,
-        .22+Math.random()*.35
-      ),
-      i%3===0?gold:darkMetal
+  for(let i=0;i<150;i++) {
+    const size=.07+Math.random()*.2;
+
+    const block=mesh(
+      core,
+      new THREE.BoxGeometry(size,size,size),
+      i%4===0?gold:blackMetal
     );
 
     const direction = new THREE.Vector3(
@@ -975,644 +712,742 @@ function createCube() {
       Math.random()-.5
     ).normalize();
 
-    fragments.push({
-      mesh:piece,
+    blocks.push({
+      object:block,
       direction,
-      speed:.5+Math.random()*1.4,
-      phase:Math.random()*Math.PI*2
+      distance:1.5+Math.random()*3,
+      speed:.6+Math.random()*1.4,
+      phase:Math.random()*6.28
     });
   }
 
-  const ring1=addRing(group,2.3,.012,0,0,0,gold);
-  const ring2=addRing(group,2.7,.009,0,0,0,glowMaterial);
+  const ringA=torus(group,2.8,.014);
+  const ringB=torus(group,3.4,.009,bronze);
+  const ringC=torus(group,4,.008);
 
-  ring1.rotation.x=1;
-  ring2.rotation.y=1;
+  ringA.rotation.x=1.1;
+  ringB.rotation.y=.8;
+  ringC.rotation.x=-.7;
 
-  addParticles(group,450,12);
+  const dust=particles(group,1000,18,.018);
 
-  group.userData.update=t=>{
-    cubeGroup.rotation.x=t*.22;
-    cubeGroup.rotation.y=t*.34;
+  return {
+    group,
+    update(t) {
+      core.rotation.x=t*.23;
+      core.rotation.y=t*.32;
 
-    const explode=(Math.sin(t*.8)+1)/2;
+      const explosion=(Math.sin(t*.9)+1)/2;
 
-    core.scale.setScalar(1-explode*.13);
+      central.scale.setScalar(1+explosion*.12);
 
-    fragments.forEach(f=>{
-      const distance=explode*.9;
+      blocks.forEach(b=>{
+        const amount=b.distance*(.15+explosion*.85);
 
-      f.mesh.position.copy(
-        f.direction.clone().multiplyScalar(distance*f.speed)
-      );
+        b.object.position.copy(
+          b.direction.clone().multiplyScalar(amount)
+        );
 
-      f.mesh.rotation.x=t*.6+f.phase;
-      f.mesh.rotation.y=t*.7+f.phase;
-    });
+        b.object.rotation.x=t*b.speed+b.phase;
+        b.object.rotation.y=t*b.speed*.8;
+      });
 
-    ring1.rotation.z=t*.3;
-    ring2.rotation.x=t*.2;
+      ringA.rotation.z=t*.2;
+      ringB.rotation.x=t*.18;
+      ringC.rotation.y=t*.12;
+
+      dust.rotation.y=-t*.025;
+    }
   };
-
-  return group;
 }
 
-/* ------------------------------------------------
-   SCENE 02 - ETERNAL BLOOM
------------------------------------------------- */
+/* =========================================
+   02 — DIGITAL BLOOM
+   Procedural flower
+========================================= */
 
-function createFlower() {
-  const group=new THREE.Group();
-  const flower=new THREE.Group();
+function bloomScene() {
+  const group = new THREE.Group();
+  const flower = new THREE.Group();
   group.add(flower);
 
-  const stem=addMesh(
+  const stem = mesh(
     flower,
-    new THREE.CylinderGeometry(.045,.07,2.7,12),
-    darkMetal,
-    0,-1.2,0
+    new THREE.CylinderGeometry(.045,.075,3,16),
+    blackMetal,
+    0,-1.15,0
   );
 
-  stem.rotation.z=-.08;
-
-  const core=addMesh(
-    flower,
-    new THREE.SphereGeometry(.3,32,32),
-    gold,
-    0,.2,0
-  );
+  stem.rotation.z=-.12;
 
   const petals=[];
 
-  for(let i=0;i<12;i++) {
-    const angle=(i/12)*Math.PI*2;
+  for(let layer=0;layer<3;layer++) {
+    const count=18;
 
-    const geo=new THREE.SphereGeometry(
-      1,32,24,0,Math.PI*2,0,Math.PI*.75
-    );
+    for(let i=0;i<count;i++) {
+      const angle=(i/count)*Math.PI*2;
+      const petal=mesh(
+        flower,
+        new THREE.SphereGeometry(1,32,24),
+        layer===1?gold:crystal
+      );
 
-    geo.scale(.33,.95,.15);
+      petal.scale.set(.22,.9,.105);
+      petal.position.set(0,.15,0);
+      petal.rotation.z=-Math.PI/2;
+      petal.rotation.y=angle;
 
-    const petal=addMesh(
-      flower,geo,crystal,
-      Math.cos(angle)*.25,
-      .25,
-      Math.sin(angle)*.25
-    );
+      petals.push({
+        object:petal,
+        angle,
+        layer,
+        offset:Math.random()*6.28
+      });
+    }
+  }
 
-    petal.rotation.z=-Math.PI/2;
-    petal.rotation.y=-angle;
+  const center=mesh(
+    flower,
+    new THREE.SphereGeometry(.34,40,40),
+    glow,
+    0,.2,0
+  );
 
-    petals.push({
-      mesh:petal,
+  const coreRing=torus(group,2.3,.014);
+  coreRing.rotation.x=1.3;
+
+  const dust=particles(group,700,12,.018);
+
+  return {
+    group,
+    update(t) {
+      flower.rotation.y=t*.16;
+
+      petals.forEach(p=>{
+        const opening=(Math.sin(t*.75+p.offset*.08)+1)/2;
+        const angle=p.angle;
+        const radius=.2+opening*(.55+p.layer*.35);
+
+        p.object.position.set(
+          Math.cos(angle)*radius,
+          .15-p.layer*.08,
+          Math.sin(angle)*radius
+        );
+
+        p.object.rotation.y=angle;
+        p.object.rotation.z=-1.3+opening*.8;
+        p.object.rotation.x=Math.sin(t+p.offset)*.12;
+
+        p.object.scale.set(
+          .22,
+          .65+opening*.25,
+          .09
+        );
+      });
+
+      center.scale.setScalar(1+Math.sin(t*2)*.1);
+      coreRing.rotation.z=t*.18;
+      dust.rotation.y=t*.03;
+    }
+  };
+}
+
+/* =========================================
+   03 — LIQUID UNIVERSE
+   Animated shader sculpture
+========================================= */
+
+function liquidScene() {
+  const group=new THREE.Group();
+
+  const liquidMaterial=new THREE.ShaderMaterial({
+    uniforms:{
+      uTime:{value:0}
+    },
+
+    vertexShader:`
+      uniform float uTime;
+      varying vec3 vNormal;
+      varying vec3 vPosition;
+
+      void main() {
+        vec3 p=position;
+        float wave=
+          sin(p.x*3.5+uTime*1.2)*0.12+
+          sin(p.y*4.0-uTime)*0.10+
+          cos(p.z*3.0+uTime*.8)*0.12;
+
+        p+=normal*wave;
+
+        vNormal=normalize(normalMatrix*normal);
+        vPosition=(modelViewMatrix*vec4(p,1.0)).xyz;
+
+        gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);
+      }
+    `,
+
+    fragmentShader:`
+      uniform float uTime;
+      varying vec3 vNormal;
+      varying vec3 vPosition;
+
+      void main() {
+        vec3 n=normalize(vNormal);
+        vec3 viewDir=normalize(-vPosition);
+
+        float fresnel=pow(1.0-max(dot(n,viewDir),0.0),2.5);
+
+        float lines=sin(vPosition.y*8.0+uTime*1.8)*.5+.5;
+
+        vec3 dark=vec3(.025,.023,.02);
+        vec3 goldColor=vec3(.72,.49,.23);
+
+        vec3 color=mix(dark,goldColor,fresnel*.9+lines*.16);
+
+        float shine=pow(max(dot(reflect(-normalize(vec3(.5,1.0,1.0)),n),viewDir),0.0),18.0);
+
+        color+=vec3(.8,.62,.34)*shine*.9;
+
+        gl_FragColor=vec4(color,1.0);
+      }
+    `
+  });
+
+  const sphere=mesh(
+    group,
+    new THREE.IcosahedronGeometry(1.8,7),
+    liquidMaterial
+  );
+
+  const rings=[];
+
+  for(let i=0;i<5;i++) {
+    const r=torus(group,2.5+i*.22,.012,i%2===0?gold:bronze);
+    r.rotation.set(i*.7,i*.9,i*.3);
+    rings.push(r);
+  }
+
+  const dust=particles(group,900,15,.018);
+
+  return {
+    group,
+    update(t) {
+      liquidMaterial.uniforms.uTime.value=t;
+      sphere.rotation.y=t*.2;
+      sphere.rotation.x=Math.sin(t*.4)*.25;
+
+      rings.forEach((r,i)=>{
+        r.rotation.x+=.001*(i+1);
+        r.rotation.y+=.002*(i+1);
+      });
+
+      dust.rotation.y=-t*.025;
+    }
+  };
+}
+
+/* =========================================
+   04 — PARTICLE SINGULARITY
+   Black hole and orbital particles
+========================================= */
+
+function singularityScene() {
+  const group=new THREE.Group();
+
+  const blackHole=mesh(
+    group,
+    new THREE.SphereGeometry(1.15,48,48),
+    new THREE.MeshBasicMaterial({color:0x000000})
+  );
+
+  const eventHorizon=torus(group,1.25,.045,glow);
+  eventHorizon.rotation.x=.25;
+
+  const disk=torus(group,2.0,.22,bronze);
+  disk.rotation.x=.25;
+
+  const count=7000;
+  const positions=new Float32Array(count*3);
+  const seeds=[];
+
+  for(let i=0;i<count;i++) {
+    const angle=Math.random()*Math.PI*2;
+    const radius=1.5+Math.random()*3.8;
+
+    seeds.push({
       angle,
-      offset:Math.random()
+      radius,
+      speed:.15+Math.random()*.65,
+      height:(Math.random()-.5)*.3
     });
   }
 
-  const halo=addRing(group,1.8,.012);
-  halo.rotation.x=1.1;
+  const geometry=new THREE.BufferGeometry();
+  geometry.setAttribute(
+    'position',
+    new THREE.BufferAttribute(positions,3)
+  );
 
-  addParticles(group,350,9);
+  const material=new THREE.PointsMaterial({
+    color:0xe1b56f,
+    size:.024,
+    transparent:true,
+    opacity:.8,
+    depthWrite:false
+  });
 
-  group.userData.update=t=>{
-    flower.rotation.y=t*.18;
+  const stars=new THREE.Points(geometry,material);
+  group.add(stars);
 
-    petals.forEach(p=>{
-      const open=(Math.sin(t*.8)+1)/2;
+  const outer=torus(group,4.8,.009,gold);
+  outer.rotation.x=1.25;
 
-      p.mesh.position.x=Math.cos(p.angle)*(.2+open*.55);
-      p.mesh.position.z=Math.sin(p.angle)*(.2+open*.55);
+  return {
+    group,
+    update(t) {
+      seeds.forEach((p,i)=>{
+        const angle=p.angle+t*p.speed;
+        const radius=p.radius+Math.sin(t*1.3+i)*.06;
 
-      p.mesh.rotation.z=-1.2+open*.8;
-      p.mesh.rotation.x=Math.sin(t+p.offset)*.15;
-    });
+        positions[i*3]=Math.cos(angle)*radius;
+        positions[i*3+1]=p.height+Math.sin(angle*2+t)*.08;
+        positions[i*3+2]=Math.sin(angle)*radius;
+      });
 
-    core.scale.setScalar(1+Math.sin(t*2)*.08);
-    halo.rotation.z=t*.25;
+      geometry.attributes.position.needsUpdate=true;
+
+      blackHole.rotation.y=t*.12;
+      disk.rotation.z=t*.12;
+      eventHorizon.rotation.z=-t*.3;
+      outer.rotation.z=t*.08;
+    }
   };
-
-  return group;
 }
 
-/* ------------------------------------------------
-   SCENE 03 - LIQUID SOUL
------------------------------------------------- */
+/* =========================================
+   05 — KINETIC SCULPTURE
+   Interlocking rotating rings
+========================================= */
 
-function createLiquid() {
+function kineticScene() {
   const group=new THREE.Group();
 
-  const sphere=addMesh(
-    group,
-    new THREE.IcosahedronGeometry(1.35,5),
-    new THREE.MeshPhysicalMaterial({
-      color:0x8b7759,
-      metalness:1,
-      roughness:.12,
-      clearcoat:1,
-      clearcoatRoughness:.05
+  const assembly=new THREE.Group();
+  group.add(assembly);
+
+  const rings=[];
+
+  for(let i=0;i<16;i++) {
+    const ring=torus(
+      assembly,
+      1.3+(i%4)*.4,
+      .025+(i%3)*.012,
+      i%3===0?glow:i%2===0?gold:bronze
+    );
+
+    ring.rotation.set(
+      i*.71,
+      i*.42,
+      i*.27
+    );
+
+    rings.push(ring);
+  }
+
+  const center=mesh(
+    assembly,
+    new THREE.DodecahedronGeometry(.8,2),
+    blackMetal
+  );
+
+  const innerWire=mesh(
+    assembly,
+    new THREE.IcosahedronGeometry(1.1,2),
+    new THREE.MeshBasicMaterial({
+      color:0xc6a467,
+      wireframe:true,
+      transparent:true,
+      opacity:.5
     })
   );
+
+  const dust=particles(group,1200,18,.018);
+
+  return {
+    group,
+    update(t) {
+      rings.forEach((r,i)=>{
+        r.rotation.x+=.0015*(i+1);
+        r.rotation.y+=.001*(i+1);
+        r.rotation.z+=.0008*(i+1);
+      });
+
+      center.rotation.x=t*.28;
+      center.rotation.y=t*.34;
+      innerWire.rotation.x=-t*.22;
+      innerWire.rotation.y=t*.19;
+
+      assembly.rotation.y=Math.sin(t*.25)*.3;
+      dust.rotation.y=t*.02;
+    }
+  };
+}
+
+/* =========================================
+   06 — GRAVITY ENGINE
+   Orbital physics
+========================================= */
+
+function gravityScene() {
+  const group=new THREE.Group();
+
+  const core=mesh(
+    group,
+    new THREE.SphereGeometry(.55,48,48),
+    new THREE.MeshBasicMaterial({color:0x000000})
+  );
+
+  const halo=torus(group,1.05,.045,glow);
+  halo.rotation.x=.7;
+
+  const orbiters=[];
+
+  for(let i=0;i<8;i++) {
+    const orbit=torus(group,1.6+i*.38,.008,bronze);
+    orbit.rotation.set(i*.4,i*.8,i*.2);
+    orbiters.push(orbit);
+  }
+
+  const count=4500;
+  const positions=new Float32Array(count*3);
+  const initial=[];
+
+  for(let i=0;i<count;i++) {
+    initial.push({
+      radius:1.4+Math.random()*4,
+      angle:Math.random()*Math.PI*2,
+      speed:.12+Math.random()*.8,
+      tilt:(Math.random()-.5)*.8
+    });
+  }
+
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(positions,3));
+
+  const pts=new THREE.Points(
+    geo,
+    new THREE.PointsMaterial({
+      color:0xc7a36a,
+      size:.022,
+      transparent:true,
+      opacity:.75,
+      depthWrite:false
+    })
+  );
+
+  group.add(pts);
+
+  return {
+    group,
+    update(t) {
+      initial.forEach((p,i)=>{
+        const radius=p.radius;
+        const angle=p.angle+t*p.speed;
+
+        positions[i*3]=Math.cos(angle)*radius;
+        positions[i*3+1]=Math.sin(angle*2)*p.tilt;
+        positions[i*3+2]=Math.sin(angle)*radius;
+      });
+
+      geo.attributes.position.needsUpdate=true;
+
+      orbiters.forEach((r,i)=>{
+        r.rotation.z=t*(.06+i*.018);
+        r.rotation.x=Math.sin(t*.2+i)*.12;
+      });
+
+      halo.rotation.z=t*.35;
+      core.rotation.y=t*.2;
+    }
+  };
+}
+
+/* =========================================
+   07 — WAVE DIMENSION
+   Mathematical wave field
+========================================= */
+
+function waveScene() {
+  const group=new THREE.Group();
+
+  const geometry=new THREE.PlaneGeometry(13,13,150,150);
+
+  const material=new THREE.MeshStandardMaterial({
+    color:0x79603b,
+    metalness:.82,
+    roughness:.26,
+    wireframe:true,
+    emissive:0x241708,
+    emissiveIntensity:.45,
+    side:THREE.DoubleSide
+  });
+
+  const surface=mesh(
+    group,
+    geometry,
+    material
+  );
+
+  surface.rotation.x=-Math.PI/2.3;
+  surface.position.y=-.4;
+
+  const positions=geometry.attributes.position;
+  const original=[];
+
+  for(let i=0;i<positions.count;i++) {
+    original.push({
+      x:positions.getX(i),
+      y:positions.getY(i),
+      z:positions.getZ(i)
+    });
+  }
 
   const rings=[];
 
   for(let i=0;i<4;i++) {
-    const ring=addRing(group,2+i*.3,.014);
-    ring.rotation.set(
-      Math.random()*Math.PI,
-      Math.random()*Math.PI,
-      Math.random()*Math.PI
-    );
-    rings.push(ring);
+    const r=torus(group,1.3+i*.7,.009,gold);
+    r.rotation.x=Math.PI/2;
+    r.position.y=-1.6+i*.18;
+    rings.push(r);
   }
 
-  addParticles(group,500,11);
+  return {
+    group,
+    update(t) {
+      for(let i=0;i<positions.count;i++) {
+        const p=original[i];
 
-  group.userData.update=t=>{
-    const position=sphere.geometry.attributes.position;
+        const wave1=Math.sin(p.x*1.2+t*1.2);
+        const wave2=Math.cos(p.z*1.4-t*.9);
+        const wave3=Math.sin((p.x+p.z)*.7+t*.6);
 
-    for(let i=0;i<position.count;i++) {
-      const x=position.getX(i);
-      const y=position.getY(i);
-      const z=position.getZ(i);
+        positions.setZ(
+          i,
+          p.z+wave1*.35+wave2*.25+wave3*.18
+        );
+      }
 
-      const wave=
-        1+
-        Math.sin(x*3+t*1.4)*.09+
-        Math.cos(y*4+t)*.07+
-        Math.sin(z*3-t)*.06;
+      positions.needsUpdate=true;
+      geometry.computeVertexNormals();
 
-      position.setXYZ(i,x*wave,y*wave,z*wave);
+      surface.rotation.z=Math.sin(t*.15)*.06;
+
+      rings.forEach((r,i)=>{
+        r.rotation.z=t*(.06+i*.02);
+      });
     }
-
-    position.needsUpdate=true;
-    sphere.geometry.computeVertexNormals();
-
-    sphere.rotation.y=t*.24;
-    sphere.rotation.x=Math.sin(t*.3)*.2;
-
-    rings.forEach((r,i)=>{
-      r.rotation.x+=.003*(i+1);
-      r.rotation.y+=.006*(i+1);
-    });
   };
-
-  return group;
 }
 
-/* ------------------------------------------------
-   SCENE 04 - TIME MACHINE
------------------------------------------------- */
+/* =========================================
+   08 — FRACTAL INFINITY
+   Recursive geometric structure
+========================================= */
 
-function createClock() {
+function fractalScene() {
   const group=new THREE.Group();
 
-  const central=addMesh(
-    group,
-    new THREE.CylinderGeometry(.55,.55,.16,64),
-    darkMetal
-  );
+  const fractal=new THREE.Group();
+  group.add(fractal);
 
-  central.rotation.x=Math.PI/2;
+  function branch(parent,level,size,angle) {
+    if(level<=0) return;
 
-  const rings=[];
+    const object=new THREE.Group();
+    parent.add(object);
 
-  for(let i=0;i<5;i++) {
-    const ring=addRing(group,1.25+i*.38,.035,i%2===0?0:.1);
-    ring.rotation.set(i*.7,i*.45,i*.3);
-    rings.push(ring);
-  }
-
-  const gears=[];
-
-  for(let i=0;i<8;i++) {
-    const gear=new THREE.Group();
-
-    const body=addMesh(
-      gear,
-      new THREE.CylinderGeometry(.3,.3,.1,12),
-      gold
+    const shape=mesh(
+      object,
+      new THREE.OctahedronGeometry(size,1),
+      level%2===0?gold:blackMetal
     );
 
-    body.rotation.x=Math.PI/2;
+    shape.rotation.set(angle,angle*.7,angle*.4);
 
-    for(let j=0;j<12;j++) {
-      const a=j/12*Math.PI*2;
+    const wire=mesh(
+      object,
+      new THREE.OctahedronGeometry(size*1.2,1),
+      new THREE.MeshBasicMaterial({
+        color:0xb78c4e,
+        wireframe:true,
+        transparent:true,
+        opacity:.32
+      })
+    );
 
-      addMesh(
-        gear,
-        new THREE.BoxGeometry(.1,.14,.12),
-        gold,
-        Math.cos(a)*.34,
-        Math.sin(a)*.34,
+    object.userData.phase=angle;
+
+    for(let i=0;i<4;i++) {
+      const child=new THREE.Group();
+
+      child.position.set(
+        Math.cos(i*Math.PI/2)*size*1.55,
+        Math.sin(i*Math.PI/2)*size*1.55,
         0
       );
+
+      object.add(child);
+      branch(child,level-1,size*.42,angle+i*.7);
     }
 
-    gear.position.set(
-      Math.cos(i/8*Math.PI*2)*1.2,
-      Math.sin(i/8*Math.PI*2)*1.2,
-      (i%3-1)*.3
-    );
+    object.userData.spin=level%2===0?1:-1;
+    object.userData.shape=shape;
+    object.userData.wire=wire;
 
-    group.add(gear);
-    gears.push(gear);
+    return object;
   }
 
-  addParticles(group,300,10);
+  const root=branch(fractal,4,1.25,.4);
 
-  group.userData.update=t=>{
-    rings.forEach((r,i)=>{
-      r.rotation.x=t*(.12+i*.08);
-      r.rotation.y=t*(.2+i*.05);
-      r.rotation.z=t*(.16+i*.06);
-    });
+  const orbit1=torus(group,3.8,.012,gold);
+  const orbit2=torus(group,4.5,.009,bronze);
+  orbit1.rotation.x=.8;
+  orbit2.rotation.y=1.1;
 
-    gears.forEach((g,i)=>{
-      g.rotation.z=t*(i%2===0?.6:-.6);
-    });
+  const dust=particles(group,1000,18,.018);
 
-    central.rotation.z=t*.2;
-  };
+  const nodes=[];
+  fractal.traverse(o=>{
+    if(o.userData.spin) nodes.push(o);
+  });
 
-  return group;
-}
-
-/* ------------------------------------------------
-   SCENE 05 - SHADOW BUTTERFLY
------------------------------------------------- */
-
-function createButterfly() {
-  const group=new THREE.Group();
-
-  const body=addMesh(
+  return {
     group,
-    new THREE.CapsuleGeometry(.09,.9,6,12),
-    darkMetal
-  );
+    update(t) {
+      fractal.rotation.y=t*.14;
+      fractal.rotation.x=Math.sin(t*.3)*.2;
 
-  body.rotation.x=Math.PI/2;
+      nodes.forEach((n,i)=>{
+        n.rotation.x=t*.15*n.userData.spin;
+        n.rotation.y=t*.12*n.userData.spin;
 
-  const wings=[];
+        const pulse=1+Math.sin(t*1.2+i)*.035;
+        n.scale.setScalar(pulse);
+      });
 
-  for(let side of [-1,1]) {
-    for(let i=0;i<2;i++) {
-      const wing=addMesh(
-        group,
-        new THREE.SphereGeometry(1,32,32),
-        crystal
-      );
-
-      wing.scale.set(.8-i*.18,.58-i*.12,.07);
-      wing.position.set(side*.55,.35-i*.6,0);
-      wing.rotation.z=side*.3;
-
-      wings.push({mesh:wing,side,i});
+      orbit1.rotation.z=t*.1;
+      orbit2.rotation.x=t*.08;
+      dust.rotation.y=t*.02;
     }
-  }
-
-  const particles=addParticles(group,700,7);
-
-  group.userData.update=t=>{
-    wings.forEach(w=>{
-      w.mesh.rotation.y=
-        w.side*(Math.sin(t*5)*.75+.15);
-
-      w.mesh.rotation.z=
-        w.side*(.2+Math.sin(t*5)*.12);
-    });
-
-    group.position.y=Math.sin(t*1.3)*.3;
-    group.rotation.y=Math.sin(t*.5)*.3;
-
-    particles.rotation.y=t*.08;
   };
-
-  return group;
 }
 
-/* ------------------------------------------------
-   SCENE 06 - IMPOSSIBLE DIMENSION
------------------------------------------------- */
-
-function createDimension() {
-  const group=new THREE.Group();
-
-  const structures=[];
-
-  for(let i=0;i<7;i++) {
-    const platform=addMesh(
-      group,
-      new THREE.BoxGeometry(
-        1.3+i*.18,
-        .12,
-        1.3+i*.18
-      ),
-      i%2===0?gold:darkMetal,
-      Math.sin(i*1.4)*1.3,
-      i*.55-1.7,
-      Math.cos(i*1.4)*1.3
-    );
-
-    platform.rotation.y=i*.3;
-    structures.push(platform);
-  }
-
-  const center=addMesh(
-    group,
-    new THREE.OctahedronGeometry(.6,2),
-    crystal,
-    0,.5,0
-  );
-
-  const ring1=addRing(group,2.5,.02);
-  const ring2=addRing(group,3,.012);
-
-  ring1.rotation.x=1.1;
-  ring2.rotation.y=1.2;
-
-  addParticles(group,500,13);
-
-  group.userData.update=t=>{
-    structures.forEach((p,i)=>{
-      p.rotation.y=t*.1+i*.3;
-      p.position.y=i*.55-1.7+Math.sin(t+i)*.12;
-    });
-
-    center.rotation.x=t*.3;
-    center.rotation.y=t*.5;
-
-    ring1.rotation.z=t*.2;
-    ring2.rotation.x=t*.18;
-  };
-
-  return group;
-}
-
-/* ------------------------------------------------
-   SCENE 07 - ALL SEEING EYE
------------------------------------------------- */
-
-function createEye() {
-  const group=new THREE.Group();
-
-  const eyeball=addMesh(
-    group,
-    new THREE.SphereGeometry(1.05,48,48),
-    new THREE.MeshPhysicalMaterial({
-      color:0xc1a77d,
-      roughness:.15,
-      metalness:.25,
-      clearcoat:1
-    })
-  );
-
-  eyeball.scale.set(1.5,.7,.6);
-
-  const pupil=addMesh(
-    group,
-    new THREE.SphereGeometry(.38,32,32),
-    darkMetal,
-    0,0,.53
-  );
-
-  const iris=addRing(group,.45,.06,0,0,.54,gold);
-
-  const rings=[];
-
-  for(let i=0;i<5;i++) {
-    const ring=addRing(group,1.6+i*.38,.016);
-    ring.rotation.set(i*.5,i*.7,i*.3);
-    rings.push(ring);
-  }
-
-  const centerLight=addMesh(
-    group,
-    new THREE.SphereGeometry(.1,24,24),
-    glowMaterial,
-    0,0,.88
-  );
-
-  addParticles(group,400,12);
-
-  group.userData.update=t=>{
-    rings.forEach((r,i)=>{
-      r.rotation.x=t*(.1+i*.06);
-      r.rotation.y=t*(.15+i*.04);
-    });
-
-    pupil.position.x+=(mouseX*.35-pupil.position.x)*.04;
-    pupil.position.y+=(-mouseY*.2-pupil.position.y)*.04;
-
-    iris.position.x=pupil.position.x;
-    iris.position.y=pupil.position.y;
-  };
-
-  return group;
-}
-
-/* ------------------------------------------------
-   SCENE 08 - FORGOTTEN DRAGON
------------------------------------------------- */
-
-function createDragon() {
-  const group=new THREE.Group();
-
-  const dragon=new THREE.Group();
-  group.add(dragon);
-
-  // Skull
-  const skull=addMesh(
-    dragon,
-    new THREE.IcosahedronGeometry(.8,2),
-    darkMetal,
-    0,.2,0
-  );
-
-  skull.scale.set(1.15,.8,1);
-
-  // Snout
-  const snout=addMesh(
-    dragon,
-    new THREE.ConeGeometry(.36,.9,8),
-    darkMetal,
-    0,-.15,.75
-  );
-
-  snout.rotation.x=-Math.PI/2;
-
-  // Horns
-  for(let side of [-1,1]) {
-    const horn=addMesh(
-      dragon,
-      new THREE.ConeGeometry(.14,.85,8),
-      gold,
-      side*.58,.85,-.2
-    );
-
-    horn.rotation.z=-side*.45;
-  }
-
-  // Eyes
-  for(let side of [-1,1]) {
-    addMesh(
-      dragon,
-      new THREE.SphereGeometry(.13,20,20),
-      glowMaterial,
-      side*.38,.32,.65
-    );
-  }
-
-  // Neck
-  const neck=addMesh(
-    dragon,
-    new THREE.CylinderGeometry(.3,.48,1.4,12),
-    darkMetal,
-    0,-.85,-.25
-  );
-
-  neck.rotation.x=.4;
-
-  // Wings
-  const wings=[];
-
-  for(let side of [-1,1]) {
-    const wing=new THREE.Group();
-
-    const bone=addMesh(
-      wing,
-      new THREE.ConeGeometry(.13,2.4,8),
-      gold,
-      side*.65,.8,0
-    );
-
-    bone.rotation.z=-side*.65;
-
-    for(let i=0;i<3;i++) {
-      const rib=addMesh(
-        wing,
-        new THREE.CylinderGeometry(.018,.035,1.4,6),
-        darkMetal,
-        side*(.5+i*.35),.15,-.1
-      );
-
-      rib.rotation.z=-side*(.5+i*.22);
-    }
-
-    wing.position.set(side*.65,.1,-.1);
-    dragon.add(wing);
-    wings.push({wing,side});
-  }
-
-  addParticles(group,550,12);
-
-  group.userData.update=t=>{
-    dragon.rotation.y=Math.sin(t*.35)*.4;
-    dragon.position.y=Math.sin(t*1.1)*.18;
-
-    wings.forEach(w=>{
-      w.wing.rotation.z=
-        w.side*(Math.sin(t*2.1)*.3+.25);
-    });
-  };
-
-  return group;
-}
-
-/* ------------------------------------------------
+/* =========================================
    SCENE MANAGER
------------------------------------------------- */
+========================================= */
 
-const scenes={
-  cube:createCube,
-  flower:createFlower,
-  liquid:createLiquid,
-  clock:createClock,
-  butterfly:createButterfly,
-  dimension:createDimension,
-  eye:createEye,
-  dragon:createDragon
+const builders={
+  geometry:geometryScene,
+  bloom:bloomScene,
+  liquid:liquidScene,
+  singularity:singularityScene,
+  kinetic:kineticScene,
+  gravity:gravityScene,
+  waves:waveScene,
+  fractal:fractalScene
 };
 
-function loadScene(name) {
-  if(name===currentScene) return;
+const sectionList=[
+  ...document.querySelectorAll('.world-section[data-scene]')
+];
 
-  currentScene=name;
-  clearScene();
+const counter=document.getElementById('sceneNumber');
 
-  if(scenes[name]) {
-    const object=scenes[name]();
-    activeGroup.add(object);
+function loadScene(name,index) {
+  if(name===activeScene) return;
 
-    activeGroup.userData.animate=object.userData.update;
-  }
+  activeScene=name;
+  resetGroup();
+
+  const result=builders[name]();
+
+  activeGroup.add(result.group);
+  activeGroup.userData.update=result.update;
+
+  activeGroup.scale.setScalar(.85);
+
+  counter.textContent=String(index+1).padStart(2,'0');
+
+  camera.position.set(0,0,10);
 }
 
-/* ------------------------------------------------
-   SCROLL DETECTION
------------------------------------------------- */
-
-const sections=[
-  ...document.querySelectorAll('[data-scene]')
-];
+/* =========================================
+   SCROLL OBSERVER
+========================================= */
 
 const observer=new IntersectionObserver(entries=>{
   entries.forEach(entry=>{
     if(entry.isIntersecting) {
-      loadScene(entry.target.dataset.scene);
+      const index=sectionList.indexOf(entry.target);
+      loadScene(entry.target.dataset.scene,index);
     }
   });
 },{
   threshold:.45
 });
 
-sections.forEach(section=>observer.observe(section));
+sectionList.forEach(section=>observer.observe(section));
 
-/* ------------------------------------------------
-   MOUSE INTERACTION
------------------------------------------------- */
+/* =========================================
+   POINTER INTERACTION
+========================================= */
 
-window.addEventListener('pointermove',e=>{
-  targetX=(e.clientX/innerWidth-.5)*2;
-  targetY=(e.clientY/innerHeight-.5)*2;
+window.addEventListener('pointermove',event=>{
+  pointerX=(event.clientX/innerWidth-.5)*2;
+  pointerY=(event.clientY/innerHeight-.5)*2;
 },{passive:true});
 
-/* ------------------------------------------------
+/* =========================================
    ANIMATION LOOP
------------------------------------------------- */
+========================================= */
+
+const clock=new THREE.Clock();
 
 function animate() {
   requestAnimationFrame(animate);
 
-  const delta=Math.min(clock.getDelta(),.05);
-  const elapsed=clock.elapsedTime;
+  const delta=Math.min(clock.getDelta(),.04);
+  elapsed+=delta;
 
-  sceneTime+=delta;
+  smoothX+=(pointerX-smoothX)*.025;
+  smoothY+=(pointerY-smoothY)*.025;
 
-  mouseX+=(targetX-mouseX)*.035;
-  mouseY+=(targetY-mouseY)*.035;
-
-  if(activeGroup.userData.animate) {
-    activeGroup.userData.animate(elapsed);
+  if(activeGroup.userData.update) {
+    activeGroup.userData.update(elapsed);
   }
 
-  // Gentle camera movement
-  camera.position.x+=(mouseX*.38-camera.position.x)*.025;
-  camera.position.y+=(-mouseY*.28-camera.position.y)*.025;
+  activeGroup.scale.lerp(
+    new THREE.Vector3(1,1,1),
+    .025
+  );
 
+  camera.position.x+=(smoothX*.32-camera.position.x)*.025;
+  camera.position.y+=(-smoothY*.24-camera.position.y)*.025;
   camera.lookAt(0,0,0);
 
-  goldLight.position.x=Math.sin(elapsed*.4)*4;
-  goldLight.position.y=Math.cos(elapsed*.5)*3;
+  keyLight.position.x=Math.sin(elapsed*.35)*4;
+  keyLight.position.y=Math.cos(elapsed*.4)*3;
 
   composer.render();
 }
 
+loadScene('geometry',0);
 animate();
 
-/* ------------------------------------------------
-   RESPONSIVE
------------------------------------------------- */
+/* =========================================
+   RESIZE
+========================================= */
 
 window.addEventListener('resize',()=>{
   camera.aspect=innerWidth/innerHeight;
@@ -1625,72 +1460,59 @@ window.addEventListener('resize',()=>{
   bloom.setSize(innerWidth,innerHeight);
 });
 
-/* ------------------------------------------------
-   MUSIC + ENTER EXPERIENCE
------------------------------------------------- */
+/* =========================================
+   OPENING + MUSIC
+========================================= */
 
 const intro=document.getElementById('intro');
 const main=document.getElementById('main');
-const enterBtn=document.getElementById('enterBtn');
+const enter=document.getElementById('enter');
+const music=document.getElementById('music');
+const sound=document.getElementById('sound');
+const soundLabel=document.getElementById('soundLabel');
 
-const audio=document.getElementById('backgroundMusic');
-const soundBtn=document.getElementById('soundBtn');
-const soundText=document.getElementById('soundText');
+music.volume=.38;
 
-audio.volume=.35;
+enter.addEventListener('click',async()=>{
+  enter.disabled=true;
+  enter.textContent='ENTERING THE UNIVERSE...';
 
-let musicStarted=false;
+  main.classList.add('show');
+  document.body.classList.remove('intro-open');
 
-enterBtn.addEventListener('click',async()=>{
-  enterBtn.disabled=true;
-  enterBtn.textContent='ENTERING...';
-
-  main.classList.add('visible');
-  document.body.classList.remove('locked');
-
-  // Start music from the user's click
   try {
-    await audio.play();
-    musicStarted=true;
-    soundBtn.classList.add('playing');
-    soundText.textContent='SOUND ON';
+    await music.play();
+    sound.classList.add('playing');
+    soundLabel.textContent='SOUND ON';
   } catch(error) {
-    musicStarted=false;
-    soundBtn.classList.remove('playing');
-    soundText.textContent='PLAY SOUND';
-    console.warn('Music playback was blocked:',error);
+    sound.classList.remove('playing');
+    soundLabel.textContent='PLAY SOUND';
+    console.warn('Music playback failed:',error);
   }
 
-  // Load initial scene
-  loadScene('cube');
+  intro.classList.add('exit');
 
-  setTimeout(()=>{
-    intro.classList.add('hide');
-    window.scrollTo({top:0,behavior:'instant'});
-  },350);
+  window.scrollTo({
+    top:0,
+    behavior:'instant'
+  });
 });
 
-/* SOUND CONTROL */
-
-soundBtn.addEventListener('click',async()=>{
-  if(audio.paused) {
+sound.addEventListener('click',async()=>{
+  if(music.paused) {
     try {
-      await audio.play();
-      soundBtn.classList.add('playing');
-      soundText.textContent='SOUND ON';
+      await music.play();
+      sound.classList.add('playing');
+      soundLabel.textContent='SOUND ON';
     } catch(error) {
-      soundText.textContent='PLAY SOUND';
+      soundLabel.textContent='PLAY SOUND';
     }
   } else {
-    audio.pause();
-    soundBtn.classList.remove('playing');
-    soundText.textContent='SOUND OFF';
+    music.pause();
+    sound.classList.remove('playing');
+    soundLabel.textContent='SOUND OFF';
   }
 });
-
-/* INITIAL SCENE */
-
-loadScene('cube');
 
 </script>
 </body>
