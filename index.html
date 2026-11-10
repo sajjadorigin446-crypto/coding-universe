@@ -1,15 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>MAMUN CODING FANTASY</title>
+<meta name="theme-color" content="#050509">
+<title>MAMUN CODING FANTASY — Masterclass</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <script type="importmap">
 {
@@ -18,204 +17,1540 @@
   }
 }
 </script>
+
+<style>
+:root{
+  --bg:#050509;
+  --panel:#0c0c14;
+  --gold:#d4af37;
+  --white:#f5f0e6;
+  --muted:#9693a4;
+  --line:rgba(212,175,55,.2);
+  --glass:rgba(15,15,25,.72);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--white);
+  font-family:Inter,sans-serif;
+  overflow-x:hidden;
+}
+button{font:inherit}
+.hidden{display:none!important}
+#opening{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse at 50% 45%,#20162d 0%,#090812 42%,#030307 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:opacity 1s,transform 1s;
+}
+#opening.opening-exit{opacity:0;transform:scale(1.08);pointer-events:none}
+#openingCanvas{position:absolute;inset:0;width:100%;height:100%}
+.opening-content{
+  position:relative;
+  z-index:2;
+  text-align:center;
+  width:min(900px,92%);
+  pointer-events:none;
+}
+.eyebrow{
+  color:var(--gold);
+  font-size:10px;
+  letter-spacing:6px;
+  text-transform:uppercase;
+  margin-bottom:24px;
+}
+.brand-title{
+  font-family:Cinzel,serif;
+  font-size:clamp(37px,8vw,88px);
+  font-weight:500;
+  line-height:1.12;
+  letter-spacing:3px;
+  margin:0;
+  text-shadow:0 0 35px rgba(212,175,55,.2);
+}
+.brand-title span{
+  display:block;
+  color:var(--gold);
+  font-size:.58em;
+  letter-spacing:9px;
+  margin-top:15px;
+}
+.opening-subtitle{
+  color:#b8b3c7;
+  font-size:clamp(11px,1.5vw,14px);
+  letter-spacing:4px;
+  margin:30px 0 38px;
+  text-transform:uppercase;
+}
+.gold-button{
+  pointer-events:auto;
+  position:relative;
+  border:1px solid rgba(212,175,55,.8);
+  color:var(--gold);
+  background:rgba(8,8,14,.55);
+  padding:17px 34px;
+  letter-spacing:3px;
+  font-size:11px;
+  cursor:pointer;
+  overflow:hidden;
+  transition:.35s;
+}
+.gold-button:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:var(--gold);
+  transform:translateY(105%);
+  transition:.35s;
+  z-index:-1;
+}
+.gold-button:hover{color:#08080b;box-shadow:0 0 35px #d4af3744}
+.gold-button:hover:before{transform:translateY(0)}
+.opening-footer{
+  margin-top:55px;
+  font-size:9px;
+  letter-spacing:4px;
+  color:#777184;
+}
+.corner{
+  position:absolute;
+  width:45px;height:45px;
+  border-color:rgba(212,175,55,.55);
+  border-style:solid;
+}
+.corner.tl{top:25px;left:25px;border-width:1px 0 0 1px}
+.corner.tr{top:25px;right:25px;border-width:1px 1px 0 0}
+.corner.bl{bottom:25px;left:25px;border-width:0 0 1px 1px}
+.corner.br{bottom:25px;right:25px;border-width:0 1px 1px 0}
+
+#mainPage{min-height:100vh}
+.navbar{
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 5%;
+  background:rgba(5,5,9,.82);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.nav-logo{
+  font-family:Cinzel,serif;
+  color:var(--gold);
+  font-size:15px;
+  letter-spacing:2px;
+}
+.nav-label{font-size:9px;letter-spacing:3px;color:#858193}
+.hero{
+  min-height:440px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:90px 20px 75px;
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse at 50% 50%,rgba(86,48,117,.18),transparent 65%);
+}
+.hero:before,.hero:after{
+  content:"";
+  position:absolute;
+  width:400px;height:400px;
+  border:1px solid rgba(212,175,55,.1);
+  border-radius:50%;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  animation:halo 18s linear infinite;
+}
+.hero:after{width:550px;height:550px;animation-direction:reverse}
+@keyframes halo{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.hero-inner{position:relative;z-index:1}
+.hero h1{
+  font:500 clamp(34px,7vw,68px) Cinzel,serif;
+  margin:15px 0;
+  letter-spacing:2px;
+}
+.hero h1 span{color:var(--gold)}
+.hero p{
+  max-width:650px;
+  margin:20px auto 0;
+  color:#aaa6b5;
+  font-size:13px;
+  line-height:1.9;
+}
+.section-wrap{width:min(1200px,90%);margin:auto;padding:35px 0 100px}
+.section-heading{text-align:center;margin-bottom:40px}
+.section-heading small{
+  color:var(--gold);
+  font-size:9px;
+  letter-spacing:5px;
+}
+.section-heading h2{
+  font:500 clamp(26px,4vw,42px) Cinzel,serif;
+  margin:12px 0;
+}
+.section-heading p{color:var(--muted);font-size:12px;line-height:1.8}
+.scene-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:17px;
+}
+.scene-card{
+  text-align:left;
+  position:relative;
+  min-height:210px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:3px;
+  padding:20px;
+  color:white;
+  cursor:pointer;
+  background:
+    radial-gradient(circle at 70% 25%,var(--card-glow,rgba(212,175,55,.17)),transparent 48%),
+    linear-gradient(145deg,#15131f,#090910 75%);
+  transition:transform .35s,border-color .35s,box-shadow .35s;
+}
+.scene-card:hover{
+  transform:translateY(-7px);
+  border-color:rgba(212,175,55,.65);
+  box-shadow:0 15px 50px rgba(0,0,0,.35),0 0 30px rgba(212,175,55,.08);
+}
+.scene-card-number{
+  color:var(--gold);
+  font:12px Cinzel,serif;
+  letter-spacing:2px;
+}
+.scene-card-orb{
+  position:absolute;
+  width:120px;height:120px;
+  right:10px;top:20px;
+  border-radius:50%;
+  opacity:.75;
+  filter:blur(.2px);
+  background:radial-gradient(circle at 35% 30%,#fff8,transparent 15%),radial-gradient(circle at 45% 45%,var(--orb,#d4af37),transparent 65%);
+  box-shadow:0 0 35px var(--orb,#d4af37);
+  transition:transform .5s;
+}
+.scene-card:hover .scene-card-orb{transform:scale(1.18) rotate(30deg)}
+.scene-card:nth-child(3n+1){--orb:#d4af37;--card-glow:rgba(212,175,55,.17)}
+.scene-card:nth-child(3n+2){--orb:#7c4dff;--card-glow:rgba(124,77,255,.18)}
+.scene-card:nth-child(3n){--orb:#00c99a;--card-glow:rgba(0,201,154,.15)}
+.scene-card:nth-child(5n){--orb:#268cff;--card-glow:rgba(38,140,255,.17)}
+.scene-card-content{position:absolute;left:20px;right:15px;bottom:20px;z-index:2}
+.scene-card-title{
+  display:block;
+  font:500 17px Cinzel,serif;
+  max-width:75%;
+  line-height:1.5;
+}
+.scene-card-description{
+  display:block;
+  color:#9e9aaa;
+  font-size:10px;
+  margin-top:6px;
+  line-height:1.6;
+}
+.scene-card-action{
+  display:block;
+  color:var(--gold);
+  font-size:8px;
+  letter-spacing:2px;
+  margin-top:15px;
+}
+.about{
+  border-top:1px solid rgba(255,255,255,.08);
+  padding:50px 0;
+  text-align:center;
+}
+.about h3{font:500 25px Cinzel,serif}
+.about p{max-width:650px;margin:15px auto;color:#9995a5;font-size:12px;line-height:2}
+.footer{
+  padding:25px;text-align:center;
+  border-top:1px solid rgba(255,255,255,.07);
+  color:#777184;font-size:9px;letter-spacing:3px;
+}
+
+/* FULLSCREEN SCENE */
+#experience{
+  position:fixed;inset:0;z-index:80;
+  background:#030308;
+  overflow:hidden;
+}
+#experienceCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.experience-vignette{
+  position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 25%,rgba(0,0,0,.55) 100%);
+}
+.experience-top{
+  position:absolute;top:0;left:0;right:0;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:23px 4%;
+  z-index:3;
+}
+.experience-brand{font:13px Cinzel,serif;color:var(--gold);letter-spacing:2px}
+.control-button{
+  border:1px solid rgba(255,255,255,.2);
+  background:rgba(8,8,14,.55);
+  backdrop-filter:blur(12px);
+  color:#eee;
+  padding:11px 15px;
+  cursor:pointer;
+  font-size:9px;
+  letter-spacing:1px;
+  transition:.25s;
+}
+.control-button:hover{border-color:var(--gold);color:var(--gold)}
+.experience-info{
+  position:absolute;left:6%;bottom:12%;
+  z-index:3;max-width:450px;pointer-events:none;
+}
+.experience-info small{
+  color:var(--gold);font-size:9px;letter-spacing:4px;
+}
+.experience-info h2{
+  font:500 clamp(30px,5vw,58px) Cinzel,serif;
+  margin:15px 0;
+  text-shadow:0 4px 30px #000;
+}
+.experience-info p{
+  color:#c2bdcc;font-size:12px;line-height:1.8;
+  max-width:390px;
+}
+.experience-bottom{
+  position:absolute;bottom:30px;right:4%;
+  z-index:4;display:flex;gap:9px;align-items:center;
+}
+.scene-count{
+  color:var(--gold);font:12px Cinzel,serif;
+  letter-spacing:2px;margin-right:12px;
+}
+.drag-hint{
+  position:absolute;bottom:35px;left:6%;
+  color:#aaa6b5;font-size:9px;letter-spacing:2px;
+  z-index:3;
+}
+.loading{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  z-index:10;background:#050509;color:var(--gold);
+  font:12px Cinzel,serif;letter-spacing:4px;
+  transition:opacity .5s;
+}
+@media(max-width:850px){
+  .scene-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:540px){
+  .navbar{padding:15px 5%}
+  .nav-label{font-size:7px;letter-spacing:1px}
+  .hero{min-height:390px}
+  .section-wrap{width:92%}
+  .scene-grid{grid-template-columns:1fr;gap:12px}
+  .scene-card{min-height:180px}
+  .experience-top{padding:15px 4%}
+  .experience-brand{font-size:10px}
+  .control-button{padding:10px;font-size:8px}
+  .experience-info{left:6%;right:6%;bottom:110px}
+  .experience-info h2{font-size:32px}
+  .experience-info p{font-size:11px}
+  .experience-bottom{bottom:22px;left:5%;right:5%;justify-content:flex-end}
+  .drag-hint{display:none}
+}
+</style>
 </head>
 
 <body>
 
-<div id="noise"></div>
+<!-- OPENING -->
+<section id="opening">
+  <canvas id="openingCanvas"></canvas>
+  <div class="corner tl"></div><div class="corner tr"></div>
+  <div class="corner bl"></div><div class="corner br"></div>
 
-<!-- OPENING PAGE -->
-
-<section id="opening" class="opening">
-
-    <div id="openingCanvas"></div>
-
-    <div class="opening-content">
-
-        <div class="eyebrow">
-            CREATIVE CODE / DIGITAL UNIVERSE
-        </div>
-
-        <h1>
-            MAMUN<br>
-            <span>CODING</span><br>
-            FANTASY
-        </h1>
-
-        <div class="tagline">
-            WHEN IMAGINATION MEETS PYTHON
-        </div>
-
-        <p>
-            Beyond the boundaries of ordinary imagination.
-            Enter a universe of living geometry,
-            impossible structures and cinematic motion.
-        </p>
-
-        <button id="enterButton">
-            ENTER THE FANTASY
-            <span>↗</span>
-        </button>
-
-        <div class="opening-footer">
-            25 WORLDS &nbsp; · &nbsp;
-            INFINITE MOTION &nbsp; · &nbsp;
-            ONE IMAGINATION
-        </div>
-
-    </div>
-
-    <div class="opening-coordinate">
-        MCF / 001
-    </div>
-
+  <div class="opening-content">
+    <div class="eyebrow">A DIGITAL UNIVERSE BY MAMUN</div>
+    <h1 class="brand-title">
+      MAMUN
+      <span>CODING FANTASY</span>
+    </h1>
+    <div class="opening-subtitle">WHEN IMAGINATION MEETS PYTHON</div>
+    <button class="gold-button" id="enterButton">ENTER THE FANTASY&nbsp; ↗</button>
+    <div class="opening-footer">25 WORLDS · INFINITE POSSIBILITIES</div>
+  </div>
 </section>
 
-
-<!-- MAIN PAGE -->
-
+<!-- MAIN GALLERY -->
 <main id="mainPage" class="hidden">
+  <nav class="navbar">
+    <div class="nav-logo">MAMUN ✦ FANTASY</div>
+    <div class="nav-label">25 WORLDS / ONE UNIVERSE</div>
+  </nav>
 
-    <header class="navbar">
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">WELCOME TO ANOTHER DIMENSION</div>
+      <h1>Explore The <span>Impossible.</span></h1>
+      <p>
+        Step beyond ordinary imagination. Discover 25 unique digital
+        dimensions shaped by geometry, light, motion and creative code.
+      </p>
+    </div>
+  </header>
 
-        <div class="brand">
-            <span>M</span>
-            MAMUN CODING FANTASY
-        </div>
+  <section class="section-wrap">
+    <div class="section-heading">
+      <small>THE COLLECTION</small>
+      <h2>Choose Your Universe</h2>
+      <p>Every world has its own identity. Select a dimension to enter its experience.</p>
+    </div>
 
-        <nav>
-            <a href="#home">HOME</a>
-            <a href="#worlds">WORLDS</a>
-            <a href="#about">ABOUT</a>
-        </nav>
+    <div class="scene-grid" id="sceneGrid"></div>
 
-        <button id="soundButton">♫</button>
+    <div class="about">
+      <div class="eyebrow">THE CREATIVE UNIVERSE</div>
+      <h3>Imagination Has No Limits.</h3>
+      <p>
+        MAMUN CODING FANTASY is an experimental 3D playground where
+        technology meets imagination. Every scene explores a different
+        visual language through motion, geometry and light.
+      </p>
+    </div>
+  </section>
 
-    </header>
-
-
-    <section id="home" class="hero">
-
-        <div class="hero-content">
-
-            <div class="eyebrow">
-                A NEW DIMENSION OF CREATIVITY
-            </div>
-
-            <h2>
-                When Imagination<br>
-                <span>Becomes Reality.</span>
-            </h2>
-
-            <p>
-                Explore 25 extraordinary 3D experimental
-                worlds powered by creative coding.
-            </p>
-
-            <a href="#worlds" class="explore">
-                EXPLORE THE WORLDS ↓
-            </a>
-
-        </div>
-
-        <div class="hero-decoration"></div>
-
-    </section>
-
-
-    <!-- 25 SCENES -->
-
-    <section id="worlds" class="worlds">
-
-        <div class="section-title">
-
-            <div class="eyebrow">
-                THE COLLECTION / 01—25
-            </div>
-
-            <h2>
-                Choose Your <span>Dimension.</span>
-            </h2>
-
-        </div>
-
-        <div id="sceneGrid" class="scene-grid"></div>
-
-    </section>
-
-
-    <section id="about" class="about">
-
-        <div class="eyebrow">THE PHILOSOPHY</div>
-
-        <h2>
-            Not just code.<br>
-            <span>A universe of creation.</span>
-        </h2>
-
-        <p>
-            Where mathematics becomes art,
-            geometry learns to breathe,
-            and imagination takes shape.
-        </p>
-
-    </section>
-
-
-    <footer>
-        © MAMUN CODING FANTASY
-        <span>WHEN IMAGINATION MEETS PYTHON</span>
-    </footer>
-
+  <footer class="footer">
+    CREATED WITH IMAGINATION · MAMUN CODING FANTASY
+  </footer>
 </main>
 
-
-<!-- FULLSCREEN SCENE EXPERIENCE -->
-
+<!-- FULLSCREEN EXPERIENCE -->
 <section id="experience" class="hidden">
+  <canvas id="experienceCanvas"></canvas>
+  <div class="experience-vignette"></div>
 
-    <div id="experienceCanvas"></div>
+  <div class="experience-top">
+    <div class="experience-brand">MAMUN / FANTASY</div>
+    <button class="control-button" id="backButton">← BACK TO WORLDS</button>
+  </div>
 
-    <div class="experience-navbar">
+  <div class="experience-info">
+    <small id="sceneCategory">MAMUN CODING FANTASY</small>
+    <h2 id="sceneTitle">Masterclass Cube</h2>
+    <p id="sceneDescription">A living geometric dimension.</p>
+  </div>
 
-        <button id="backButton">
-            ← ALL WORLDS
-        </button>
+  <div class="drag-hint">DRAG TO ROTATE · SCROLL TO ZOOM</div>
 
-        <div id="sceneCounter">01 / 25</div>
-
-        <button id="fullscreenButton">⛶</button>
-
-    </div>
-
-    <div class="experience-details">
-
-        <div class="eyebrow" id="sceneCategory">
-            MOTION STUDY / 01
-        </div>
-
-        <h2 id="sceneTitle"></h2>
-
-        <p id="sceneDescription"></p>
-
-    </div>
-
-    <div class="scene-controls">
-
-        <button id="previousButton">← PREVIOUS</button>
-
-        <button id="replayButton">↻ REPLAY</button>
-
-        <button id="nextButton">NEXT →</button>
-
-    </div>
-
+  <div class="experience-bottom">
+    <span class="scene-count" id="sceneCounter">01 / 25</span>
+    <button class="control-button" id="previousButton">← PREV</button>
+    <button class="control-button" id="replayButton">↻ REPLAY</button>
+    <button class="control-button" id="nextButton">NEXT →</button>
+    <button class="control-button" id="fullscreenButton">⛶</button>
+  </div>
 </section>
 
+<audio id="backgroundMusic" loop preload="none"></audio>
 
-<audio id="backgroundMusic" loop preload="auto"></audio>
+<script type="module">
+import * as THREE from "three";
 
-<script type="module" src="js/main.js"></script>
+/* =====================================================
+   MAMUN CODING FANTASY
+   MASTERCLASS SINGLE-FILE EDITION
+===================================================== */
+
+/* ---------- CONFIGURATION ---------- */
+
+const CONFIG = {
+  musicFile: "./dark-fantasy.mp3",
+  musicVolume: 0.35,
+  maxPixelRatio: 1.8,
+  cameraDistance: 8.5
+};
+
+const $ = id => document.getElementById(id);
+
+const opening = $("opening");
+const mainPage = $("mainPage");
+const experience = $("experience");
+const sceneGrid = $("sceneGrid");
+const music = $("backgroundMusic");
+
+music.src = CONFIG.musicFile;
+music.volume = CONFIG.musicVolume;
+
+/* ---------- SCENE DATA ---------- */
+
+const SCENES = [
+  ["Masterclass Cube","A living geometric dimension.","Geometry"],
+  ["Masterclass Flower","A cosmic flower blooming in space.","Nature"],
+  ["Infinite Knot","An endless ribbon of impossible geometry.","Geometry"],
+  ["Orbital Machine","A mysterious celestial mechanism.","Technology"],
+  ["Fractal Tree","A branching universe of living light.","Nature"],
+  ["Liquid Dimension","A fluid world of shifting matter.","Elements"],
+  ["Mechanical Butterfly","A machine learning to fly.","Technology"],
+  ["Golden Spiral","The mathematics of infinity.","Geometry"],
+  ["Crystal Collapse","A crystalline world breaking into light.","Elements"],
+  ["DNA Universe","Life's code floating through the cosmos.","Science"],
+  ["Impossible Architecture","A city beyond the laws of space.","Architecture"],
+  ["Gyroscope","Balance inside a rotating universe.","Technology"],
+  ["Abyss Creature","An unknown lifeform from the deep.","Creatures"],
+  ["Chaotic Pendulum","Order emerging from chaos.","Physics"],
+  ["Sacred Geometry","A universe built from perfect patterns.","Geometry"],
+  ["Phoenix Rebirth","A fiery rebirth from cosmic ashes.","Elements"],
+  ["Black Hole","Light bending into the unknown.","Cosmos"],
+  ["Liquid Wave","An ocean of luminous motion.","Elements"],
+  ["Clockwork Heart","The pulse of a mechanical soul.","Technology"],
+  ["Particle Storm","A storm of a thousand stars.","Cosmos"],
+  ["Hybrid Organism","Nature and technology becoming one.","Nature"],
+  ["Morphing Dimension","Matter changing its identity.","Geometry"],
+  ["Gravity Playground","A world where gravity dances.","Physics"],
+  ["Portal Engine","A gateway to another dimension.","Cosmos"],
+  ["The Final Creation","The universe becomes art.","Finale"]
+];
+
+const COLORS = [
+  0xd4af37,0x7c4dff,0x00d6a0,0x268cff,0xff315c,
+  0xc0c0d0,0xff8c42,0x42e8ff,0xe879f9,0xffffff
+];
+
+/* ---------- COMMON 3D HELPERS ---------- */
+
+const material = (color, options={}) => new THREE.MeshStandardMaterial({
+  color,
+  metalness:0.72,
+  roughness:0.23,
+  ...options
+});
+
+function addMesh(parent, geometry, mat, position=[0,0,0]){
+  const obj = new THREE.Mesh(geometry,mat);
+  obj.position.set(...position);
+  parent.add(obj);
+  return obj;
+}
+
+function addBall(parent, position, radius, color, options={}){
+  const obj = addMesh(parent,new THREE.SphereGeometry(radius,28,20),
+    material(color,options),position);
+  return obj;
+}
+
+function addRing(parent,radius,tube,color,rotation=[0,0,0],position=[0,0,0]){
+  const obj = addMesh(parent,new THREE.TorusGeometry(radius,tube,12,120),
+    material(color,{emissive:color,emissiveIntensity:.25}),position);
+  obj.rotation.set(...rotation);
+  obj.userData.spin = .004 + Math.random()*.006;
+  return obj;
+}
+
+function addLine(parent,points,color,width=.025){
+  const curve = new THREE.CatmullRomCurve3(
+    points.map(p=>new THREE.Vector3(...p))
+  );
+  const obj = addMesh(parent,
+    new THREE.TubeGeometry(curve,Math.max(80,points.length*3),width,7,false),
+    material(color,{emissive:color,emissiveIntensity:.45})
+  );
+  return obj;
+}
+
+function addStars(parent,count=900,spread=35,color=0xffffff){
+  const p = new Float32Array(count*3);
+  for(let i=0;i<count;i++){
+    p[i*3]=(Math.random()-.5)*spread;
+    p[i*3+1]=(Math.random()-.5)*spread;
+    p[i*3+2]=(Math.random()-.5)*spread;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.BufferAttribute(p,3));
+  const points = new THREE.Points(geo,new THREE.PointsMaterial({
+    color,size:.035,transparent:true,opacity:.8
+  }));
+  parent.add(points);
+  points.userData.stars=true;
+  return points;
+}
+
+function addGlow(parent,color,intensity=70,position=[4,4,5]){
+  const light = new THREE.PointLight(color,intensity,35);
+  light.position.set(...position);
+  parent.add(light);
+}
+
+function createBasicWorld(index){
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x05050b);
+  scene.fog = new THREE.FogExp2(0x05050b,.018);
+
+  const camera = new THREE.PerspectiveCamera(48,1,.1,120);
+  camera.position.set(0,.2,CONFIG.cameraDistance);
+
+  scene.add(new THREE.AmbientLight(0xffffff,.7));
+  addGlow(scene,COLORS[index%COLORS.length],85,[4,4,5]);
+  addGlow(scene,0x5540ff,55,[-5,-3,3]);
+  addGlow(scene,0xffffff,35,[0,5,-5]);
+
+  const world = new THREE.Group();
+  scene.add(world);
+  addStars(world,1100,42);
+
+  return {scene,camera,world};
+}
+
+/* =====================================================
+   25 UNIQUE SCENE BUILDERS
+===================================================== */
+
+/* 01 — MASTERCLASS CUBE */
+function buildCube(g){
+  const core = addMesh(g,new THREE.BoxGeometry(2.1,2.1,2.1),
+    material(0xd4af37,{metalness:.95,roughness:.1}));
+  core.userData.spin=.009;
+
+  const wire = addMesh(g,new THREE.BoxGeometry(2.35,2.35,2.35),
+    new THREE.MeshBasicMaterial({color:0x7c4dff,wireframe:true}));
+  wire.userData.spin=-.004;
+
+  const inner = addMesh(g,new THREE.BoxGeometry(1.25,1.25,1.25),
+    new THREE.MeshStandardMaterial({
+      color:0x42e8ff,metalness:.9,roughness:.1,
+      emissive:0x075b88,emissiveIntensity:1
+    }));
+  inner.userData.spin=.02;
+
+  for(let i=0;i<12;i++){
+    const a=i/12*Math.PI*2;
+    const orb=addBall(g,[Math.cos(a)*3,Math.sin(a)*3,Math.sin(i)*.6],
+      .11,COLORS[i%COLORS.length]);
+    orb.userData.orbit=i;
+  }
+  addRing(g,3.3,.025,0xffffff,[.8,.3,.2]);
+}
+
+/* 02 — MASTERCLASS FLOWER */
+function buildFlower(g){
+  const stem=addMesh(g,new THREE.CylinderGeometry(.07,.13,3.3,16),
+    material(0x16a66b),[0,-1.45,0]);
+  stem.rotation.z=-.08;
+
+  const center=addBall(g,[0,.15,0],.42,0xffd45c,{
+    emissive:0xffa800,emissiveIntensity:1.2
+  });
+  center.userData.pulse=true;
+
+  for(let i=0;i<18;i++){
+    const a=i/18*Math.PI*2;
+    const petal=addMesh(g,new THREE.SphereGeometry(.52,28,20),
+      material(COLORS[i%COLORS.length],{
+        emissive:COLORS[i%COLORS.length],emissiveIntensity:.18
+      }),[Math.cos(a)*.86,.15+Math.sin(a)*.86,0]);
+    petal.scale.set(.68,1.55,.28);
+    petal.rotation.z=-a;
+    petal.userData.petal=i;
+  }
+
+  for(let i=0;i<7;i++){
+    const leaf=addMesh(g,new THREE.SphereGeometry(.3,20,12),
+      material(0x00a96b),[
+        Math.sin(i*2)*.5,-.65-i*.24,0
+      ]);
+    leaf.scale.set(1.8,.42,.35);
+    leaf.rotation.z=i*.6;
+  }
+}
+
+/* 03 — INFINITE KNOT */
+function buildKnot(g){
+  for(let k=0;k<4;k++){
+    const pts=[];
+    for(let i=0;i<=700;i++){
+      const t=i/700*Math.PI*2;
+      const r=1.5+.48*Math.cos(5*t+k*1.5);
+      pts.push([
+        r*Math.cos(3*t+k),
+        r*Math.sin(2*t+k*1.3),
+        .8*Math.sin(5*t+k*2)
+      ]);
+    }
+    addLine(g,pts,COLORS[k],.055);
+  }
+  addBall(g,[0,0,0],.2,0xffffff);
+}
+
+/* 04 — ORBITAL MACHINE */
+function buildOrbital(g){
+  for(let i=0;i<9;i++){
+    const r=.7+i*.25;
+    addRing(g,r,.025,COLORS[i%10],
+      [i*.42,i*.31,i*.2]);
+  }
+  addBall(g,[0,0,0],.38,0xffd45c,{
+    emissive:0xffa500,emissiveIntensity:1
+  });
+  for(let i=0;i<16;i++){
+    const a=i/16*Math.PI*2;
+    const o=addBall(g,[Math.cos(a)*2.8,Math.sin(a)*2.8,0],
+      .095,COLORS[i%10]);
+    o.userData.orbit=i;
+  }
+}
+
+/* 05 — FRACTAL TREE */
+function buildTree(g){
+  function branch(x,y,z,length,angle,depth){
+    if(depth<=0)return;
+    const end=[x+Math.sin(angle)*length,y+Math.cos(angle)*length,z];
+    const mid=[(x+end[0])/2,(y+end[1])/2,z];
+    const obj=addMesh(g,new THREE.CylinderGeometry(
+      length*.035,length*.07,length,8),
+      material(depth<3?0x00d6a0:0xd4af37),mid);
+    obj.rotation.z=angle;
+    branch(...end,length*.73,angle-.55,depth-1);
+    branch(...end,length*.73,angle+.55,depth-1);
+    if(depth<3)addBall(g,end,.08,0x42e8ff);
+  }
+  branch(0,-2.6,0,1.35,0,7);
+}
+
+/* 06 — LIQUID DIMENSION */
+function buildLiquid(g){
+  const geo=new THREE.PlaneGeometry(8,8,75,75);
+  const p=geo.attributes.position;
+  for(let i=0;i<p.count;i++){
+    const x=p.getX(i),y=p.getY(i);
+    p.setZ(i,Math.sin(x*1.7)*.3+Math.cos(y*1.5)*.3);
+  }
+  geo.computeVertexNormals();
+  const water=addMesh(g,geo,new THREE.MeshStandardMaterial({
+    color:0x075a99,metalness:.8,roughness:.15,
+    emissive:0x06335c,emissiveIntensity:.5,
+    side:THREE.DoubleSide
+  }),[0,-1.5,0]);
+  water.rotation.x=-.15;
+  water.userData.wave=true;
+
+  for(let i=0;i<30;i++){
+    const b=addBall(g,[
+      (Math.random()-.5)*6,
+      (Math.random()-.5)*3,
+      (Math.random()-.5)*3
+    ],.07+Math.random()*.12,COLORS[i%10]);
+    b.userData.float=i;
+  }
+}
+
+/* 07 — MECHANICAL BUTTERFLY */
+function buildButterfly(g){
+  const body=addMesh(g,new THREE.CapsuleGeometry(.13,.9,5,12),
+    material(0xd4af37));
+  body.rotation.x=Math.PI/2;
+
+  for(const side of [-1,1]){
+    for(let j=0;j<2;j++){
+      const wing=addMesh(g,new THREE.SphereGeometry(.8,28,18),
+        material(j?0x7c4dff:0x00d6a0,{
+          emissive:j?0x7c4dff:0x00d6a0,
+          emissiveIntensity:.3
+        }),[side*(.7+j*.28),j?.45:-.4,0]);
+      wing.scale.set(1.15,.75,.13);
+      wing.rotation.z=side*(j?-.55:.5);
+      wing.userData.wing=side*(j+1);
+    }
+  }
+
+  for(let i=0;i<2;i++){
+    addLine(g,[[0,.5,0],[Math.sin(i)*.4,1.45,.1]],0xd4af37,.025);
+  }
+}
+
+/* 08 — GOLDEN SPIRAL */
+function buildSpiral(g){
+  for(let k=0;k<4;k++){
+    const pts=[];
+    for(let i=0;i<900;i++){
+      const t=i/900*Math.PI*10;
+      const r=.1+t*.065;
+      pts.push([
+        Math.cos(t+k*1.5)*r,
+        Math.sin(t+k*1.5)*r,
+        k*.35-.5
+      ]);
+    }
+    addLine(g,pts,COLORS[k],.035);
+  }
+}
+
+/* 09 — CRYSTAL COLLAPSE */
+function buildCrystal(g){
+  for(let i=0;i<65;i++){
+    const size=.2+Math.random()*.65;
+    const c=addMesh(g,new THREE.OctahedronGeometry(size,0),
+      material(COLORS[i%10],{
+        metalness:.95,roughness:.08,
+        emissive:COLORS[i%10],emissiveIntensity:.18
+      }),[
+        (Math.random()-.5)*6,
+        (Math.random()-.5)*5,
+        (Math.random()-.5)*4
+      ]);
+    c.userData.spin=(Math.random()-.5)*.02;
+    c.userData.float=i;
+  }
+}
+
+/* 10 — DNA UNIVERSE */
+function buildDNA(g){
+  for(let s=0;s<2;s++){
+    const pts=[];
+    for(let i=0;i<=300;i++){
+      const t=i/300*Math.PI*6;
+      const a=t+s*Math.PI;
+      pts.push([Math.cos(a)*1.2,i/300*6-3,Math.sin(a)*1.2]);
+    }
+    addLine(g,pts,s?0x42e8ff:0xff4da6,.055);
+  }
+  for(let i=0;i<42;i++){
+    const t=i/42*Math.PI*6;
+    const y=i/42*6-3;
+    addLine(g,[
+      [Math.cos(t)*1.2,y,Math.sin(t)*1.2],
+      [Math.cos(t+Math.PI)*1.2,y,Math.sin(t+Math.PI)*1.2]
+    ],0xd4af37,.018);
+  }
+}
+
+/* 11 — IMPOSSIBLE ARCHITECTURE */
+function buildArchitecture(g){
+  for(let i=0;i<24;i++){
+    const h=.8+Math.random()*3.8;
+    const x=(i%6-2.5)*1.05;
+    const z=(Math.floor(i/6)-1.5)*1.05;
+    const tower=addMesh(g,new THREE.BoxGeometry(.5,h,.5),
+      material(COLORS[i%10]),[x,-1.8+h/2,z]);
+    tower.rotation.y=i*.2;
+    addRing(g,.32,.018,0xd4af37,[Math.PI/2,0,0],[x,-1.8+h,z]);
+  }
+}
+
+/* 12 — GYROSCOPE */
+function buildGyroscope(g){
+  for(let i=0;i<7;i++){
+    addRing(g,.65+i*.25,.045,COLORS[i],
+      [i*.45,i*.35,i*.2]);
+  }
+  addBall(g,[0,0,0],.35,0xffffff,{
+    emissive:0x777777,emissiveIntensity:.5
+  });
+}
+
+/* 13 — ABYSS CREATURE */
+function buildCreature(g){
+  const body=addBall(g,[0,0,0],1,0x153c65,{
+    metalness:.9,roughness:.15,
+    emissive:0x071a55,emissiveIntensity:.7
+  });
+  body.scale.set(1.4,.8,.85);
+
+  for(let i=0;i<18;i++){
+    const a=i/18*Math.PI*2;
+    const pts=[
+      [Math.cos(a)*.7,Math.sin(a)*.5,0],
+      [Math.cos(a)*1.4,Math.sin(a)*1.1,.2],
+      [Math.cos(a)*2.1,Math.sin(a)*1.5,Math.sin(i)*.7]
+    ];
+    addLine(g,pts,COLORS[i%10],.045);
+    addBall(g,[Math.cos(a)*.55,Math.sin(a)*.3,.7],.1,0xff315c);
+  }
+}
+
+/* 14 — CHAOTIC PENDULUM */
+function buildPendulum(g){
+  for(let i=0;i<7;i++){
+    const rod=addMesh(g,new THREE.CylinderGeometry(.025,.025,2.8,8),
+      material(0xc0c0d0),[i*.35-1.05,0,0]);
+    rod.userData.pendulum=i;
+    const bob=addBall(g,[i*.35-1.05,-1.4,0],.2,COLORS[i]);
+    bob.userData.bob=i;
+  }
+  addRing(g,1.8,.035,0xd4af37,[0,0,0],[0,0,0]);
+}
+
+/* 15 — SACRED GEOMETRY */
+function buildSacred(g){
+  for(let i=0;i<7;i++){
+    const r=.6+i*.28;
+    for(let j=0;j<6;j++){
+      const a=j*Math.PI/3;
+      addRing(g,r,.018,COLORS[(i+j)%10],
+        [0,0,a],[Math.cos(a)*.25,Math.sin(a)*.25,i*.04]);
+    }
+  }
+  const poly=addMesh(g,new THREE.IcosahedronGeometry(1.35,1),
+    new THREE.MeshBasicMaterial({color:0xd4af37,wireframe:true}));
+  poly.userData.spin=.005;
+}
+
+/* 16 — PHOENIX REBIRTH */
+function buildPhoenix(g){
+  const core=addBall(g,[0,-.2,0],.5,0xff4b16,{
+    emissive:0xff3b10,emissiveIntensity:1.5
+  });
+  core.userData.pulse=true;
+
+  for(const side of [-1,1]){
+    for(let i=0;i<13;i++){
+      const feather=addMesh(g,new THREE.ConeGeometry(.15,1.2+i*.06,8),
+        material(i%2?0xff8c42:0xff315c,{
+          emissive:0xff3b10,emissiveIntensity:.7
+        }),[side*(.4+i*.19),.1+i*.15,0]);
+      feather.rotation.z=side*(Math.PI/2-i*.1);
+      feather.userData.feather=side*i;
+    }
+  }
+
+  for(let i=0;i<40;i++){
+    const ember=addBall(g,[
+      (Math.random()-.5)*4,
+      (Math.random()-.5)*4,
+      (Math.random()-.5)*2
+    ],.045,0xff8c42);
+    ember.userData.float=i;
+  }
+}
+
+/* 17 — BLACK HOLE */
+function buildBlackHole(g){
+  addMesh(g,new THREE.SphereGeometry(.95,48,36),
+    new THREE.MeshBasicMaterial({color:0x010104}));
+
+  for(let i=0;i<12;i++){
+    addRing(g,1.2+i*.15,.035,i%2?0x7c4dff:0xff8c42,
+      [.25+i*.1,.15,i*.08]);
+  }
+
+  for(let i=0;i<45;i++){
+    const a=i*.7;
+    const r=1.8+Math.random()*1.7;
+    const star=addBall(g,[Math.cos(a)*r,Math.sin(a*2)*1.5,
+      Math.sin(a)*1.2],.045,0xffffff);
+    star.userData.orbit=i;
+  }
+}
+
+/* 18 — LIQUID WAVE */
+function buildWave(g){
+  for(let i=0;i<25;i++){
+    const pts=[];
+    for(let j=0;j<=160;j++){
+      const x=(j/160-.5)*8;
+      const y=Math.sin(j*.1+i*.35)*(.3+i*.018)+i*.12-1.4;
+      const z=Math.cos(j*.07+i)*.3;
+      pts.push([x,y,z]);
+    }
+    addLine(g,pts,COLORS[i%10],.022);
+  }
+}
+
+/* 19 — CLOCKWORK HEART */
+function buildHeart(g){
+  const shape=new THREE.Shape();
+  shape.moveTo(0,-.65);
+  shape.bezierCurveTo(-2,.6,-1.5,1.7,0,1.1);
+  shape.bezierCurveTo(1.5,1.7,2,.6,0,-.65);
+  const geo=new THREE.ExtrudeGeometry(shape,{
+    depth:.45,bevelEnabled:true,bevelSegments:5,
+    steps:2,bevelSize:.12,bevelThickness:.12
+  });
+  const heart=addMesh(g,geo,material(0xb51d4c,{
+    emissive:0x610c2b,emissiveIntensity:.8
+  }));
+  heart.scale.set(.7,.7,.7);
+  heart.userData.pulse=true;
+
+  for(let i=0;i<12;i++){
+    const gear=addRing(g,.2+(i%3)*.12,.04,0xd4af37,
+      [0,0,0],[(i%3-1)*.65,Math.floor(i/3)*.55-.5,.5]);
+    gear.userData.spin=i%2?.02:-.02;
+  }
+}
+
+/* 20 — PARTICLE STORM */
+function buildStorm(g){
+  const count=2500;
+  const positions=new Float32Array(count*3);
+  const velocities=[];
+  for(let i=0;i<count;i++){
+    positions[i*3]=(Math.random()-.5)*9;
+    positions[i*3+1]=(Math.random()-.5)*9;
+    positions[i*3+2]=(Math.random()-.5)*6;
+    velocities.push(.008+Math.random()*.025);
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.BufferAttribute(positions,3));
+  const points=new THREE.Points(geo,new THREE.PointsMaterial({
+    color:0x9adfff,size:.035,transparent:true,opacity:.9
+  }));
+  points.userData.storm=true;
+  points.userData.velocities=velocities;
+  g.add(points);
+  addBall(g,[0,0,0],.3,0xd4af37);
+}
+
+/* 21 — HYBRID ORGANISM */
+function buildHybrid(g){
+  addMesh(g,new THREE.CylinderGeometry(.2,.42,2.8,12),
+    material(0x187a59),[0,-.5,0]);
+
+  for(let i=0;i<12;i++){
+    const a=i*Math.PI/6;
+    const branch=addMesh(g,new THREE.CylinderGeometry(.04,.12,1.7,8),
+      material(i%2?0x00d6a0:0xd4af37),
+      [Math.cos(a)*.9,.5+Math.sin(i)*.3,Math.sin(a)*.9]);
+    branch.rotation.z=Math.cos(a)*.8;
+    branch.rotation.x=Math.sin(a)*.8;
+    addBall(g,[Math.cos(a)*1.7,1.3,Math.sin(a)*1.7],
+      .2,COLORS[i%10]);
+  }
+  addRing(g,1.7,.035,0x42e8ff,[Math.PI/2,0,0]);
+}
+
+/* 22 — MORPHING DIMENSION */
+function buildMorph(g){
+  const forms=[
+    addMesh(g,new THREE.IcosahedronGeometry(1.4,2),material(0x7c4dff)),
+    addMesh(g,new THREE.TorusKnotGeometry(.9,.24,180,18,3,5),material(0x00d6a0)),
+    addMesh(g,new THREE.OctahedronGeometry(1.5,1),material(0xff8c42)),
+    addMesh(g,new THREE.DodecahedronGeometry(1.4,1),material(0x42e8ff))
+  ];
+  forms.forEach((o,i)=>{
+    o.visible=i===0;
+    o.userData.morphIndex=i;
+  });
+  g.userData.morphForms=forms;
+}
+
+/* 23 — GRAVITY PLAYGROUND */
+function buildGravity(g){
+  addBall(g,[0,0,0],.4,0xd4af37,{
+    emissive:0xffa500,emissiveIntensity:1
+  });
+
+  for(let i=0;i<35;i++){
+    const a=i/35*Math.PI*2;
+    const r=1+Math.random()*2.2;
+    const orb=addBall(g,[
+      Math.cos(a)*r,
+      Math.sin(a*2)*1.2,
+      Math.sin(a)*r
+    ],.07+Math.random()*.08,COLORS[i%10]);
+    orb.userData.gravity=i;
+  }
+
+  for(let i=0;i<5;i++){
+    addRing(g,1+i*.4,.02,COLORS[i],[i*.4,i*.7,0]);
+  }
+}
+
+/* 24 — PORTAL ENGINE */
+function buildPortal(g){
+  for(let i=0;i<9;i++){
+    addRing(g,1+i*.16,.045,COLORS[i],
+      [0,0,i*.15],[0,0,-i*.13]);
+  }
+  const core=addMesh(g,new THREE.CircleGeometry(1,80),
+    new THREE.MeshBasicMaterial({
+      color:0x160c38,transparent:true,opacity:.85,
+      side:THREE.DoubleSide
+    }),[0,0,-.8]);
+  core.userData.portal=true;
+
+  for(let i=0;i<30;i++){
+    const a=i/30*Math.PI*2;
+    addBall(g,[Math.cos(a)*2.3,Math.sin(a)*1.8,-1],
+      .06,COLORS[i%10]);
+  }
+}
+
+/* 25 — THE FINAL CREATION */
+function buildFinal(g){
+  for(let i=0;i<35;i++){
+    const a=i*2.4;
+    const r=.5+i*.065;
+    const obj=addMesh(g,new THREE.IcosahedronGeometry(
+      .2+Math.random()*.35,1),
+      material(COLORS[i%10],{
+        emissive:COLORS[i%10],emissiveIntensity:.5
+      }),[
+        Math.cos(a)*r,
+        Math.sin(a)*r,
+        Math.sin(i*.8)*1.4
+      ]);
+    obj.userData.spin=.008+i*.0005;
+  }
+
+  const core=addBall(g,[0,0,0],.55,0xd4af37,{
+    emissive:0xffd45c,emissiveIntensity:1.5
+  });
+  core.userData.pulse=true;
+
+  for(let i=0;i<7;i++){
+    addRing(g,1.5+i*.25,.025,COLORS[i],[i*.4,i*.3,i*.2]);
+  }
+}
+
+/* ---------- BUILDER ARRAY ---------- */
+
+const BUILDERS=[
+  buildCube,buildFlower,buildKnot,buildOrbital,buildTree,
+  buildLiquid,buildButterfly,buildSpiral,buildCrystal,buildDNA,
+  buildArchitecture,buildGyroscope,buildCreature,buildPendulum,
+  buildSacred,buildPhoenix,buildBlackHole,buildWave,buildHeart,
+  buildStorm,buildHybrid,buildMorph,buildGravity,buildPortal,
+  buildFinal
+];
+
+/* ---------- CREATE ACTIVE SCENE ---------- */
+
+function createFantasyScene(index){
+  const base=createBasicWorld(index);
+  const {scene,camera,world}=base;
+
+  BUILDERS[index](world);
+
+  const clock=new THREE.Clock();
+
+  function update(){
+    const t=clock.getElapsedTime();
+
+    world.rotation.y+=.0018;
+    world.rotation.x=Math.sin(t*.22)*.045;
+
+    world.traverse(obj=>{
+      if(obj.userData.spin){
+        obj.rotation.y+=obj.userData.spin;
+        obj.rotation.z+=obj.userData.spin*.5;
+      }
+
+      if(obj.userData.float!==undefined){
+        obj.position.y+=Math.sin(t*1.5+obj.userData.float)*.0018;
+      }
+
+      if(obj.userData.pulse){
+        const s=1+Math.sin(t*2.4)*.1;
+        obj.scale.setScalar(s);
+      }
+
+      if(obj.userData.wing){
+        obj.rotation.z=Math.sin(t*8)*.48*Math.sign(obj.userData.wing);
+      }
+
+      if(obj.userData.pendulum!==undefined){
+        const i=obj.userData.pendulum;
+        obj.rotation.z=Math.sin(t*2+i*.55)*.55;
+      }
+
+      if(obj.userData.bob!==undefined){
+        const i=obj.userData.bob;
+        obj.position.x=i*.35-1.05+Math.sin(t*2+i*.55)*.85;
+      }
+
+      if(obj.userData.storm){
+        const p=obj.geometry.attributes.position;
+        const v=obj.userData.velocities;
+        for(let i=0;i<p.count;i++){
+          let y=p.getY(i)+v[i];
+          if(y>4.5)y=-4.5;
+          p.setY(i,y);
+        }
+        p.needsUpdate=true;
+      }
+
+      if(obj.userData.wave){
+        const p=obj.geometry.attributes.position;
+        for(let i=0;i<p.count;i++){
+          const x=p.getX(i),y=p.getY(i);
+          p.setZ(i,Math.sin(x*1.7+t*1.2)*.3+
+            Math.cos(y*1.5+t)*.3);
+        }
+        p.needsUpdate=true;
+        obj.geometry.computeVertexNormals();
+      }
+
+      if(obj.userData.morphIndex!==undefined){
+        const forms=world.userData.morphForms;
+        if(forms){
+          const active=Math.floor(t/2.5)%forms.length;
+          forms.forEach((form,i)=>form.visible=i===active);
+        }
+      }
+
+      if(obj.userData.portal){
+        obj.rotation.z=t*.4;
+      }
+
+      if(obj.userData.orbit!==undefined){
+        const i=obj.userData.orbit;
+        const a=t*.5+i*.55;
+        obj.position.x=Math.cos(a)*(2.5+(i%3)*.2);
+        obj.position.y=Math.sin(a*1.2)*(1.2+(i%2)*.4);
+      }
+
+      if(obj.userData.gravity!==undefined){
+        const i=obj.userData.gravity;
+        const a=t*.5+i*.7;
+        const r=1.1+(i%5)*.28;
+        obj.position.x=Math.cos(a)*r;
+        obj.position.z=Math.sin(a)*r;
+        obj.position.y=Math.sin(a*2)*1.1;
+      }
+    });
+  }
+
+  return {scene,camera,world,update};
+}
+
+/* ---------- RENDERER SETUP ---------- */
+
+function makeRenderer(canvas){
+  const renderer=new THREE.WebGLRenderer({
+    canvas,
+    antialias:true,
+    alpha:true,
+    powerPreference:"high-performance"
+  });
+  renderer.setPixelRatio(Math.min(
+    window.devicePixelRatio||1,CONFIG.maxPixelRatio
+  ));
+  renderer.outputColorSpace=THREE.SRGBColorSpace;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.2;
+  return renderer;
+}
+
+const openingCanvas=$("openingCanvas");
+const experienceCanvas=$("experienceCanvas");
+
+const openingRenderer=makeRenderer(openingCanvas);
+const sceneRenderer=makeRenderer(experienceCanvas);
+
+/* ---------- OPENING 3D WORLD ---------- */
+
+const openingScene=new THREE.Scene();
+openingScene.background=new THREE.Color(0x050509);
+
+const openingCamera=new THREE.PerspectiveCamera(
+  55,window.innerWidth/window.innerHeight,.1,100
+);
+openingCamera.position.set(0,0,8);
+
+openingScene.add(new THREE.AmbientLight(0xffffff,.8));
+addGlow(openingScene,0xd4af37,120,[3,4,5]);
+addGlow(openingScene,0x7c4dff,85,[-4,-2,3]);
+
+const openingWorld=new THREE.Group();
+openingScene.add(openingWorld);
+
+const openingCore=addMesh(openingWorld,
+  new THREE.IcosahedronGeometry(1.25,2),
+  material(0xd4af37,{
+    metalness:.95,roughness:.12,
+    emissive:0x6c4a08,emissiveIntensity:.8
+  })
+);
+
+const openingShell=addMesh(openingWorld,
+  new THREE.IcosahedronGeometry(1.7,2),
+  new THREE.MeshBasicMaterial({
+    color:0x7c4dff,wireframe:true,transparent:true,opacity:.55
+  })
+);
+
+const openingRings=[];
+for(let i=0;i<5;i++){
+  const r=addRing(openingWorld,2+i*.24,.018,COLORS[i],
+    [i*.7,i*.45,i*.3]);
+  openingRings.push(r);
+}
+
+addStars(openingWorld,1800,25,0xd4af37);
+
+const openingClock=new THREE.Clock();
+
+function animateOpening(){
+  requestAnimationFrame(animateOpening);
+  const t=openingClock.getElapsedTime();
+
+  openingCore.rotation.x=t*.24;
+  openingCore.rotation.y=t*.38;
+  openingShell.rotation.x=-t*.13;
+  openingShell.rotation.y=t*.2;
+  openingWorld.rotation.y=Math.sin(t*.3)*.15;
+
+  openingRings.forEach((r,i)=>{
+    r.rotation.x+=.001*(i+1);
+    r.rotation.y+=.0015*(i+1);
+  });
+
+  openingCamera.position.x=Math.sin(t*.18)*.25;
+  openingCamera.position.y=Math.cos(t*.2)*.18;
+  openingCamera.lookAt(0,0,0);
+
+  openingRenderer.render(openingScene,openingCamera);
+}
+animateOpening();
+
+/* ---------- GALLERY ---------- */
+
+function buildGallery(){
+  sceneGrid.innerHTML="";
+
+  SCENES.forEach((data,index)=>{
+    const card=document.createElement("button");
+    card.type="button";
+    card.className="scene-card";
+    card.innerHTML=`
+      <span class="scene-card-number">${String(index+1).padStart(2,"0")}</span>
+      <span class="scene-card-orb"></span>
+      <span class="scene-card-content">
+        <span class="scene-card-title">${data[0]}</span>
+        <span class="scene-card-description">${data[1]}</span>
+        <span class="scene-card-action">EXPLORE ${data[2].toUpperCase()} ↗</span>
+      </span>
+    `;
+    card.addEventListener("click",()=>openScene(index));
+    sceneGrid.appendChild(card);
+  });
+}
+buildGallery();
+
+/* ---------- ACTIVE EXPERIENCE ---------- */
+
+let active=null;
+let activeIndex=0;
+let running=false;
+let animationFrame=null;
+
+let pointerDown=false;
+let pointerX=0,pointerY=0;
+let targetX=0,targetY=0;
+let zoom=CONFIG.cameraDistance;
+
+function updateInfo(index){
+  const data=SCENES[index];
+  $("sceneTitle").textContent=data[0];
+  $("sceneDescription").textContent=data[1];
+  $("sceneCategory").textContent="MAMUN / "+data[2].toUpperCase();
+  $("sceneCounter").textContent=
+    String(index+1).padStart(2,"0")+" / 25";
+}
+
+function disposeActive(){
+  if(!active)return;
+
+  active.scene.traverse(obj=>{
+    if(obj.geometry)obj.geometry.dispose();
+
+    if(obj.material){
+      if(Array.isArray(obj.material)){
+        obj.material.forEach(m=>m.dispose());
+      }else{
+        obj.material.dispose();
+      }
+    }
+  });
+
+  active=null;
+}
+
+function openScene(index){
+  activeIndex=(index+25)%25;
+  disposeActive();
+
+  active=createFantasyScene(activeIndex);
+  updateInfo(activeIndex);
+
+  targetX=0;
+  targetY=0;
+  zoom=CONFIG.cameraDistance;
+
+  active.camera.aspect=
+    (experience.clientWidth||innerWidth)/
+    (experience.clientHeight||innerHeight);
+  active.camera.position.z=zoom;
+  active.camera.updateProjectionMatrix();
+
+  mainPage.classList.add("hidden");
+  experience.classList.remove("hidden");
+
+  resizeSceneRenderer();
+  running=true;
+  animateExperience();
+}
+
+function closeScene(){
+  running=false;
+  if(animationFrame)cancelAnimationFrame(animationFrame);
+  animationFrame=null;
+
+  disposeActive();
+
+  experience.classList.add("hidden");
+  mainPage.classList.remove("hidden");
+}
+
+function nextScene(direction){
+  openScene((activeIndex+direction+25)%25);
+}
+
+function animateExperience(){
+  if(animationFrame)cancelAnimationFrame(animationFrame);
+
+  function frame(){
+    if(!running||!active)return;
+    animationFrame=requestAnimationFrame(frame);
+
+    active.update();
+
+    active.world.rotation.y+=
+      (targetY-active.world.rotation.y)*.035;
+    active.world.rotation.x+=
+      (targetX-active.world.rotation.x)*.035;
+
+    active.camera.position.z+=
+      (zoom-active.camera.position.z)*.08;
+
+    sceneRenderer.render(active.scene,active.camera);
+  }
+
+  frame();
+}
+
+/* ---------- OPENING BUTTON + MUSIC ---------- */
+
+$("enterButton").addEventListener("click",async()=>{
+  try{
+    await music.play();
+  }catch(error){
+    console.warn("Music did not play. Check the MP3 filename and path.",error);
+  }
+
+  opening.classList.add("opening-exit");
+
+  setTimeout(()=>{
+    opening.classList.add("hidden");
+    mainPage.classList.remove("hidden");
+  },850);
+});
+
+/* ---------- EXPERIENCE BUTTONS ---------- */
+
+$("backButton").addEventListener("click",closeScene);
+$("previousButton").addEventListener("click",()=>nextScene(-1));
+$("nextButton").addEventListener("click",()=>nextScene(1));
+$("replayButton").addEventListener("click",()=>openScene(activeIndex));
+
+$("fullscreenButton").addEventListener("click",async()=>{
+  try{
+    if(!document.fullscreenElement){
+      await experience.requestFullscreen();
+    }else{
+      await document.exitFullscreen();
+    }
+  }catch(e){
+    console.warn("Fullscreen unavailable",e);
+  }
+});
+
+/* ---------- TOUCH + MOUSE ROTATION ---------- */
+
+experienceCanvas.addEventListener("pointerdown",event=>{
+  pointerDown=true;
+  pointerX=event.clientX;
+  pointerY=event.clientY;
+  experienceCanvas.setPointerCapture(event.pointerId);
+});
+
+experienceCanvas.addEventListener("pointermove",event=>{
+  if(!pointerDown||!active)return;
+
+  const dx=event.clientX-pointerX;
+  const dy=event.clientY-pointerY;
+
+  targetY+=dx*.004;
+  targetX+=dy*.003;
+
+  pointerX=event.clientX;
+  pointerY=event.clientY;
+});
+
+experienceCanvas.addEventListener("pointerup",()=>{
+  pointerDown=false;
+});
+experienceCanvas.addEventListener("pointercancel",()=>{
+  pointerDown=false;
+});
+
+experienceCanvas.addEventListener("wheel",event=>{
+  if(!active)return;
+  zoom=THREE.MathUtils.clamp(
+    zoom+event.deltaY*.004,4,15
+  );
+},{passive:true});
+
+/* ---------- KEYBOARD ---------- */
+
+window.addEventListener("keydown",event=>{
+  if(!running)return;
+  if(event.key==="ArrowRight")nextScene(1);
+  if(event.key==="ArrowLeft")nextScene(-1);
+  if(event.key==="Escape")closeScene();
+});
+
+/* ---------- RESPONSIVE RESIZE ---------- */
+
+function resizeSceneRenderer(){
+  const w=experience.clientWidth||innerWidth;
+  const h=experience.clientHeight||innerHeight;
+  sceneRenderer.setSize(w,h,false);
+
+  if(active){
+    active.camera.aspect=w/h;
+    active.camera.updateProjectionMatrix();
+  }
+}
+
+function resizeAll(){
+  const w=innerWidth,h=innerHeight;
+
+  openingCamera.aspect=w/h;
+  openingCamera.updateProjectionMatrix();
+  openingRenderer.setSize(w,h,false);
+
+  resizeSceneRenderer();
+}
+
+window.addEventListener("resize",resizeAll);
+resizeAll();
+
+/* ---------- VISIBILITY ---------- */
+
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden){
+    if(music&&!music.paused)music.pause();
+  }else if(!opening.classList.contains("hidden")){
+    // Keep the opening animation running.
+  }
+});
+
+console.log("MAMUN CODING FANTASY — MASTERCLASS EDITION READY.");
+console.log("25 procedural 3D scenes initialized.");
+</script>
 
 </body>
-    </html>
+</html>
