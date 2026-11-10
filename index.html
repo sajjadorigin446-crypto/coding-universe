@@ -1,0 +1,1665 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050409">
+<title>OBSCURA — The Art of Impossible Worlds</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root{
+ --bg:#050409;
+ --gold:#c6a45a;
+ --gold2:#edcf91;
+ --violet:#9b65dc;
+ --text:#e8dfd0;
+ --muted:#827b83;
+ --panel:rgba(12,10,17,.88);
+ --border:rgba(198,164,90,.22);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+ background:var(--bg);
+ color:var(--text);
+ font-family:Inter,sans-serif;
+ overflow:hidden;
+}
+
+button{font-family:inherit;cursor:pointer}
+
+#stage{
+ position:fixed;
+ inset:0;
+ z-index:0;
+}
+
+canvas{display:block}
+
+.overlay{
+ position:fixed;
+ inset:0;
+ z-index:2;
+ pointer-events:none;
+ display:flex;
+ flex-direction:column;
+}
+
+nav{
+ pointer-events:auto;
+ height:76px;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ padding:0 5%;
+ background:linear-gradient(#050409dd,transparent);
+}
+
+.brand{
+ font-family:Cinzel,serif;
+ font-size:21px;
+ letter-spacing:5px;
+ color:var(--gold2);
+}
+
+.brand small{
+ display:block;
+ font:8px Inter;
+ letter-spacing:3px;
+ color:var(--muted);
+ margin-top:3px;
+}
+
+.nav-right{
+ display:flex;
+ align-items:center;
+ gap:23px;
+}
+
+.nav-right button{
+ background:none;
+ border:0;
+ color:#b9a98f;
+ font-size:10px;
+ letter-spacing:2px;
+}
+
+.hero{
+ margin:auto;
+ width:100%;
+ text-align:center;
+ padding:20px;
+ transform:translateY(-8px);
+}
+
+.kicker{
+ font-size:9px;
+ letter-spacing:7px;
+ color:var(--gold);
+ margin-bottom:20px;
+}
+
+.hero h1{
+ font:400 clamp(38px,7vw,85px) Cinzel,serif;
+ letter-spacing:12px;
+ color:#eee0c2;
+ text-shadow:0 0 40px #9b65dc55;
+}
+
+.hero p{
+ margin:20px auto 0;
+ font-size:10px;
+ letter-spacing:5px;
+ color:#a69a9e;
+}
+
+.world-name{
+ font:14px Cinzel,serif;
+ color:var(--gold2);
+ letter-spacing:5px;
+ margin-top:45px;
+}
+
+.world-description{
+ font-size:11px;
+ color:#aaa0a8;
+ letter-spacing:1px;
+ margin-top:12px;
+}
+
+.bottom{
+ pointer-events:auto;
+ padding:20px 5% 28px;
+ background:linear-gradient(transparent,#050409f5);
+}
+
+.worlds{
+ display:flex;
+ gap:9px;
+ overflow-x:auto;
+ padding-bottom:15px;
+ scrollbar-width:none;
+}
+
+.worlds button{
+ flex-shrink:0;
+ padding:12px 17px;
+ color:#a69ba0;
+ background:#111019dd;
+ border:1px solid var(--border);
+ font-size:9px;
+ letter-spacing:1.5px;
+ transition:.3s;
+}
+
+.worlds button.active,
+.worlds button:hover{
+ color:var(--gold2);
+ border-color:var(--gold);
+ background:#261c24;
+}
+
+.world-footer{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ border-top:1px solid var(--border);
+ padding-top:16px;
+}
+
+.world-footer span{
+ font-size:9px;
+ letter-spacing:2px;
+ color:var(--muted);
+}
+
+.actions{
+ display:flex;
+ gap:9px;
+}
+
+.action{
+ background:#17121b;
+ border:1px solid var(--border);
+ color:var(--gold2);
+ padding:11px 16px;
+ font-size:9px;
+ letter-spacing:1.5px;
+}
+
+.action:hover{
+ background:#392832;
+}
+
+.panel{
+ pointer-events:auto;
+ position:fixed;
+ right:20px;
+ top:100px;
+ width:min(420px,calc(100% - 40px));
+ max-height:calc(100vh - 130px);
+ overflow:auto;
+ background:var(--panel);
+ border:1px solid var(--border);
+ backdrop-filter:blur(20px);
+ padding:22px;
+ display:none;
+ z-index:5;
+}
+
+.panel.open{display:block}
+
+.panel-head{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:20px;
+}
+
+.panel-head h2{
+ font:18px Cinzel,serif;
+ color:var(--gold2);
+ letter-spacing:3px;
+}
+
+.close{
+ background:none;
+ color:var(--gold);
+ border:0;
+ font-size:22px;
+}
+
+.panel p{
+ font-size:11px;
+ line-height:1.8;
+ color:#aaa0a8;
+ margin-bottom:16px;
+}
+
+pre{
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+ background:#08070c;
+ border:1px solid #27202d;
+ padding:15px;
+ font:11px/1.8 'JetBrains Mono',monospace;
+ color:#cdbb9b;
+ overflow:auto;
+}
+
+textarea{
+ width:100%;
+ min-height:190px;
+ resize:vertical;
+ background:#08070c;
+ border:1px solid #392b40;
+ color:#e7d6bd;
+ padding:15px;
+ font:11px/1.8 'JetBrains Mono',monospace;
+ outline:none;
+}
+
+textarea:focus{border-color:var(--gold)}
+
+.output{
+ min-height:55px;
+ background:#09080d;
+ padding:13px;
+ margin-top:12px;
+ color:#b7d5a0;
+ font:11px/1.8 'JetBrains Mono',monospace;
+ white-space:pre-wrap;
+}
+
+.panel-button{
+ background:#332538;
+ border:1px solid var(--gold);
+ color:var(--gold2);
+ padding:12px 18px;
+ margin-top:12px;
+ font-size:10px;
+ letter-spacing:2px;
+}
+
+label{
+ display:block;
+ font-size:10px;
+ color:var(--gold);
+ margin:15px 0 7px;
+ letter-spacing:2px;
+}
+
+input[type=range]{
+ width:100%;
+ accent-color:var(--gold);
+}
+
+#loading{
+ position:fixed;
+ inset:0;
+ z-index:10;
+ background:#050409;
+ display:grid;
+ place-items:center;
+ text-align:center;
+ transition:opacity 1s;
+}
+
+#loading h2{
+ font:25px Cinzel,serif;
+ letter-spacing:7px;
+ color:var(--gold2);
+}
+
+#loading p{
+ margin-top:15px;
+ font-size:9px;
+ letter-spacing:4px;
+ color:#8c7a84;
+}
+
+@media(max-width:600px){
+ nav{height:65px;padding:0 18px}
+ .brand{font-size:17px}
+ .nav-right{gap:12px}
+ .nav-right button{font-size:8px}
+ .hero h1{letter-spacing:6px}
+ .hero p{letter-spacing:2px;line-height:2}
+ .world-name{margin-top:25px}
+ .bottom{padding:12px 15px 20px}
+ .world-footer span{font-size:8px}
+ .action{padding:10px}
+ .panel{top:75px;right:10px;width:calc(100% - 20px)}
+}
+</style>
+</head>
+
+<body>
+
+<div id="loading">
+ <div>
+  <h2>OBSCURA</h2>
+  <p>GENERATING IMPOSSIBLE WORLDS</p>
+ </div>
+</div>
+
+<div id="stage"></div>
+
+<div class="overlay">
+
+<nav>
+ <div class="brand">
+  OBSCURA
+  <small>THE ART OF IMPOSSIBLE WORLDS</small>
+ </div>
+
+ <div class="nav-right">
+  <button id="labBtn">CODE LAB</button>
+  <button id="shaderBtn">SHADER LAB</button>
+  <button id="fullBtn">FULLSCREEN</button>
+ </div>
+</nav>
+
+<section class="hero">
+ <div class="kicker">BEYOND THE LIMITS OF IMAGINATION</div>
+ <h1>OBSCURA</h1>
+ <p>WHERE CODE BECOMES ANOTHER REALITY</p>
+
+ <div class="world-name" id="worldName">THE GOTHIC KINGDOM</div>
+ <div class="world-description" id="worldDesc">
+  A kingdom suspended between darkness and eternity.
+ </div>
+</section>
+
+<div class="bottom">
+
+ <div class="worlds" id="worlds">
+  <button class="active" data-world="castle">01 · KINGDOM</button>
+  <button data-world="dragon">02 · DRAGON REALM</button>
+  <button data-world="portal">03 · VOID PORTAL</button>
+  <button data-world="forest">04 · DARK FOREST</button>
+  <button data-world="islands">05 · DIMENSIONS</button>
+  <button data-world="flower">06 · ETERNAL BLOOM</button>
+  <button data-world="nebula">07 · COSMOS</button>
+ </div>
+
+ <div class="world-footer">
+  <span>REAL-TIME PROCEDURAL EXPERIENCE</span>
+  <div class="actions">
+   <button class="action" id="magicBtn">✦ CAST MAGIC</button>
+   <button class="action" id="autoBtn">AUTO: ON</button>
+  </div>
+ </div>
+
+</div>
+</div>
+
+<!-- PYTHON LAB -->
+
+<div class="panel" id="codePanel">
+ <div class="panel-head">
+  <h2>PYTHON LAB</h2>
+  <button class="close" data-close="codePanel">×</button>
+ </div>
+
+ <p>
+  Explore procedural mathematics, fractals and generative art.
+  Python runs in your browser through Pyodide.
+ </p>
+
+ <label>PYTHON SOURCE CODE</label>
+
+ <textarea id="pythonCode" spellcheck="false">import math
+
+print("OBSCURA - PYTHON ENGINE")
+print("-----------------------")
+
+# Generate a fantasy spiral
+for i in range(1, 16):
+    angle = i * 0.45
+    radius = i * 0.25
+
+    x = radius * math.cos(angle)
+    y = radius * math.sin(angle)
+
+    print(
+        f"Particle {i:02}: "
+        f"x={x:.3f}, y={y:.3f}"
+    )
+
+print("\\nFANTASY GEOMETRY GENERATED.")</textarea>
+
+ <button class="panel-button" id="runPython">▶ RUN PYTHON</button>
+
+ <div class="output" id="pythonOutput">
+  Python engine ready to initialize...
+ </div>
+
+ <label>MORE PYTHON EXPERIMENTS</label>
+
+ <pre># Mandelbrot-style iteration
+z = 0
+c = complex(-0.4, 0.6)
+
+for i in range(50):
+    z = z*z + c
+
+print(z)</pre>
+
+ <p>
+  Try changing the values, writing your own loops and exploring
+  mathematical patterns.
+ </p>
+</div>
+
+<!-- SHADER LAB -->
+
+<div class="panel" id="shaderPanel">
+ <div class="panel-head">
+  <h2>VISUAL ENGINE</h2>
+  <button class="close" data-close="shaderPanel">×</button>
+ </div>
+
+ <p>Control the live environment in real time.</p>
+
+ <label>MAGICAL ENERGY</label>
+ <input type="range" id="energySlider" min="0" max="100" value="75">
+
+ <label>ATMOSPHERIC GLOW</label>
+ <input type="range" id="glowSlider" min="0" max="100" value="70">
+
+ <label>PARTICLE DENSITY</label>
+ <input type="range" id="particleSlider" min="0" max="100" value="75">
+
+ <label>CAMERA ZOOM</label>
+ <input type="range" id="zoomSlider" min="7" max="25" value="14">
+
+ <label>RENDERING TECHNIQUES</label>
+ <pre>
+THREE.JS
+PROCEDURAL GEOMETRY
+PHYSICAL MATERIALS
+PARTICLE SYSTEMS
+POST-PROCESSING BLOOM
+ANIMATED LIGHTING
+REAL-TIME CAMERA
+ </pre>
+</div>
+
+<script type="importmap">
+{
+ "imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+ }
+}
+</script>
+
+<script type="module">
+
+import * as THREE from 'three';
+
+import {EffectComposer}
+from 'three/addons/postprocessing/EffectComposer.js';
+
+import {RenderPass}
+from 'three/addons/postprocessing/RenderPass.js';
+
+import {UnrealBloomPass}
+from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+import {OutputPass}
+from 'three/addons/postprocessing/OutputPass.js';
+
+// ======================================
+// ENGINE
+// ======================================
+
+const stage=document.getElementById('stage');
+
+const scene=new THREE.Scene();
+
+scene.background=new THREE.Color('#050409');
+scene.fog=new THREE.FogExp2('#09050e',.025);
+
+const camera=new THREE.PerspectiveCamera(
+ 45,innerWidth/innerHeight,.1,150
+);
+
+camera.position.set(0,4,14);
+camera.lookAt(0,2,0);
+
+const renderer=new THREE.WebGLRenderer({
+ antialias:true,
+ powerPreference:'high-performance'
+});
+
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.15;
+
+stage.appendChild(renderer.domElement);
+
+// POST PROCESSING
+
+const composer=new EffectComposer(renderer);
+
+composer.addPass(new RenderPass(scene,camera));
+
+const bloom=new UnrealBloomPass(
+ new THREE.Vector2(innerWidth,innerHeight),
+ 1.2,.6,.15
+);
+
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+// ======================================
+// LIGHTS
+// ======================================
+
+scene.add(new THREE.AmbientLight('#87718e',.5));
+
+const goldLight=new THREE.PointLight('#d8a65e',180,40);
+goldLight.position.set(2,8,5);
+scene.add(goldLight);
+
+const violetLight=new THREE.PointLight('#8d3aff',180,40);
+violetLight.position.set(-7,4,-5);
+scene.add(violetLight);
+
+const redLight=new THREE.PointLight('#b32c5a',100,30);
+redLight.position.set(5,3,-5);
+scene.add(redLight);
+
+// ======================================
+// ENVIRONMENT
+// ======================================
+
+const floor=new THREE.Mesh(
+ new THREE.CircleGeometry(100,80),
+ new THREE.MeshStandardMaterial({
+  color:'#100b14',
+  roughness:.6,
+  metalness:.4
+ })
+);
+
+floor.rotation.x=-Math.PI/2;
+floor.position.y=-1;
+scene.add(floor);
+
+// Star field
+
+const starCount=3000;
+const starPositions=new Float32Array(starCount*3);
+
+for(let i=0;i<starCount;i++){
+ starPositions[i*3]=(Math.random()-.5)*90;
+ starPositions[i*3+1]=Math.random()*35-5;
+ starPositions[i*3+2]=(Math.random()-.5)*90;
+}
+
+const starGeo=new THREE.BufferGeometry();
+
+starGeo.setAttribute(
+ 'position',
+ new THREE.BufferAttribute(starPositions,3)
+);
+
+const stars=new THREE.Points(
+ starGeo,
+ new THREE.PointsMaterial({
+  color:'#d9bce8',
+  size:.055,
+  transparent:true,
+  opacity:.8
+ })
+);
+
+scene.add(stars);
+
+// ======================================
+// WORLD MANAGEMENT
+// ======================================
+
+const worlds={};
+let currentWorld='castle';
+
+function newWorld(name){
+ const group=new THREE.Group();
+ group.name=name;
+ scene.add(group);
+ worlds[name]=group;
+ return group;
+}
+
+// ======================================
+// MATERIALS
+// ======================================
+
+const obsidian=new THREE.MeshStandardMaterial({
+ color:'#17121e',
+ roughness:.25,
+ metalness:.75
+});
+
+const stone=new THREE.MeshStandardMaterial({
+ color:'#332735',
+ roughness:.85,
+ metalness:.1
+});
+
+const gold=new THREE.MeshStandardMaterial({
+ color:'#d4a35b',
+ metalness:.85,
+ roughness:.2,
+ emissive:'#5d3312',
+ emissiveIntensity:.6
+});
+
+const magic=new THREE.MeshStandardMaterial({
+ color:'#8b38d5',
+ emissive:'#701dba',
+ emissiveIntensity:2,
+ metalness:.4,
+ roughness:.2
+});
+
+const green=new THREE.MeshStandardMaterial({
+ color:'#234b34',
+ roughness:.4
+});
+
+// ======================================
+// SHARED OBJECT HELPERS
+// ======================================
+
+function box(parent,x,y,z,sx,sy,sz,mat){
+ const m=new THREE.Mesh(
+  new THREE.BoxGeometry(sx,sy,sz),mat
+ );
+ m.position.set(x,y,z);
+ parent.add(m);
+ return m;
+}
+
+function sphere(parent,x,y,z,r,mat,detail=2){
+ const m=new THREE.Mesh(
+  new THREE.IcosahedronGeometry(r,detail),mat
+ );
+ m.position.set(x,y,z);
+ parent.add(m);
+ return m;
+}
+
+function cone(parent,x,y,z,r,h,mat,segments=8){
+ const m=new THREE.Mesh(
+  new THREE.ConeGeometry(r,h,segments),mat
+ );
+ m.position.set(x,y,z);
+ parent.add(m);
+ return m;
+}
+
+function torus(parent,x,y,z,r,t,mat){
+ const m=new THREE.Mesh(
+  new THREE.TorusGeometry(r,t,8,100),mat
+ );
+ m.position.set(x,y,z);
+ parent.add(m);
+ return m;
+}
+
+// ======================================
+// 01. GOTHIC KINGDOM
+// ======================================
+
+{
+ const g=newWorld('castle');
+
+ // Castle base
+
+ box(g,0,1.1,0,5,3,4,stone);
+
+ // Main towers
+
+ const towerPositions=[
+  [-2.4,2,-1.8],
+  [2.4,2,-1.8],
+  [-2.4,2,1.8],
+  [2.4,2,1.8]
+ ];
+
+ towerPositions.forEach(([x,y,z])=>{
+
+  const t=new THREE.Mesh(
+   new THREE.CylinderGeometry(.5,.7,4,12),
+   obsidian
+  );
+
+  t.position.set(x,y,z);
+  g.add(t);
+
+  cone(g,x,4.6,z,.75,1.6,obsidian,8);
+
+  sphere(g,x,3.9,z,.09,gold);
+ });
+
+ // Central keep
+
+ box(g,0,2,0,2,4,2,obsidian);
+
+ cone(g,0,4.8,0,1.3,2,obsidian,9);
+
+ // Windows
+
+ for(let x=-1;x<=1;x+=2){
+  for(let y=1;y<=3;y+=1.2){
+
+   const w=new THREE.Mesh(
+    new THREE.BoxGeometry(.12,.6,.05),
+    magic
+   );
+
+   w.position.set(x,y,1.03);
+   g.add(w);
+  }
+ }
+
+ // Floating ruins
+
+ for(let i=0;i<9;i++){
+
+  const a=i/9*Math.PI*2;
+  const r=6+Math.random()*2;
+
+  const rock=sphere(
+   g,Math.cos(a)*r,
+   Math.random()*2+1,
+   Math.sin(a)*r,
+   .7,stone,1
+  );
+
+  rock.scale.set(1.4,.65,1);
+ }
+}
+
+// ======================================
+// 02. DRAGON REALM
+// ======================================
+
+const dragonParts=[];
+
+{
+ const g=newWorld('dragon');
+
+ const dragon=new THREE.Group();
+ g.add(dragon);
+
+ const body=sphere(dragon,0,3,0,1,obsidian,3);
+ body.scale.set(1.7,.7,.8);
+
+ const neck=sphere(dragon,0,3.5,1, .48,obsidian,2);
+ neck.scale.set(.7,1,1.4);
+
+ const head=sphere(dragon,0,4.1,2,.45,obsidian,2);
+
+ // Snout
+
+ box(dragon,0,3.95,2.5,.4,.25,.7,obsidian);
+
+ // Horns
+
+ cone(dragon,-.3,4.7,1.9,.15,.8,gold);
+ cone(dragon,.3,4.7,1.9,.15,.8,gold);
+
+ // Eyes
+
+ sphere(dragon,-.35,4.2,2.3,.09,magic);
+ sphere(dragon,.35,4.2,2.3,.09,magic);
+
+ // Wings
+
+ const wingMaterial=new THREE.MeshStandardMaterial({
+  color:'#30152e',
+  roughness:.45,
+  metalness:.4,
+  side:THREE.DoubleSide
+ });
+
+ for(let side of [-1,1]){
+
+  const wing=new THREE.Group();
+  wing.position.set(side*.5,3.4,0);
+
+  const shape=new THREE.Shape();
+
+  shape.moveTo(0,0);
+  shape.lineTo(side*2.8,.9);
+  shape.lineTo(side*3.4,-.3);
+  shape.lineTo(side*2,-.1);
+  shape.lineTo(side*1.4,-1.2);
+  shape.lineTo(side*.7,-.4);
+  shape.closePath();
+
+  const mesh=new THREE.Mesh(
+   new THREE.ShapeGeometry(shape),
+   wingMaterial
+  );
+
+  wing.add(mesh);
+  dragon.add(wing);
+
+  dragonParts.push({wing,side});
+ }
+
+ // Tail
+
+ const tailCurve=new THREE.CatmullRomCurve3([
+  new THREE.Vector3(0,2.9,-.5),
+  new THREE.Vector3(.3,2.4,-1.7),
+  new THREE.Vector3(-.1,2.6,-2.7),
+  new THREE.Vector3(0,3.1,-3.5)
+ ]);
+
+ dragon.add(new THREE.Mesh(
+  new THREE.TubeGeometry(tailCurve,40,.12,8,false),
+  obsidian
+ ));
+
+ dragon.position.y=.3;
+ dragon.userData.dragon=true;
+}
+
+// ======================================
+// 03. VOID PORTAL
+// ======================================
+
+{
+ const g=newWorld('portal');
+
+ // Portal frame
+
+ const frame=new THREE.Group();
+ g.add(frame);
+
+ torus(frame,0,3,0,2.4,.16,gold);
+
+ torus(frame,0,3,0,2.15,.04,magic);
+
+ // Portal energy rings
+
+ const portalRings=[];
+
+ for(let i=0;i<5;i++){
+
+  const ring=torus(
+   frame,0,3,-.1+i*.035,
+   1.6+i*.13,.018,
+   i%2?gold:magic
+  );
+
+  portalRings.push(ring);
+ }
+
+ frame.userData.rings=portalRings;
+
+ // Central vortex
+
+ const vortex=new THREE.Mesh(
+  new THREE.CircleGeometry(1.95,80),
+  new THREE.MeshBasicMaterial({
+   color:'#250b3f',
+   transparent:true,
+   opacity:.7,
+   side:THREE.DoubleSide
+  })
+ );
+
+ vortex.position.set(0,3,-.15);
+ g.add(vortex);
+
+ const inner=new THREE.Mesh(
+  new THREE.TorusGeometry(1.5,.12,12,100),
+  magic
+ );
+
+ inner.position.set(0,3,.05);
+ g.add(inner);
+
+ frame.userData.inner=inner;
+
+ // Floating symbols
+
+ for(let i=0;i<12;i++){
+
+  const a=i/12*Math.PI*2;
+
+  sphere(
+   g,Math.cos(a)*3.1,
+   3+Math.sin(a)*3.1,
+   0,.13,gold,1
+  );
+ }
+}
+
+// ======================================
+// 04. DARK FOREST
+// ======================================
+
+{
+ const g=newWorld('forest');
+
+ for(let i=0;i<36;i++){
+
+  const a=Math.random()*Math.PI*2;
+  const r=3+Math.random()*8;
+
+  const x=Math.cos(a)*r;
+  const z=Math.sin(a)*r;
+
+  const height=3+Math.random()*4;
+
+  const trunk=new THREE.Mesh(
+   new THREE.CylinderGeometry(.18,.4,height,8),
+   stone
+  );
+
+  trunk.position.set(x,height/2,z);
+  g.add(trunk);
+
+  const branches=new THREE.Mesh(
+   new THREE.ConeGeometry(
+    1.3+Math.random(),
+    3+Math.random()*2,
+    7
+   ),
+   green
+  );
+
+  branches.position.set(x,height+1,z);
+  g.add(branches);
+
+  if(i%3===0){
+
+   sphere(
+    g,x+1,height*.45,z,
+    .12,magic,1
+   );
+  }
+ }
+
+ // Glowing mushrooms
+
+ for(let i=0;i<35;i++){
+
+  const x=(Math.random()-.5)*14;
+  const z=(Math.random()-.5)*14;
+
+  const stem=new THREE.Mesh(
+   new THREE.CylinderGeometry(.025,.04,.3,6),
+   gold
+  );
+
+  stem.position.set(x,.15,z);
+  g.add(stem);
+
+  sphere(g,x,.34,z,.13,magic,1);
+ }
+}
+
+// ======================================
+// 05. FLOATING DIMENSIONS
+// ======================================
+
+{
+ const g=newWorld('islands');
+
+ for(let i=0;i<8;i++){
+
+  const a=i/8*Math.PI*2;
+  const r=4+Math.random()*4;
+
+  const island=new THREE.Group();
+
+  island.position.set(
+   Math.cos(a)*r,
+   1+Math.random()*4,
+   Math.sin(a)*r
+  );
+
+  g.add(island);
+
+  const rock=new THREE.Mesh(
+   new THREE.ConeGeometry(1.5,3,7),
+   stone
+  );
+
+  rock.rotation.x=Math.PI;
+  island.add(rock);
+
+  const top=new THREE.Mesh(
+   new THREE.CylinderGeometry(1.5,1.2,.25,8),
+   green
+  );
+
+  top.position.y=1.2;
+  island.add(top);
+
+  cone(island,0,2,0,.5,1.5,obsidian);
+
+  island.userData.float=true;
+  island.userData.phase=Math.random()*5;
+ }
+}
+
+// ======================================
+// 06. ETERNAL BLOOM
+// ======================================
+
+const bloomPetals=[];
+
+{
+ const g=newWorld('flower');
+
+ const head=new THREE.Group();
+ head.position.y=4;
+ g.add(head);
+
+ function petalGeometry(){
+
+  const points=[];
+  const indices=[];
+
+  const rows=25,cols=18;
+
+  for(let i=0;i<=rows;i++){
+
+   const t=i/rows;
+
+   for(let j=0;j<=cols;j++){
+
+    const u=j/cols*2-1;
+    const w=.6*Math.sin(Math.PI*t);
+
+    points.push(
+     u*w,
+     .3*t*t+.2*Math.sin(Math.PI*t)*(1-u*u),
+     t*2
+    );
+   }
+  }
+
+  for(let i=0;i<rows;i++){
+   for(let j=0;j<cols;j++){
+
+    const a=i*(cols+1)+j;
+    const b=a+cols+1;
+
+    indices.push(a,b,a+1,b,b+1,a+1);
+   }
+  }
+
+  const geo=new THREE.BufferGeometry();
+
+  geo.setAttribute(
+   'position',
+   new THREE.Float32BufferAttribute(points,3)
+  );
+
+  geo.setIndex(indices);
+  geo.computeVertexNormals();
+
+  return geo;
+ }
+
+ const material=new THREE.MeshPhysicalMaterial({
+  color:'#9e367c',
+  emissive:'#30102e',
+  emissiveIntensity:.7,
+  roughness:.22,
+  metalness:.2,
+  side:THREE.DoubleSide,
+  clearcoat:1
+ });
+
+ for(let layer=0;layer<3;layer++){
+
+  for(let i=0;i<12;i++){
+
+   const a=i/12*Math.PI*2;
+
+   const group=new THREE.Group();
+
+   group.rotation.y=a;
+   group.rotation.x=-.3-layer*.3;
+
+   const mesh=new THREE.Mesh(
+    petalGeometry(),material
+   );
+
+   group.add(mesh);
+
+   group.scale.setScalar(.8+layer*.08);
+
+   head.add(group);
+
+   bloomPetals.push(group);
+  }
+ }
+
+ sphere(head,0,.1,0,.38,gold,3);
+
+ // Stem
+
+ const stem=new THREE.Mesh(
+  new THREE.CylinderGeometry(.08,.13,4,12),
+  green
+ );
+
+ stem.position.y=2;
+ g.add(stem);
+}
+
+// ======================================
+// 07. COSMOS / NEBULA
+// ======================================
+
+{
+ const g=newWorld('nebula');
+
+ const nebulaColors=[
+  '#6b36c0','#b12b74','#d39b58'
+ ];
+
+ for(let j=0;j<3;j++){
+
+  const positions=new Float32Array(1800*3);
+
+  for(let i=0;i<1800;i++){
+
+   const a=Math.random()*Math.PI*2;
+   const r=Math.random()*7;
+
+   positions[i*3]=Math.cos(a)*r;
+   positions[i*3+1]=(Math.random()-.5)*4;
+   positions[i*3+2]=Math.sin(a)*r;
+  }
+
+  const geo=new THREE.BufferGeometry();
+
+  geo.setAttribute(
+   'position',
+   new THREE.BufferAttribute(positions,3)
+  );
+
+  const cloud=new THREE.Points(
+   geo,
+   new THREE.PointsMaterial({
+    color:nebulaColors[j],
+    size:.075+j*.025,
+    transparent:true,
+    opacity:.35,
+    blending:THREE.AdditiveBlending,
+    depthWrite:false
+   })
+  );
+
+  g.add(cloud);
+ }
+
+ const planet=sphere(g,0,2,0,1.7,obsidian,4);
+
+ planet.material=new THREE.MeshPhysicalMaterial({
+  color:'#21132e',
+  roughness:.3,
+  metalness:.6,
+  emissive:'#2a0c43',
+  emissiveIntensity:.4
+ });
+
+ torus(g,0,2,0,2.4,.045,gold).rotation.x=.7;
+}
+
+// ======================================
+// GLOBAL MAGIC PARTICLES
+// ======================================
+
+const particleCount=2400;
+
+const particlePositions=new Float32Array(particleCount*3);
+const particleSpeeds=[];
+
+for(let i=0;i<particleCount;i++){
+
+ particlePositions[i*3]=(Math.random()-.5)*28;
+ particlePositions[i*3+1]=Math.random()*14-2;
+ particlePositions[i*3+2]=(Math.random()-.5)*25;
+
+ particleSpeeds.push(.1+Math.random()*.7);
+}
+
+const particleGeometry=new THREE.BufferGeometry();
+
+particleGeometry.setAttribute(
+ 'position',
+ new THREE.BufferAttribute(particlePositions,3)
+);
+
+const particleSystem=new THREE.Points(
+ particleGeometry,
+ new THREE.PointsMaterial({
+  color:'#d8adff',
+  size:.035,
+  transparent:true,
+  opacity:.75,
+  blending:THREE.AdditiveBlending,
+  depthWrite:false
+ })
+);
+
+scene.add(particleSystem);
+
+// ======================================
+// WORLD SWITCHING
+// ======================================
+
+const descriptions={
+ castle:['THE GOTHIC KINGDOM',
+ 'A kingdom suspended between darkness and eternity.'],
+ dragon:['THE DRAGON REALM',
+ 'Where ancient beasts guard the secrets of creation.'],
+ portal:['THE VOID PORTAL',
+ 'A gateway between realities and forgotten dimensions.'],
+ forest:['THE ENCHANTED FOREST',
+ 'Where every shadow hides another living world.'],
+ islands:['FLOATING DIMENSIONS',
+ 'Fragments of lost worlds drifting through eternity.'],
+ flower:['THE ETERNAL BLOOM',
+ 'A living artifact born from ancient magic.'],
+ nebula:['THE COSMIC ABYSS',
+ 'Infinite stars, forgotten galaxies and cosmic energy.']
+};
+
+function switchWorld(name){
+
+ if(!worlds[name])return;
+
+ currentWorld=name;
+
+ Object.entries(worlds).forEach(([key,g])=>{
+  g.visible=key===name;
+ });
+
+ const [title,description]=descriptions[name];
+
+ document.getElementById('worldName').textContent=title;
+ document.getElementById('worldDesc').textContent=description;
+
+ document.querySelectorAll('.worlds button').forEach(b=>{
+  b.classList.toggle('active',b.dataset.world===name);
+ });
+
+ camera.position.set(0,4,14);
+ camera.lookAt(0,2,0);
+}
+
+document.querySelectorAll('.worlds button').forEach(button=>{
+ button.addEventListener('click',()=>{
+  switchWorld(button.dataset.world);
+ });
+});
+
+// ======================================
+// INTERACTIVE CAMERA
+// ======================================
+
+let drag=false;
+let lastX=0,lastY=0;
+let targetX=0,targetY=0;
+let autoRotate=true;
+
+renderer.domElement.addEventListener('pointerdown',e=>{
+ drag=true;
+ lastX=e.clientX;
+ lastY=e.clientY;
+ renderer.domElement.setPointerCapture(e.pointerId);
+});
+
+renderer.domElement.addEventListener('pointermove',e=>{
+
+ if(!drag)return;
+
+ targetY+=(e.clientX-lastX)*.005;
+ targetX+=(e.clientY-lastY)*.003;
+
+ targetX=THREE.MathUtils.clamp(targetX,-.5,.5);
+
+ lastX=e.clientX;
+ lastY=e.clientY;
+});
+
+renderer.domElement.addEventListener('pointerup',()=>{
+ drag=false;
+});
+
+renderer.domElement.addEventListener('pointercancel',()=>{
+ drag=false;
+});
+
+renderer.domElement.addEventListener('wheel',e=>{
+
+ camera.position.z=THREE.MathUtils.clamp(
+  camera.position.z+e.deltaY*.008,7,25
+ );
+
+},{passive:true});
+
+document.getElementById('autoBtn').onclick=function(){
+
+ autoRotate=!autoRotate;
+
+ this.textContent=autoRotate?'AUTO: ON':'AUTO: OFF';
+};
+
+// ======================================
+// MAGIC SPELL
+// ======================================
+
+let spellTime=0;
+let spellPower=0;
+
+document.getElementById('magicBtn').onclick=()=>{
+
+ spellTime=0;
+ spellPower=1;
+
+ violetLight.intensity=450;
+ goldLight.intensity=350;
+};
+
+// ======================================
+// PANELS
+// ======================================
+
+function togglePanel(id){
+
+ document.getElementById(id).classList.toggle('open');
+}
+
+document.getElementById('labBtn').onclick=()=>{
+ togglePanel('codePanel');
+};
+
+document.getElementById('shaderBtn').onclick=()=>{
+ togglePanel('shaderPanel');
+};
+
+document.querySelectorAll('[data-close]').forEach(btn=>{
+ btn.onclick=()=>{
+  document.getElementById(btn.dataset.close).classList.remove('open');
+ };
+});
+
+document.getElementById('fullBtn').onclick=()=>{
+
+ if(!document.fullscreenElement){
+  document.documentElement.requestFullscreen?.();
+ }else{
+  document.exitFullscreen?.();
+ }
+};
+
+// ======================================
+// PYTHON RUNTIME
+// ======================================
+
+let pyodide=null;
+
+document.getElementById('runPython').onclick=async function(){
+
+ const output=document.getElementById('pythonOutput');
+ const code=document.getElementById('pythonCode').value;
+
+ this.disabled=true;
+ this.textContent='LOADING PYTHON...';
+
+ try{
+
+  if(!pyodide){
+
+   output.textContent='Initializing Python runtime...';
+
+   const loadPyodide=await import(
+    'https://cdn.jsdelivr.net/pyodide/v0.27.2/full/pyodide.mjs'
+   );
+
+   pyodide=await loadPyodide.loadPyodide();
+  }
+
+  let result='';
+
+  pyodide.setStdout({
+   batched:(text)=>{
+    result+=text+'\n';
+   }
+  });
+
+  await pyodide.runPythonAsync(code);
+
+  output.textContent=result||'Python executed successfully.';
+
+ }catch(error){
+
+  output.textContent='ERROR: '+error.message;
+
+ }finally{
+
+  this.disabled=false;
+  this.textContent='▶ RUN PYTHON';
+ }
+};
+
+// ======================================
+// LIVE VISUAL CONTROLS
+// ======================================
+
+document.getElementById('energySlider').oninput=e=>{
+
+ const v=Number(e.target.value)/100;
+
+ violetLight.intensity=50+v*300;
+ goldLight.intensity=50+v*170;
+};
+
+document.getElementById('glowSlider').oninput=e=>{
+
+ bloom.strength=Number(e.target.value)/45;
+};
+
+document.getElementById('particleSlider').oninput=e=>{
+
+ particleSystem.material.opacity=
+  Number(e.target.value)/100;
+};
+
+document.getElementById('zoomSlider').oninput=e=>{
+
+ camera.position.z=Number(e.target.value);
+};
+
+// ======================================
+// MASTER ANIMATION LOOP
+// ======================================
+
+const clock=new THREE.Clock();
+let elapsed=0;
+
+function animate(){
+
+ requestAnimationFrame(animate);
+
+ const dt=Math.min(clock.getDelta(),.05);
+ elapsed+=dt;
+
+ // Camera orbit
+
+ if(autoRotate&&!drag){
+  targetY+=dt*.06;
+ }
+
+ camera.position.x=THREE.MathUtils.damp(
+  camera.position.x,
+  Math.sin(targetY)*.5,
+  3,dt
+ );
+
+ camera.position.y=THREE.MathUtils.damp(
+  camera.position.y,
+  4+targetX*3,
+  3,dt
+ );
+
+ camera.lookAt(0,2.2,0);
+
+ // Floating particles
+
+ const p=particleGeometry.attributes.position.array;
+
+ for(let i=0;i<particleCount;i++){
+
+  p[i*3+1]+=particleSpeeds[i]*dt*.25;
+
+  if(p[i*3+1]>12){
+   p[i*3+1]=-2;
+  }
+ }
+
+ particleGeometry.attributes.position.needsUpdate=true;
+
+ // Dragon animation
+
+ const dragon=worlds.dragon;
+
+ if(dragon.visible){
+
+  const d=dragon.children.find(
+   child=>child.userData.dragon
+  );
+
+  if(d){
+   d.position.y=.3+Math.sin(elapsed*1.4)*.15;
+   d.rotation.y=Math.sin(elapsed*.4)*.1;
+  }
+
+  dragonParts.forEach(({wing,side})=>{
+
+   wing.rotation.z=
+    side*(.18+Math.sin(elapsed*3)*.2);
+  });
+ }
+
+ // Portal
+
+ if(worlds.portal.visible){
+
+  const frame=worlds.portal.children.find(
+   c=>c.userData.rings
+  );
+
+  if(frame){
+
+   frame.userData.rings.forEach((r,i)=>{
+    r.rotation.z+=dt*(i%2?.4:-.3);
+   });
+
+   frame.userData.inner.rotation.z+=dt*.3;
+  }
+ }
+
+ // Floating islands
+
+ worlds.islands.children.forEach((obj)=>{
+
+  if(obj.userData.float){
+
+   obj.position.y+=
+    Math.sin(elapsed+obj.userData.phase)*dt*.1;
+
+   obj.rotation.y+=dt*.05;
+  }
+ });
+
+ // Flower
+
+ if(worlds.flower.visible){
+
+  bloomPetals.forEach((p,i)=>{
+
+   p.rotation.z=Math.sin(elapsed+i)*.008;
+  });
+ }
+
+ // Global magic effect
+
+ if(spellPower>0){
+
+  spellTime+=dt;
+
+  spellPower=Math.max(0,1-spellTime/1.8);
+
+  violetLight.intensity=100+350*spellPower;
+  goldLight.intensity=70+300*spellPower;
+ }
+
+ // Lights
+
+ goldLight.position.x=Math.sin(elapsed*.4)*4;
+ violetLight.position.z=Math.cos(elapsed*.4)*4;
+
+ // Stars
+
+ stars.rotation.y+=dt*.003;
+
+ composer.render();
+}
+
+// ======================================
+// RESPONSIVE
+// ======================================
+
+window.addEventListener('resize',()=>{
+
+ camera.aspect=innerWidth/innerHeight;
+ camera.updateProjectionMatrix();
+
+ renderer.setSize(innerWidth,innerHeight);
+
+ composer.setSize(innerWidth,innerHeight);
+
+ renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+});
+
+// INITIALIZE
+
+switchWorld('castle');
+
+animate();
+
+document.getElementById('loading').style.opacity='0';
+
+setTimeout(()=>{
+ document.getElementById('loading').style.display='none';
+},1100);
+
+</script>
+
+</body>
+</html>
