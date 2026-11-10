@@ -3,1517 +3,913 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#030303">
-
-<title>MAMUN CODING FANTASY — When Imagination Meets Python</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#050509">
+<title>MAMUN CODING FANTASY</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
 :root {
-  --black:#030303;
-  --gold:#c6a467;
-  --ivory:#eee8dc;
+  --bg:#050509;
+  --white:#f5f5f7;
+  --muted:rgba(255,255,255,.48);
 }
-
-* {
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
+* { box-sizing:border-box; }
 html {
-  background:var(--black);
-  scroll-behavior:smooth;
-  scrollbar-width:thin;
-  scrollbar-color:#8e7040 #030303;
+  margin:0;
+  width:100%;
+  scroll-behavior:auto;
+  background:var(--bg);
 }
-
 body {
-  background:var(--black);
-  color:var(--ivory);
-  font-family:Inter,sans-serif;
+  margin:0;
+  width:100%;
+  min-height:100%;
   overflow-x:hidden;
+  background:var(--bg);
+  color:var(--white);
+  font-family:Inter,Arial,sans-serif;
 }
+body.locked { overflow:hidden; }
 
-body.intro-open {
-  overflow:hidden;
-}
-
-button {
-  font:inherit;
-}
-
-/* 3D WORLD */
-
-#world {
+#visual {
   position:fixed;
   inset:0;
-  z-index:1;
+  z-index:0;
+  width:100%;
+  height:100%;
   pointer-events:none;
 }
-
-#world canvas {
+#visual canvas {
   display:block;
   width:100%;
   height:100%;
 }
-
-.vignette {
+#grain {
+  position:fixed;
+  inset:0;
+  z-index:3;
+  pointer-events:none;
+  opacity:.11;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+}
+#vignette {
   position:fixed;
   inset:0;
   z-index:2;
   pointer-events:none;
-  background:
-    radial-gradient(ellipse at center,transparent 35%,rgba(0,0,0,.38) 100%),
-    linear-gradient(180deg,rgba(0,0,0,.12),transparent 35%,rgba(0,0,0,.25));
+  background:radial-gradient(ellipse at center,transparent 35%,rgba(0,0,0,.42) 100%);
 }
-
-/* INTRO */
-
 #intro {
   position:fixed;
   inset:0;
   z-index:20;
-  display:grid;
-  place-items:center;
-  text-align:center;
+  display:flex;
+  justify-content:center;
+  align-items:center;
   overflow:hidden;
-  background:#030303;
-  transition:opacity 1.2s ease,visibility 1.2s ease;
+  background:#030308;
+  transition:opacity 1.2s ease, visibility 1.2s ease;
 }
-
-#intro.exit {
+#intro.hide {
   opacity:0;
   visibility:hidden;
   pointer-events:none;
 }
-
+.intro-space {
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse at 50% 52%,rgba(57,45,112,.25),transparent 40%),
+    radial-gradient(ellipse at 50% 100%,rgba(0,177,210,.10),transparent 50%),
+    #030308;
+}
+.intro-space:before,
+.intro-space:after {
+  content:"";
+  position:absolute;
+  width:min(76vw,650px);
+  aspect-ratio:1;
+  left:50%;
+  top:48%;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  border:1px solid rgba(160,133,255,.24);
+  box-shadow:0 0 60px rgba(90,90,255,.13),inset 0 0 60px rgba(0,220,255,.08);
+  animation:portal 18s linear infinite;
+}
+.intro-space:after {
+  width:min(57vw,490px);
+  border-color:rgba(0,220,255,.26);
+  box-shadow:0 0 70px rgba(0,220,255,.12),inset 0 0 55px rgba(170,80,255,.1);
+  animation:portal 12s linear infinite reverse;
+}
+@keyframes portal {
+  from { transform:translate(-50%,-50%) rotateX(65deg) rotateZ(0deg) scale(1); }
+  to { transform:translate(-50%,-50%) rotateX(65deg) rotateZ(360deg) scale(1); }
+}
+.portal-core {
+  position:absolute;
+  left:50%;
+  top:48%;
+  width:min(34vw,280px);
+  aspect-ratio:1;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle, #020207 0 23%,#17112e 30%,#5c36a0 34%,#00b8d4 37%,#19142e 41%,transparent 66%);
+  filter:blur(2px);
+  box-shadow:0 0 90px rgba(0,180,255,.24),0 0 150px rgba(143,60,255,.2);
+  animation:corePulse 5s ease-in-out infinite alternate;
+}
+@keyframes corePulse {
+  from { transform:translate(-50%,-50%) scale(.9); filter:hue-rotate(0deg) blur(2px); }
+  to { transform:translate(-50%,-50%) scale(1.12); filter:hue-rotate(45deg) blur(5px); }
+}
 .intro-orbit {
   position:absolute;
-  width:min(75vw,620px);
+  left:50%;
+  top:48%;
+  width:min(90vw,850px);
   aspect-ratio:1;
-  border:1px solid rgba(198,164,103,.22);
+  transform:translate(-50%,-50%);
+  border:1px solid rgba(255,255,255,.08);
   border-radius:50%;
-  box-shadow:
-    0 0 80px rgba(198,164,103,.05),
-    inset 0 0 80px rgba(198,164,103,.035);
-  animation:orbit 35s linear infinite;
+  animation:orbit 30s linear infinite;
 }
-
-.intro-orbit::before,
-.intro-orbit::after {
+.intro-orbit:before,.intro-orbit:after {
   content:"";
   position:absolute;
-  inset:9%;
-  border:1px dashed rgba(198,164,103,.23);
-  border-radius:50%;
+  width:8px;height:8px;border-radius:50%;
+  background:#b9a2ff;
+  box-shadow:0 0 25px 8px rgba(145,100,255,.65);
+  top:15%;left:19%;
 }
-
-.intro-orbit::after {
-  inset:20%;
-  border-style:solid;
-  border-color:rgba(198,164,103,.13);
-  animation:orbit 20s linear infinite reverse;
+.intro-orbit:after {
+  width:5px;height:5px;
+  background:#65eaff;
+  box-shadow:0 0 25px 8px rgba(0,220,255,.5);
+  top:75%;left:78%;
 }
-
-.intro-light {
-  position:absolute;
-  width:60vw;
-  max-width:600px;
-  aspect-ratio:1;
-  border-radius:50%;
-  background:radial-gradient(circle,rgba(180,133,66,.13),transparent 68%);
-  filter:blur(25px);
-  animation:pulse 5s ease-in-out infinite;
-}
-
+@keyframes orbit { to { transform:translate(-50%,-50%) rotate(360deg); } }
 .intro-content {
   position:relative;
-  z-index:3;
+  z-index:2;
+  text-align:center;
+  width:100%;
   padding:24px;
+  margin-top:190px;
 }
-
 .intro-kicker {
-  font-size:9px;
-  letter-spacing:6px;
-  color:var(--gold);
-  margin-bottom:28px;
-}
-
-.intro-title {
-  font-family:Cinzel,serif;
-  font-size:clamp(32px,7vw,78px);
-  font-weight:400;
-  letter-spacing:3px;
-  line-height:1.25;
-}
-
-.intro-title span {
-  display:block;
-  color:var(--gold);
-}
-
-.intro-subtitle {
-  margin-top:20px;
   font-size:10px;
-  letter-spacing:4px;
-  color:#898174;
+  letter-spacing:.48em;
+  color:rgba(255,255,255,.52);
+  margin-bottom:20px;
 }
-
+.intro-title {
+  font-size:clamp(34px,7.2vw,88px);
+  line-height:.98;
+  letter-spacing:-.075em;
+  font-weight:800;
+  margin:0 auto;
+  max-width:1000px;
+  background:linear-gradient(110deg,#fff 5%,#9deaff 35%,#c3a4ff 65%,#fff 95%);
+  color:transparent;
+  background-clip:text;
+  -webkit-background-clip:text;
+  text-shadow:0 0 60px rgba(130,130,255,.15);
+}
+.intro-tagline {
+  margin:22px 0 32px;
+  font-size:10px;
+  letter-spacing:.42em;
+  color:rgba(255,255,255,.62);
+}
 .enter {
-  margin-top:48px;
-  padding:17px 35px;
-  border:1px solid rgba(198,164,103,.65);
-  background:rgba(198,164,103,.04);
-  color:#e5cb99;
-  letter-spacing:4px;
-  font-size:9px;
+  border:1px solid rgba(255,255,255,.42);
+  background:rgba(255,255,255,.04);
+  color:white;
+  padding:16px 28px;
+  border-radius:50px;
+  font-size:10px;
+  letter-spacing:.22em;
+  font-weight:600;
   cursor:pointer;
-  transition:.4s;
+  backdrop-filter:blur(12px);
+  transition:.35s ease;
 }
-
 .enter:hover {
-  background:var(--gold);
-  color:#080706;
-  box-shadow:0 0 40px rgba(198,164,103,.25);
+  background:white;
+  color:#050509;
+  box-shadow:0 0 40px rgba(120,170,255,.3);
+  transform:translateY(-3px);
 }
-
-.intro-footer {
+.intro-bottom {
   position:absolute;
-  bottom:27px;
-  color:#655c4d;
-  font-size:8px;
-  letter-spacing:4px;
+  bottom:28px;
+  left:0;right:0;
+  text-align:center;
+  color:rgba(255,255,255,.3);
+  font-size:9px;
+  letter-spacing:.3em;
 }
-
-/* MAIN INTERFACE */
-
-#main {
+#experience {
   position:relative;
-  z-index:3;
+  z-index:1;
   opacity:0;
-  visibility:hidden;
   transition:opacity 1.2s ease;
 }
-
-#main.show {
-  opacity:1;
-  visibility:visible;
-}
-
-.brand-mark {
-  position:fixed;
-  top:27px;
-  left:35px;
-  z-index:8;
-  font-family:Cinzel,serif;
-  font-size:12px;
-  letter-spacing:3px;
-  color:rgba(222,190,133,.85);
-  mix-blend-mode:screen;
+#experience.ready { opacity:1; }
+.scene-section {
+  position:relative;
+  height:100svh;
+  min-height:620px;
+  width:100%;
   pointer-events:none;
 }
-
-.scene-counter {
+.hud {
   position:fixed;
-  right:35px;
-  bottom:32px;
-  z-index:8;
+  z-index:5;
+  top:25px;
+  left:25px;
+  right:25px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .8s ease;
+}
+.hud.visible { opacity:1; }
+.brand {
   font-size:9px;
-  letter-spacing:3px;
-  color:rgba(220,194,149,.8);
-  pointer-events:none;
+  letter-spacing:.28em;
+  color:rgba(255,255,255,.58);
+  font-weight:600;
 }
-
-.scene-counter span {
-  color:#777064;
-}
-
-.sound {
-  position:fixed;
-  right:30px;
-  top:22px;
-  z-index:10;
+.hud-right {
   display:flex;
   align-items:center;
-  gap:10px;
-  padding:11px 13px;
-  color:#d5bb8b;
-  background:rgba(5,5,5,.55);
-  border:1px solid rgba(198,164,103,.25);
-  font-size:8px;
-  letter-spacing:2px;
+  gap:18px;
+}
+#counter {
+  font-size:10px;
+  letter-spacing:.2em;
+  color:rgba(255,255,255,.6);
+}
+#sound {
+  pointer-events:auto;
+  border:1px solid rgba(255,255,255,.22);
+  background:rgba(0,0,0,.2);
+  color:white;
+  border-radius:50px;
+  padding:9px 13px;
+  font-size:9px;
+  letter-spacing:.14em;
   cursor:pointer;
-  backdrop-filter:blur(10px);
+  backdrop-filter:blur(12px);
 }
-
-.sound-bars {
-  display:flex;
-  align-items:center;
-  gap:3px;
-  height:12px;
-}
-
-.sound-bars i {
-  width:2px;
-  height:4px;
-  background:var(--gold);
-}
-
-.sound.playing .sound-bars i {
-  animation:bars .65s ease-in-out infinite alternate;
-}
-
-.sound-bars i:nth-child(2) {animation-delay:.15s}
-.sound-bars i:nth-child(3) {animation-delay:.3s}
-.sound-bars i:nth-child(4) {animation-delay:.1s}
-
 .scroll-hint {
   position:fixed;
-  bottom:32px;
-  left:35px;
-  z-index:8;
-  color:rgba(205,190,164,.55);
-  font-size:8px;
-  letter-spacing:3px;
+  z-index:5;
+  bottom:26px;
+  left:50%;
+  transform:translateX(-50%);
+  color:rgba(255,255,255,.4);
+  font-size:9px;
+  letter-spacing:.25em;
   pointer-events:none;
-  writing-mode:vertical-rl;
+  opacity:0;
+  transition:opacity .8s;
 }
-
-.scroll-hint::after {
+.scroll-hint.visible { opacity:1; }
+.scroll-hint:after {
   content:"";
   display:block;
-  height:42px;
-  width:1px;
-  margin:15px auto 0;
-  background:linear-gradient(var(--gold),transparent);
+  width:1px;height:25px;
+  background:linear-gradient(white,transparent);
+  margin:12px auto 0;
 }
-
-/* SCROLL WORLD */
-
-.world-section {
-  height:100svh;
-  min-height:600px;
-  position:relative;
-  z-index:0;
-  pointer-events:none;
+@media(max-width:600px) {
+  .intro-content { margin-top:145px; }
+  .intro-kicker { font-size:8px; letter-spacing:.32em; }
+  .intro-title { font-size:clamp(35px,10vw,58px); }
+  .intro-tagline { font-size:8px; letter-spacing:.24em; }
+  .enter { padding:14px 22px; font-size:9px; }
+  .hud { top:17px;left:15px;right:15px; }
+  .brand { font-size:8px;letter-spacing:.16em; }
+  .hud-right { gap:10px; }
+  #counter { font-size:9px; }
+  #sound { padding:8px 10px;font-size:8px; }
+  .scene-section { min-height:560px; }
 }
-
-.world-section:first-child {
-  height:100svh;
-}
-
-.world-section:last-child {
-  height:100svh;
-}
-
-.end-mark {
-  position:relative;
-  z-index:4;
-  height:100svh;
-  display:grid;
-  place-items:center;
-  text-align:center;
-  pointer-events:none;
-}
-
-.end-mark div {
-  font-family:Cinzel,serif;
-  font-size:clamp(20px,4vw,45px);
-  letter-spacing:5px;
-  color:rgba(204,170,112,.65);
-}
-
-.end-mark small {
-  display:block;
-  margin-top:22px;
-  font-family:Inter,sans-serif;
-  font-size:8px;
-  letter-spacing:5px;
-  color:#777064;
-}
-
-/* RESPONSIVE */
-
-@keyframes orbit {
-  to {transform:rotate(360deg)}
-}
-
-@keyframes pulse {
-  0%,100% {transform:scale(.85);opacity:.55}
-  50% {transform:scale(1.15);opacity:1}
-}
-
-@keyframes bars {
-  from {height:3px}
-  to {height:12px}
-}
-
-@media(max-width:700px) {
-  .brand-mark {
-    left:16px;
-    top:19px;
-    font-size:9px;
-    letter-spacing:2px;
-  }
-
-  .sound {
-    top:14px;
-    right:13px;
-    padding:9px;
-    font-size:7px;
-  }
-
-  .scene-counter {
-    right:17px;
-    bottom:18px;
-  }
-
-  .scroll-hint {
-    left:16px;
-    bottom:18px;
-  }
-
-  .intro-kicker {
-    letter-spacing:3px;
-  }
-
-  .intro-subtitle {
-    font-size:8px;
-    letter-spacing:2px;
-  }
-
-  .world-section {
-    min-height:500px;
-  }
-}
-
 @media(prefers-reduced-motion:reduce) {
-  *,*::before,*::after {
-    scroll-behavior:auto!important;
-  }
+  *,*:before,*:after { animation-duration:.01ms!important; }
 }
 </style>
 </head>
 
-<body class="intro-open">
+<body class="locked">
 
-<div id="world"></div>
-<div class="vignette"></div>
-
-<!-- OPENING EXPERIENCE -->
+<div id="visual"></div>
+<div id="vignette"></div>
+<div id="grain"></div>
 
 <div id="intro">
-  <div class="intro-light"></div>
-  <div class="intro-orbit"></div>
-
+  <div class="intro-space">
+    <div class="intro-orbit"></div>
+    <div class="portal-core"></div>
+  </div>
   <div class="intro-content">
-    <div class="intro-kicker">AN EXPERIMENT IN CREATIVE CODING</div>
-
-    <h1 class="intro-title">
-      MAMUN
-      <span>CODING FANTASY</span>
-    </h1>
-
-    <div class="intro-subtitle">
-      WHEN IMAGINATION MEETS PYTHON
-    </div>
-
-    <button class="enter" id="enter">
-      ENTER THE EXPERIENCE
-    </button>
+    <div class="intro-kicker">AN EXPERIMENTAL DIGITAL UNIVERSE</div>
+    <h1 class="intro-title">MAMUN<br>CODING FANTASY</h1>
+    <div class="intro-tagline">WHEN IMAGINATION MEETS PYTHON</div>
+    <button class="enter" id="enter">ENTER THE EXPERIENCE&nbsp; ↗</button>
   </div>
-
-  <div class="intro-footer">
-    A DIGITAL EXPERIMENT BY MAMUN
-  </div>
+  <div class="intro-bottom">A JOURNEY BEYOND ORDINARY DIMENSIONS</div>
 </div>
 
-<!-- MAIN EXPERIENCE -->
-
-<main id="main">
-
-  <div class="brand-mark">MAMUN / CODING FANTASY</div>
-
-  <div class="scroll-hint">SCROLL TO EXPLORE</div>
-
-  <div class="scene-counter">
-    <span id="sceneNumber">01</span> / 08
+<div class="hud" id="hud">
+  <div class="brand">MAMUN / CODING FANTASY</div>
+  <div class="hud-right">
+    <div id="counter">01 / 25</div>
+    <button id="sound">SOUND ON</button>
   </div>
+</div>
+<div class="scroll-hint" id="scrollHint">SCROLL TO EXPLORE</div>
 
-  <button class="sound" id="sound">
-    <span class="sound-bars">
-      <i></i><i></i><i></i><i></i>
-    </span>
-    <span id="soundLabel">SOUND ON</span>
-  </button>
+<audio id="music" src="music.mp3" loop preload="none"></audio>
 
-  <section class="world-section" data-scene="geometry"></section>
-  <section class="world-section" data-scene="bloom"></section>
-  <section class="world-section" data-scene="liquid"></section>
-  <section class="world-section" data-scene="singularity"></section>
-  <section class="world-section" data-scene="kinetic"></section>
-  <section class="world-section" data-scene="gravity"></section>
-  <section class="world-section" data-scene="waves"></section>
-  <section class="world-section" data-scene="fractal"></section>
-
-  <section class="end-mark">
-    <div>
-      BEYOND IMAGINATION
-      <small>THE EXPERIMENT NEVER ENDS</small>
-    </div>
-  </section>
-
+<main id="experience">
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
+  <section class="scene-section"></section>
 </main>
 
-<audio id="music" src="music.mp3" preload="auto" loop></audio>
-
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
-
 <script type="module">
-import * as THREE from 'three';
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import { EffectComposer } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { gsap } from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js';
+import { ScrollTrigger } from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/ScrollTrigger.js';
 
-/* =========================================
-   RENDERER
-========================================= */
+gsap.registerPlugin(ScrollTrigger);
 
-const container = document.getElementById('world');
+const visual = document.getElementById('visual');
+const sections = [...document.querySelectorAll('.scene-section')];
+const counter = document.getElementById('counter');
+const intro = document.getElementById('intro');
+const experience = document.getElementById('experience');
+const hud = document.getElementById('hud');
+const soundBtn = document.getElementById('sound');
+const music = document.getElementById('music');
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x030303);
-scene.fog = new THREE.FogExp2(0x030303,0.018);
-
-const camera = new THREE.PerspectiveCamera(
-  42,
-  innerWidth/innerHeight,
-  0.1,
-  150
-);
-
-camera.position.set(0,0,10);
+const isMobile = matchMedia('(max-width: 700px)').matches;
+const pixelRatio = Math.min(devicePixelRatio || 1, isMobile ? 1.35 : 1.8);
 
 const renderer = new THREE.WebGLRenderer({
-  antialias:true,
-  alpha:false,
-  powerPreference:'high-performance'
+  antialias: !isMobile,
+  alpha: false,
+  powerPreference: 'high-performance'
 });
-
-renderer.setSize(innerWidth,innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+renderer.setPixelRatio(pixelRatio);
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.15;
-container.appendChild(renderer.domElement);
+renderer.toneMappingExposure = 1.25;
+visual.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x050509);
+scene.fog = new THREE.FogExp2(0x050509, 0.035);
+
+const camera = new THREE.PerspectiveCamera(48, innerWidth/innerHeight, .1, 150);
+camera.position.set(0,0,10);
 
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene,camera));
-
 const bloom = new UnrealBloomPass(
   new THREE.Vector2(innerWidth,innerHeight),
-  0.85,
-  0.65,
-  0.12
+  isMobile ? .55 : .85,
+  .65,
+  .18
 );
-
 composer.addPass(bloom);
-composer.addPass(new OutputPass());
 
-/* =========================================
-   LIGHTING
-========================================= */
-
-scene.add(new THREE.AmbientLight(0x8c795d,1.1));
-
-const keyLight = new THREE.PointLight(0xe1b86f,100,40);
-keyLight.position.set(4,4,6);
+const ambient = new THREE.AmbientLight(0xffffff,1.1);
+scene.add(ambient);
+const keyLight = new THREE.PointLight(0xffffff,90,50);
+keyLight.position.set(5,6,8);
 scene.add(keyLight);
-
-const rimLight = new THREE.PointLight(0x78532d,75,35);
-rimLight.position.set(-5,-3,-5);
+const rimLight = new THREE.PointLight(0x547bff,100,45);
+rimLight.position.set(-6,-3,-4);
 scene.add(rimLight);
 
-const topLight = new THREE.PointLight(0xffd9a0,35,25);
-topLight.position.set(0,6,2);
-scene.add(topLight);
-
-/* =========================================
-   MATERIALS
-========================================= */
-
-const gold = new THREE.MeshStandardMaterial({
-  color:0xb18a4e,
-  metalness:.95,
-  roughness:.19,
-  emissive:0x291706,
-  emissiveIntensity:.5
-});
-
-const blackMetal = new THREE.MeshStandardMaterial({
-  color:0x11100f,
-  metalness:.96,
-  roughness:.16
-});
-
-const bronze = new THREE.MeshStandardMaterial({
-  color:0x74552f,
-  metalness:.9,
-  roughness:.28
-});
-
-const crystal = new THREE.MeshPhysicalMaterial({
-  color:0x5b4932,
-  metalness:.55,
-  roughness:.1,
-  transmission:.15,
-  thickness:1.2,
-  clearcoat:1,
-  clearcoatRoughness:.08
-});
-
-const glow = new THREE.MeshBasicMaterial({
-  color:0xf0cb84
-});
-
-/* =========================================
-   HELPERS
-========================================= */
-
-let activeGroup = new THREE.Group();
-scene.add(activeGroup);
-
-let activeScene = '';
-let elapsed = 0;
-
-let pointerX = 0;
-let pointerY = 0;
-let smoothX = 0;
-let smoothY = 0;
-
-function mesh(parent,geometry,material,x=0,y=0,z=0) {
-  const object = new THREE.Mesh(geometry,material);
-  object.position.set(x,y,z);
-  parent.add(object);
-  return object;
-}
-
-function torus(parent,radius,tube,material=gold) {
-  return mesh(
-    parent,
-    new THREE.TorusGeometry(radius,tube,12,128),
-    material
-  );
-}
-
-function particles(parent,count,spread,size=.025) {
-  const positions = new Float32Array(count*3);
-
-  for(let i=0;i<count;i++) {
-    positions[i*3]=(Math.random()-.5)*spread;
-    positions[i*3+1]=(Math.random()-.5)*spread;
-    positions[i*3+2]=(Math.random()-.5)*spread;
-  }
-
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute(
-    'position',
-    new THREE.BufferAttribute(positions,3)
-  );
-
-  const material = new THREE.PointsMaterial({
-    color:0xc6a467,
-    size,
-    transparent:true,
-    opacity:.72,
-    sizeAttenuation:true,
-    depthWrite:false
-  });
-
-  const points = new THREE.Points(geometry,material);
-  parent.add(points);
-
-  return points;
-}
-
-function resetGroup() {
-  scene.remove(activeGroup);
-
-  activeGroup.traverse(object=>{
-    if(object.geometry) object.geometry.dispose();
-
-    if(object.material) {
-      if(Array.isArray(object.material)) {
-        object.material.forEach(m=>m.dispose());
-      } else {
-        object.material.dispose();
-      }
-    }
-  });
-
-  activeGroup = new THREE.Group();
-  scene.add(activeGroup);
-}
-
-/* =========================================
-   01 — INFINITE GEOMETRY
-   Exploding procedural cube structure
-========================================= */
-
-function geometryScene() {
-  const group = new THREE.Group();
-
-  const core = new THREE.Group();
-  group.add(core);
-
-  const central = mesh(
-    core,
-    new THREE.IcosahedronGeometry(.85,2),
-    blackMetal
-  );
-
-  const wire = new THREE.Mesh(
-    new THREE.IcosahedronGeometry(1.15,2),
-    new THREE.MeshBasicMaterial({
-      color:0xc6a467,
-      wireframe:true,
-      transparent:true,
-      opacity:.55
-    })
-  );
-
-  core.add(wire);
-
-  const blocks = [];
-
-  for(let i=0;i<150;i++) {
-    const size=.07+Math.random()*.2;
-
-    const block=mesh(
-      core,
-      new THREE.BoxGeometry(size,size,size),
-      i%4===0?gold:blackMetal
-    );
-
-    const direction = new THREE.Vector3(
-      Math.random()-.5,
-      Math.random()-.5,
-      Math.random()-.5
-    ).normalize();
-
-    blocks.push({
-      object:block,
-      direction,
-      distance:1.5+Math.random()*3,
-      speed:.6+Math.random()*1.4,
-      phase:Math.random()*6.28
-    });
-  }
-
-  const ringA=torus(group,2.8,.014);
-  const ringB=torus(group,3.4,.009,bronze);
-  const ringC=torus(group,4,.008);
-
-  ringA.rotation.x=1.1;
-  ringB.rotation.y=.8;
-  ringC.rotation.x=-.7;
-
-  const dust=particles(group,1000,18,.018);
-
-  return {
-    group,
-    update(t) {
-      core.rotation.x=t*.23;
-      core.rotation.y=t*.32;
-
-      const explosion=(Math.sin(t*.9)+1)/2;
-
-      central.scale.setScalar(1+explosion*.12);
-
-      blocks.forEach(b=>{
-        const amount=b.distance*(.15+explosion*.85);
-
-        b.object.position.copy(
-          b.direction.clone().multiplyScalar(amount)
-        );
-
-        b.object.rotation.x=t*b.speed+b.phase;
-        b.object.rotation.y=t*b.speed*.8;
-      });
-
-      ringA.rotation.z=t*.2;
-      ringB.rotation.x=t*.18;
-      ringC.rotation.y=t*.12;
-
-      dust.rotation.y=-t*.025;
-    }
-  };
-}
-
-/* =========================================
-   02 — DIGITAL BLOOM
-   Procedural flower
-========================================= */
-
-function bloomScene() {
-  const group = new THREE.Group();
-  const flower = new THREE.Group();
-  group.add(flower);
-
-  const stem = mesh(
-    flower,
-    new THREE.CylinderGeometry(.045,.075,3,16),
-    blackMetal,
-    0,-1.15,0
-  );
-
-  stem.rotation.z=-.12;
-
-  const petals=[];
-
-  for(let layer=0;layer<3;layer++) {
-    const count=18;
-
-    for(let i=0;i<count;i++) {
-      const angle=(i/count)*Math.PI*2;
-      const petal=mesh(
-        flower,
-        new THREE.SphereGeometry(1,32,24),
-        layer===1?gold:crystal
-      );
-
-      petal.scale.set(.22,.9,.105);
-      petal.position.set(0,.15,0);
-      petal.rotation.z=-Math.PI/2;
-      petal.rotation.y=angle;
-
-      petals.push({
-        object:petal,
-        angle,
-        layer,
-        offset:Math.random()*6.28
-      });
-    }
-  }
-
-  const center=mesh(
-    flower,
-    new THREE.SphereGeometry(.34,40,40),
-    glow,
-    0,.2,0
-  );
-
-  const coreRing=torus(group,2.3,.014);
-  coreRing.rotation.x=1.3;
-
-  const dust=particles(group,700,12,.018);
-
-  return {
-    group,
-    update(t) {
-      flower.rotation.y=t*.16;
-
-      petals.forEach(p=>{
-        const opening=(Math.sin(t*.75+p.offset*.08)+1)/2;
-        const angle=p.angle;
-        const radius=.2+opening*(.55+p.layer*.35);
-
-        p.object.position.set(
-          Math.cos(angle)*radius,
-          .15-p.layer*.08,
-          Math.sin(angle)*radius
-        );
-
-        p.object.rotation.y=angle;
-        p.object.rotation.z=-1.3+opening*.8;
-        p.object.rotation.x=Math.sin(t+p.offset)*.12;
-
-        p.object.scale.set(
-          .22,
-          .65+opening*.25,
-          .09
-        );
-      });
-
-      center.scale.setScalar(1+Math.sin(t*2)*.1);
-      coreRing.rotation.z=t*.18;
-      dust.rotation.y=t*.03;
-    }
-  };
-}
-
-/* =========================================
-   03 — LIQUID UNIVERSE
-   Animated shader sculpture
-========================================= */
-
-function liquidScene() {
-  const group=new THREE.Group();
-
-  const liquidMaterial=new THREE.ShaderMaterial({
-    uniforms:{
-      uTime:{value:0}
-    },
-
-    vertexShader:`
-      uniform float uTime;
-      varying vec3 vNormal;
-      varying vec3 vPosition;
-
-      void main() {
-        vec3 p=position;
-        float wave=
-          sin(p.x*3.5+uTime*1.2)*0.12+
-          sin(p.y*4.0-uTime)*0.10+
-          cos(p.z*3.0+uTime*.8)*0.12;
-
-        p+=normal*wave;
-
-        vNormal=normalize(normalMatrix*normal);
-        vPosition=(modelViewMatrix*vec4(p,1.0)).xyz;
-
-        gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);
-      }
-    `,
-
-    fragmentShader:`
-      uniform float uTime;
-      varying vec3 vNormal;
-      varying vec3 vPosition;
-
-      void main() {
-        vec3 n=normalize(vNormal);
-        vec3 viewDir=normalize(-vPosition);
-
-        float fresnel=pow(1.0-max(dot(n,viewDir),0.0),2.5);
-
-        float lines=sin(vPosition.y*8.0+uTime*1.8)*.5+.5;
-
-        vec3 dark=vec3(.025,.023,.02);
-        vec3 goldColor=vec3(.72,.49,.23);
-
-        vec3 color=mix(dark,goldColor,fresnel*.9+lines*.16);
-
-        float shine=pow(max(dot(reflect(-normalize(vec3(.5,1.0,1.0)),n),viewDir),0.0),18.0);
-
-        color+=vec3(.8,.62,.34)*shine*.9;
-
-        gl_FragColor=vec4(color,1.0);
-      }
-    `
-  });
-
-  const sphere=mesh(
-    group,
-    new THREE.IcosahedronGeometry(1.8,7),
-    liquidMaterial
-  );
-
-  const rings=[];
-
-  for(let i=0;i<5;i++) {
-    const r=torus(group,2.5+i*.22,.012,i%2===0?gold:bronze);
-    r.rotation.set(i*.7,i*.9,i*.3);
-    rings.push(r);
-  }
-
-  const dust=particles(group,900,15,.018);
-
-  return {
-    group,
-    update(t) {
-      liquidMaterial.uniforms.uTime.value=t;
-      sphere.rotation.y=t*.2;
-      sphere.rotation.x=Math.sin(t*.4)*.25;
-
-      rings.forEach((r,i)=>{
-        r.rotation.x+=.001*(i+1);
-        r.rotation.y+=.002*(i+1);
-      });
-
-      dust.rotation.y=-t*.025;
-    }
-  };
-}
-
-/* =========================================
-   04 — PARTICLE SINGULARITY
-   Black hole and orbital particles
-========================================= */
-
-function singularityScene() {
-  const group=new THREE.Group();
-
-  const blackHole=mesh(
-    group,
-    new THREE.SphereGeometry(1.15,48,48),
-    new THREE.MeshBasicMaterial({color:0x000000})
-  );
-
-  const eventHorizon=torus(group,1.25,.045,glow);
-  eventHorizon.rotation.x=.25;
-
-  const disk=torus(group,2.0,.22,bronze);
-  disk.rotation.x=.25;
-
-  const count=7000;
-  const positions=new Float32Array(count*3);
-  const seeds=[];
-
-  for(let i=0;i<count;i++) {
-    const angle=Math.random()*Math.PI*2;
-    const radius=1.5+Math.random()*3.8;
-
-    seeds.push({
-      angle,
-      radius,
-      speed:.15+Math.random()*.65,
-      height:(Math.random()-.5)*.3
-    });
-  }
-
-  const geometry=new THREE.BufferGeometry();
-  geometry.setAttribute(
-    'position',
-    new THREE.BufferAttribute(positions,3)
-  );
-
-  const material=new THREE.PointsMaterial({
-    color:0xe1b56f,
-    size:.024,
-    transparent:true,
-    opacity:.8,
-    depthWrite:false
-  });
-
-  const stars=new THREE.Points(geometry,material);
-  group.add(stars);
-
-  const outer=torus(group,4.8,.009,gold);
-  outer.rotation.x=1.25;
-
-  return {
-    group,
-    update(t) {
-      seeds.forEach((p,i)=>{
-        const angle=p.angle+t*p.speed;
-        const radius=p.radius+Math.sin(t*1.3+i)*.06;
-
-        positions[i*3]=Math.cos(angle)*radius;
-        positions[i*3+1]=p.height+Math.sin(angle*2+t)*.08;
-        positions[i*3+2]=Math.sin(angle)*radius;
-      });
-
-      geometry.attributes.position.needsUpdate=true;
-
-      blackHole.rotation.y=t*.12;
-      disk.rotation.z=t*.12;
-      eventHorizon.rotation.z=-t*.3;
-      outer.rotation.z=t*.08;
-    }
-  };
-}
-
-/* =========================================
-   05 — KINETIC SCULPTURE
-   Interlocking rotating rings
-========================================= */
-
-function kineticScene() {
-  const group=new THREE.Group();
-
-  const assembly=new THREE.Group();
-  group.add(assembly);
-
-  const rings=[];
-
-  for(let i=0;i<16;i++) {
-    const ring=torus(
-      assembly,
-      1.3+(i%4)*.4,
-      .025+(i%3)*.012,
-      i%3===0?glow:i%2===0?gold:bronze
-    );
-
-    ring.rotation.set(
-      i*.71,
-      i*.42,
-      i*.27
-    );
-
-    rings.push(ring);
-  }
-
-  const center=mesh(
-    assembly,
-    new THREE.DodecahedronGeometry(.8,2),
-    blackMetal
-  );
-
-  const innerWire=mesh(
-    assembly,
-    new THREE.IcosahedronGeometry(1.1,2),
-    new THREE.MeshBasicMaterial({
-      color:0xc6a467,
-      wireframe:true,
-      transparent:true,
-      opacity:.5
-    })
-  );
-
-  const dust=particles(group,1200,18,.018);
-
-  return {
-    group,
-    update(t) {
-      rings.forEach((r,i)=>{
-        r.rotation.x+=.0015*(i+1);
-        r.rotation.y+=.001*(i+1);
-        r.rotation.z+=.0008*(i+1);
-      });
-
-      center.rotation.x=t*.28;
-      center.rotation.y=t*.34;
-      innerWire.rotation.x=-t*.22;
-      innerWire.rotation.y=t*.19;
-
-      assembly.rotation.y=Math.sin(t*.25)*.3;
-      dust.rotation.y=t*.02;
-    }
-  };
-}
-
-/* =========================================
-   06 — GRAVITY ENGINE
-   Orbital physics
-========================================= */
-
-function gravityScene() {
-  const group=new THREE.Group();
-
-  const core=mesh(
-    group,
-    new THREE.SphereGeometry(.55,48,48),
-    new THREE.MeshBasicMaterial({color:0x000000})
-  );
-
-  const halo=torus(group,1.05,.045,glow);
-  halo.rotation.x=.7;
-
-  const orbiters=[];
-
-  for(let i=0;i<8;i++) {
-    const orbit=torus(group,1.6+i*.38,.008,bronze);
-    orbit.rotation.set(i*.4,i*.8,i*.2);
-    orbiters.push(orbit);
-  }
-
-  const count=4500;
-  const positions=new Float32Array(count*3);
-  const initial=[];
-
-  for(let i=0;i<count;i++) {
-    initial.push({
-      radius:1.4+Math.random()*4,
-      angle:Math.random()*Math.PI*2,
-      speed:.12+Math.random()*.8,
-      tilt:(Math.random()-.5)*.8
-    });
-  }
-
-  const geo=new THREE.BufferGeometry();
-  geo.setAttribute('position',new THREE.BufferAttribute(positions,3));
-
-  const pts=new THREE.Points(
-    geo,
-    new THREE.PointsMaterial({
-      color:0xc7a36a,
-      size:.022,
-      transparent:true,
-      opacity:.75,
-      depthWrite:false
-    })
-  );
-
-  group.add(pts);
-
-  return {
-    group,
-    update(t) {
-      initial.forEach((p,i)=>{
-        const radius=p.radius;
-        const angle=p.angle+t*p.speed;
-
-        positions[i*3]=Math.cos(angle)*radius;
-        positions[i*3+1]=Math.sin(angle*2)*p.tilt;
-        positions[i*3+2]=Math.sin(angle)*radius;
-      });
-
-      geo.attributes.position.needsUpdate=true;
-
-      orbiters.forEach((r,i)=>{
-        r.rotation.z=t*(.06+i*.018);
-        r.rotation.x=Math.sin(t*.2+i)*.12;
-      });
-
-      halo.rotation.z=t*.35;
-      core.rotation.y=t*.2;
-    }
-  };
-}
-
-/* =========================================
-   07 — WAVE DIMENSION
-   Mathematical wave field
-========================================= */
-
-function waveScene() {
-  const group=new THREE.Group();
-
-  const geometry=new THREE.PlaneGeometry(13,13,150,150);
-
-  const material=new THREE.MeshStandardMaterial({
-    color:0x79603b,
-    metalness:.82,
-    roughness:.26,
-    wireframe:true,
-    emissive:0x241708,
-    emissiveIntensity:.45,
-    side:THREE.DoubleSide
-  });
-
-  const surface=mesh(
-    group,
-    geometry,
-    material
-  );
-
-  surface.rotation.x=-Math.PI/2.3;
-  surface.position.y=-.4;
-
-  const positions=geometry.attributes.position;
-  const original=[];
-
-  for(let i=0;i<positions.count;i++) {
-    original.push({
-      x:positions.getX(i),
-      y:positions.getY(i),
-      z:positions.getZ(i)
-    });
-  }
-
-  const rings=[];
-
-  for(let i=0;i<4;i++) {
-    const r=torus(group,1.3+i*.7,.009,gold);
-    r.rotation.x=Math.PI/2;
-    r.position.y=-1.6+i*.18;
-    rings.push(r);
-  }
-
-  return {
-    group,
-    update(t) {
-      for(let i=0;i<positions.count;i++) {
-        const p=original[i];
-
-        const wave1=Math.sin(p.x*1.2+t*1.2);
-        const wave2=Math.cos(p.z*1.4-t*.9);
-        const wave3=Math.sin((p.x+p.z)*.7+t*.6);
-
-        positions.setZ(
-          i,
-          p.z+wave1*.35+wave2*.25+wave3*.18
-        );
-      }
-
-      positions.needsUpdate=true;
-      geometry.computeVertexNormals();
-
-      surface.rotation.z=Math.sin(t*.15)*.06;
-
-      rings.forEach((r,i)=>{
-        r.rotation.z=t*(.06+i*.02);
-      });
-    }
-  };
-}
-
-/* =========================================
-   08 — FRACTAL INFINITY
-   Recursive geometric structure
-========================================= */
-
-function fractalScene() {
-  const group=new THREE.Group();
-
-  const fractal=new THREE.Group();
-  group.add(fractal);
-
-  function branch(parent,level,size,angle) {
-    if(level<=0) return;
-
-    const object=new THREE.Group();
-    parent.add(object);
-
-    const shape=mesh(
-      object,
-      new THREE.OctahedronGeometry(size,1),
-      level%2===0?gold:blackMetal
-    );
-
-    shape.rotation.set(angle,angle*.7,angle*.4);
-
-    const wire=mesh(
-      object,
-      new THREE.OctahedronGeometry(size*1.2,1),
-      new THREE.MeshBasicMaterial({
-        color:0xb78c4e,
-        wireframe:true,
-        transparent:true,
-        opacity:.32
-      })
-    );
-
-    object.userData.phase=angle;
-
-    for(let i=0;i<4;i++) {
-      const child=new THREE.Group();
-
-      child.position.set(
-        Math.cos(i*Math.PI/2)*size*1.55,
-        Math.sin(i*Math.PI/2)*size*1.55,
-        0
-      );
-
-      object.add(child);
-      branch(child,level-1,size*.42,angle+i*.7);
-    }
-
-    object.userData.spin=level%2===0?1:-1;
-    object.userData.shape=shape;
-    object.userData.wire=wire;
-
-    return object;
-  }
-
-  const root=branch(fractal,4,1.25,.4);
-
-  const orbit1=torus(group,3.8,.012,gold);
-  const orbit2=torus(group,4.5,.009,bronze);
-  orbit1.rotation.x=.8;
-  orbit2.rotation.y=1.1;
-
-  const dust=particles(group,1000,18,.018);
-
-  const nodes=[];
-  fractal.traverse(o=>{
-    if(o.userData.spin) nodes.push(o);
-  });
-
-  return {
-    group,
-    update(t) {
-      fractal.rotation.y=t*.14;
-      fractal.rotation.x=Math.sin(t*.3)*.2;
-
-      nodes.forEach((n,i)=>{
-        n.rotation.x=t*.15*n.userData.spin;
-        n.rotation.y=t*.12*n.userData.spin;
-
-        const pulse=1+Math.sin(t*1.2+i)*.035;
-        n.scale.setScalar(pulse);
-      });
-
-      orbit1.rotation.z=t*.1;
-      orbit2.rotation.x=t*.08;
-      dust.rotation.y=t*.02;
-    }
-  };
-}
-
-/* =========================================
-   SCENE MANAGER
-========================================= */
-
-const builders={
-  geometry:geometryScene,
-  bloom:bloomScene,
-  liquid:liquidScene,
-  singularity:singularityScene,
-  kinetic:kineticScene,
-  gravity:gravityScene,
-  waves:waveScene,
-  fractal:fractalScene
-};
-
-const sectionList=[
-  ...document.querySelectorAll('.world-section[data-scene]')
+const world = new THREE.Group();
+scene.add(world);
+
+let active = -1;
+let currentPalette = [0x7b61ff,0x00d9ff,0xffffff];
+let sceneClock = 0;
+let scrollProgress = 0;
+let transition = 0;
+let isSound = true;
+let sceneObjects = [];
+
+const palettes = [
+ [0x6f5bff,0x00d8ff,0xf5e9ff],
+ [0xff66b3,0xffc0e8,0x8e65ff],
+ [0x00d9ff,0x087dff,0xffffff],
+ [0xff8b52,0xffd16c,0xff4f87],
+ [0xb6ffed,0x52a9ff,0xffffff],
+ [0xc28aff,0x6a4bff,0xf5eaff],
+ [0xffe6a6,0xff8b58,0xffffff],
+ [0x7bffb2,0x2f9e83,0xd5fff1],
+ [0x9ca8ff,0x5660ff,0xffffff],
+ [0xff7b7b,0xffc0a0,0xffffff],
+ [0x5ef0ff,0x6d7cff,0xe7faff],
+ [0xe0a0ff,0xff80c0,0xffffff],
+ [0xa9ff78,0x21c9a2,0xffffff],
+ [0xffc76a,0xff6a9f,0xeee0ff],
+ [0x86d8ff,0x8c76ff,0xffffff],
+ [0xf4f4f4,0x9b9b9b,0xffffff],
+ [0xffa9dc,0x9e77ff,0xffffff],
+ [0x78ffe2,0x3c8dff,0xffffff],
+ [0xffd27a,0xff765e,0xffffff],
+ [0x91a5ff,0xc9e7ff,0xffffff],
+ [0xff83ad,0x9d6dff,0xffffff],
+ [0x79e6ff,0xffd36e,0xffffff],
+ [0xc5ff8e,0x76baff,0xffffff],
+ [0xffa36d,0xb27bff,0xffffff],
+ [0xa4a9ff,0x52e6ff,0xffffff]
 ];
 
-const counter=document.getElementById('sceneNumber');
-
-function loadScene(name,index) {
-  if(name===activeScene) return;
-
-  activeScene=name;
-  resetGroup();
-
-  const result=builders[name]();
-
-  activeGroup.add(result.group);
-  activeGroup.userData.update=result.update;
-
-  activeGroup.scale.setScalar(.85);
-
-  counter.textContent=String(index+1).padStart(2,'0');
-
-  camera.position.set(0,0,10);
+function mat(color, metalness=.35, roughness=.25, emissive=0x000000) {
+  return new THREE.MeshPhysicalMaterial({
+    color, metalness, roughness, emissive,
+    emissiveIntensity: .32,
+    clearcoat:.8,
+    clearcoatRoughness:.15
+  });
+}
+function addMesh(geo,material,x=0,y=0,z=0,rx=0,ry=0,rz=0) {
+  const m = new THREE.Mesh(geo,material);
+  m.position.set(x,y,z);
+  m.rotation.set(rx,ry,rz);
+  world.add(m);
+  sceneObjects.push(m);
+  return m;
+}
+function addLine(points,color,opacity=.7) {
+  const geo = new THREE.BufferGeometry().setFromPoints(points);
+  const line = new THREE.Line(geo,new THREE.LineBasicMaterial({
+    color,transparent:true,opacity
+  }));
+  world.add(line);
+  sceneObjects.push(line);
+  return line;
+}
+function particles(count,color,size=.035,spread=8,mode='random') {
+  const arr = new Float32Array(count*3);
+  for(let i=0;i<count;i++) {
+    let x,y,z;
+    if(mode==='sphere') {
+      const u=Math.random()*Math.PI*2;
+      const v=Math.acos(2*Math.random()-1);
+      const r=spread*(.55+Math.random()*.45);
+      x=r*Math.sin(v)*Math.cos(u);
+      y=r*Math.sin(v)*Math.sin(u);
+      z=r*Math.cos(v);
+    } else if(mode==='ring') {
+      const a=Math.random()*Math.PI*2;
+      const r=spread*(.65+Math.random()*.35);
+      x=Math.cos(a)*r;
+      y=(Math.random()-.5)*1.3;
+      z=Math.sin(a)*r;
+    } else {
+      x=(Math.random()-.5)*spread*2;
+      y=(Math.random()-.5)*spread*2;
+      z=(Math.random()-.5)*spread*2;
+    }
+    arr[i*3]=x;arr[i*3+1]=y;arr[i*3+2]=z;
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(arr,3));
+  const points=new THREE.Points(geo,new THREE.PointsMaterial({
+    color,size,transparent:true,opacity:.85,
+    blending:THREE.AdditiveBlending,
+    depthWrite:false
+  }));
+  world.add(points);
+  sceneObjects.push(points);
+  return points;
+}
+function clearWorld() {
+  while(world.children.length) {
+    const obj=world.children[0];
+    world.remove(obj);
+    obj.traverse?.(child=>{
+      if(child.geometry) child.geometry.dispose();
+      if(child.material) {
+        if(Array.isArray(child.material)) child.material.forEach(m=>m.dispose());
+        else child.material.dispose();
+      }
+    });
+  }
+  sceneObjects=[];
+}
+function glowLights(p) {
+  keyLight.color.setHex(p[0]);
+  rimLight.color.setHex(p[1]);
+  scene.background.setHex(0x050509);
+  scene.fog.color.setHex(0x050509);
 }
 
-/* =========================================
-   SCROLL OBSERVER
-========================================= */
+function scene01() {
+  particles(isMobile?900:2200,0x8d9cff,.035,10,'sphere');
+  const core=addMesh(new THREE.IcosahedronGeometry(1.45,2),mat(0xaaaaff,.8,.12,0x4030ff));
+  const wire=addMesh(new THREE.IcosahedronGeometry(2.1,1),new THREE.MeshBasicMaterial({color:0x5eeaff,wireframe:true,transparent:true,opacity:.45}));
+  const rings=[];
+  for(let i=0;i<5;i++) {
+    const r=addMesh(new THREE.TorusGeometry(2.7+i*.24,.012,8,180),new THREE.MeshBasicMaterial({color:i%2?0x00dfff:0x9878ff}));
+    r.rotation.set(Math.random()*3,Math.random()*3,Math.random()*3);rings.push(r);
+  }
+  return t=>{core.rotation.y=t*.4;wire.rotation.x=t*.25;wire.rotation.y=-t*.2;rings.forEach((r,i)=>r.rotation.z=t*(.12+i*.025));};
+}
+function scene02() {
+  const group=new THREE.Group();world.add(group);
+  for(let i=0;i<64;i++) {
+    const a=i*Math.PI*2/64;
+    const petal=addMesh(new THREE.SphereGeometry(1,20,16),mat(i%2?0xff75bd:0xc18bff,.3,.2,0x501050));
+    petal.scale.set(.32,1.25,.12);
+    petal.position.set(Math.cos(a)*1.25,Math.sin(a)*1.25,Math.sin(i*.3)*.2);
+    petal.rotation.z=a-Math.PI/2;
+  }
+  const center=addMesh(new THREE.SphereGeometry(.48,32,32),mat(0xffe1a6,.5,.18,0x9d5a19));
+  particles(700,0xffa6db,.025,5,'sphere');
+  return t=>{world.rotation.z=t*.12;world.rotation.y=Math.sin(t*.3)*.25;center.scale.setScalar(1+Math.sin(t*2)*.08);};
+}
+function scene03() {
+  const g=new THREE.TorusKnotGeometry(1.7,.48,240,24,2,5);
+  const a=addMesh(g,mat(0x00d8ff,.85,.12,0x004c66));
+  const w=addMesh(new THREE.TorusKnotGeometry(2.1,.018,300,8,3,7),new THREE.MeshBasicMaterial({color:0x9c76ff}));
+  particles(1100,0x9aefff,.025,7);
+  return t=>{a.rotation.x=t*.3;a.rotation.y=t*.45;w.rotation.x=-t*.2;w.rotation.z=t*.3;};
+}
+function scene04() {
+  const disk=addMesh(new THREE.TorusGeometry(2.5,.5,32,180),mat(0xff8b52,.7,.16,0x9a2600));
+  disk.scale.y=.25;
+  const core=addMesh(new THREE.SphereGeometry(.8,48,48),new THREE.MeshBasicMaterial({color:0x03030a}));
+  for(let i=0;i<6;i++) {
+    const ring=addMesh(new THREE.TorusGeometry(1.4+i*.35,.018,8,150),new THREE.MeshBasicMaterial({color:i%2?0xffd06a:0xff5e8c}));
+    ring.rotation.x=Math.PI/2+Math.random()*.5;
+  }
+  particles(1800,0xffad75,.025,7,'ring');
+  return t=>{disk.rotation.z=t*.3;disk.rotation.x=Math.sin(t*.2)*.2;world.rotation.y=t*.08;};
+}
+function scene05() {
+  const geo=new THREE.PlaneGeometry(12,12,90,90);
+  const pos=geo.attributes.position;
+  const original=pos.array.slice();
+  const mesh=addMesh(geo,new THREE.MeshPhysicalMaterial({color:0x69e8ff,wireframe:true,metalness:.4,roughness:.2,emissive:0x075577}));
+  mesh.rotation.x=-Math.PI/2.5;
+  return t=>{
+    for(let i=0;i<pos.count;i++) {
+      const x=original[i*3],y=original[i*3+1];
+      pos.setZ(i,Math.sin(x*1.2+t*1.6)*.35+Math.cos(y*1.4-t)*.3);
+    }
+    pos.needsUpdate=true;geo.computeVertexNormals();mesh.rotation.z=t*.04;
+  };
+}
+function scene06() {
+  const group=new THREE.Group();world.add(group);
+  for(let i=0;i<22;i++) {
+    const m=addMesh(new THREE.OctahedronGeometry(.7+Math.random()*.5,0),mat(i%2?0x9e83ff:0x66eaff,.8,.12));
+    m.position.set((Math.random()-.5)*5,(Math.random()-.5)*5,(Math.random()-.5)*4);
+    m.rotation.set(Math.random()*3,Math.random()*3,Math.random()*3);
+  }
+  particles(1000,0xb7aaff,.025,8);
+  return t=>{world.rotation.y=t*.12;world.rotation.x=Math.sin(t*.2)*.15;};
+}
+function scene07() {
+  const core=addMesh(new THREE.SphereGeometry(.7,32,32),mat(0x8bffce,.5,.15,0x146c4a));
+  for(let i=0;i<9;i++) {
+    const curve=new THREE.EllipseCurve(0,0,2.2+i*.12,.9+i*.1,0,Math.PI*2,false,0);
+    const pts=curve.getPoints(150).map(p=>new THREE.Vector3(p.x,p.y,0));
+    const line=addLine(pts,i%2?0x6affc7:0x38bfff,.75);
+    line.rotation.set(i*.4,i*.3,i*.5);
+  }
+  particles(850,0x8effcf,.025,5,'sphere');
+  return t=>{world.rotation.y=t*.3;world.rotation.x=t*.12;core.scale.setScalar(1+Math.sin(t*2)*.12);};
+}
+function scene08() {
+  for(let i=0;i<18;i++) {
+    const m=addMesh(new THREE.TorusGeometry(1.1+i*.13,.018,8,120),new THREE.MeshBasicMaterial({color:i%2?0x9b80ff:0x52dfff}));
+    m.rotation.set(i*.3,i*.22,i*.14);
+  }
+  particles(1300,0x9e8cff,.023,8,'ring');
+  return t=>{world.rotation.z=t*.2;world.rotation.x=Math.sin(t*.3)*.3;};
+}
+function scene09() {
+  const count=40;
+  for(let i=0;i<count;i++) {
+    const y=(i-count/2)*.12;
+    const curve=[];
+    for(let j=0;j<80;j++) {
+      const x=(j/79-.5)*8;
+      curve.push(new THREE.Vector3(x,y+Math.sin(j*.15+i*.2)*.15,Math.cos(j*.1+i*.12)*.5));
+    }
+    addLine(curve,i%2?0x00d9ff:0xc17dff,.65);
+  }
+  return t=>{world.rotation.y=Math.sin(t*.25)*.3;world.position.y=Math.sin(t*.6)*.2;};
+}
+function scene10() {
+  const dna=new THREE.Group();world.add(dna);
+  for(let i=0;i<150;i++) {
+    const y=(i-75)*.045;
+    const a=i*.15;
+    const x=Math.cos(a)*1.2,z=Math.sin(a)*1.2;
+    const m=addMesh(new THREE.SphereGeometry(.055,12,12),mat(i%2?0xff82b9:0x64dcff,.4,.2));
+    m.position.set(x,y,z);
+    if(i%5===0) {
+      const m2=addMesh(new THREE.SphereGeometry(.04,10,10),mat(0xffffff));
+      m2.position.set(-x,y,-z);
+      addLine([new THREE.Vector3(x,y,z),new THREE.Vector3(-x,y,-z)],0x9daaff,.35);
+    }
+  }
+  return t=>{world.rotation.y=t*.55;world.position.y=Math.sin(t*.7)*.2;};
+}
+function scene11() {
+  const geo=new THREE.IcosahedronGeometry(2.1,1);
+  const m=addMesh(geo,new THREE.MeshPhysicalMaterial({color:0xc9f2ff,metalness:.4,roughness:.08,transmission:.45,thickness:1.4,transparent:true,opacity:.85}));
+  const wire=addMesh(new THREE.IcosahedronGeometry(2.25,1),new THREE.MeshBasicMaterial({color:0x76dfff,wireframe:true,transparent:true,opacity:.35}));
+  particles(500,0x9beaff,.035,6);
+  return t=>{m.rotation.y=t*.25;m.rotation.x=t*.2;wire.rotation.y=-t*.2;};
+}
+function scene12() {
+  for(let i=0;i<12;i++) {
+    const m=addMesh(new THREE.TorusGeometry(1.2+i*.1,.02,8,180),new THREE.MeshBasicMaterial({color:i%2?0xff8ec8:0xa88aff}));
+    m.rotation.set(i*.2,i*.32,i*.15);
+    m.scale.setScalar(1+i*.035);
+  }
+  const center=addMesh(new THREE.DodecahedronGeometry(.85,2),mat(0xf2c5ff,.7,.15));
+  return t=>{world.rotation.y=t*.18;world.rotation.z=t*.1;center.rotation.x=t*.4;};
+}
+function scene13() {
+  const count=32;
+  for(let i=0;i<count;i++) {
+    const a=i*Math.PI*2/count;
+    const h=1.3+Math.random()*2;
+    const m=addMesh(new THREE.CylinderGeometry(.035,.12,h,8),mat(i%2?0x8dffbd:0x3fc9a4,.55,.22));
+    m.position.set(Math.cos(a)*2,0,Math.sin(a)*2);
+    m.rotation.z=Math.cos(a)*.45;
+    m.rotation.x=Math.sin(a)*.45;
+  }
+  particles(900,0x7affc7,.024,6);
+  return t=>{world.rotation.y=t*.25;world.rotation.x=Math.sin(t*.3)*.15;};
+}
+function scene14() {
+  const c=addMesh(new THREE.CylinderGeometry(0,2.1,3.4,3,1),mat(0xffb05c,.7,.16,0x602100));
+  c.rotation.z=Math.PI;
+  for(let i=0;i<8;i++) {
+    const ring=addMesh(new THREE.TorusGeometry(1.2+i*.18,.012,8,120),new THREE.MeshBasicMaterial({color:i%2?0xff6f99:0xffd16a}));
+    ring.rotation.x=Math.random()*3;ring.rotation.y=Math.random()*3;
+  }
+  particles(1100,0xffc28a,.025,7,'sphere');
+  return t=>{c.rotation.y=t*.35;world.rotation.y=-t*.1;};
+}
+function scene15() {
+  const m=addMesh(new THREE.TorusKnotGeometry(1.7,.35,220,16,3,8),mat(0x7dd8ff,.85,.12));
+  const shell=addMesh(new THREE.TorusKnotGeometry(2.2,.015,300,8,2,7),new THREE.MeshBasicMaterial({color:0x8e7aff}));
+  particles(900,0x9ceaff,.022,7);
+  return t=>{m.rotation.x=t*.3;m.rotation.y=t*.4;shell.rotation.z=-t*.2;shell.rotation.y=t*.3;};
+}
+function scene16() {
+  for(let i=0;i<9;i++) {
+    const g=new THREE.BoxGeometry(1.4+i*.2,1.4+i*.2,1.4+i*.2);
+    const m=addMesh(g,new THREE.MeshBasicMaterial({color:0xe9efff,wireframe:true,transparent:true,opacity:.4-i*.025}));
+    m.rotation.set(i*.12,i*.18,i*.15);
+  }
+  return t=>{world.rotation.x=t*.18;world.rotation.y=t*.22;};
+}
+function scene17() {
+  const count=30;
+  for(let i=0;i<count;i++) {
+    const a=i*2.399;
+    const r=.3+Math.sqrt(i)*.35;
+    const m=addMesh(new THREE.SphereGeometry(.12+Math.random()*.16,20,20),mat(i%2?0xffa3dc:0x9e7cff,.4,.18));
+    m.position.set(Math.cos(a)*r,Math.sin(a)*r,(Math.random()-.5)*2);
+  }
+  particles(1000,0xffb1df,.025,6);
+  return t=>{world.rotation.z=t*.12;world.rotation.y=t*.2;};
+}
+function scene18() {
+  const lines=26;
+  for(let i=0;i<lines;i++) {
+    const pts=[];
+    for(let j=0;j<100;j++) {
+      const a=j*.12+i*.24;
+      const r=1.2+j*.025;
+      pts.push(new THREE.Vector3(Math.cos(a)*r,Math.sin(a)*r,(j-50)*.025));
+    }
+    addLine(pts,i%2?0x4eeaff:0x8c7dff,.7);
+  }
+  return t=>{world.rotation.z=t*.22;world.rotation.x=Math.sin(t*.3)*.2;};
+}
+function scene19() {
+  for(let i=0;i<10;i++) {
+    const m=addMesh(new THREE.TorusGeometry(1.5+i*.15,.025,8,150),new THREE.MeshBasicMaterial({color:i%2?0xffc66e:0xff6f85}));
+    m.rotation.set(i*.22,i*.4,i*.15);
+  }
+  const orb=addMesh(new THREE.SphereGeometry(.5,32,32),mat(0xffd98e,.8,.12));
+  return t=>{world.rotation.y=t*.22;world.rotation.x=Math.sin(t*.2)*.2;orb.scale.setScalar(1+Math.sin(t*2)*.1);};
+}
+function scene20() {
+  for(let i=0;i<14;i++) {
+    const m=addMesh(new THREE.BoxGeometry(1.5,.06,.06),mat(0x92a9ff,.65,.2));
+    const a=i*Math.PI*2/14;
+    m.position.set(Math.cos(a)*2,Math.sin(a)*2,Math.sin(i)*.5);
+    m.rotation.z=a;
+    m.rotation.y=a*.5;
+  }
+  particles(800,0xbadfff,.025,7);
+  return t=>{world.rotation.z=t*.25;world.rotation.y=t*.12;};
+}
+function scene21() {
+  const geo=new THREE.SphereGeometry(1.8,48,48);
+  const m=addMesh(geo,new THREE.MeshPhysicalMaterial({color:0xff8ab9,metalness:.2,roughness:.15,transmission:.4,thickness:2,emissive:0x451033}));
+  const wire=addMesh(new THREE.SphereGeometry(2.1,20,20),new THREE.MeshBasicMaterial({color:0xc28aff,wireframe:true,transparent:true,opacity:.2}));
+  particles(1200,0xffb1dc,.023,7);
+  return t=>{m.scale.set(1+Math.sin(t)*.1,1+Math.cos(t*.7)*.13,1+Math.sin(t*.8)*.1);m.rotation.y=t*.2;wire.rotation.y=-t*.15;};
+}
+function scene22() {
+  for(let i=0;i<24;i++) {
+    const m=addMesh(new THREE.TorusGeometry(1.3+i*.06,.014,8,120),new THREE.MeshBasicMaterial({color:i%2?0x65eaff:0xffd16a}));
+    m.rotation.set(i*.15,i*.22,i*.18);
+  }
+  particles(900,0xa9eeff,.024,7,'ring');
+  return t=>{world.rotation.y=t*.25;world.rotation.z=Math.sin(t*.3)*.15;};
+}
+function scene23() {
+  const group=new THREE.Group();world.add(group);
+  for(let i=0;i<100;i++) {
+    const m=addMesh(new THREE.TetrahedronGeometry(.13+Math.random()*.15),mat(i%2?0xb7ff8b:0x6acbff,.6,.16));
+    m.position.set((Math.random()-.5)*6,(Math.random()-.5)*6,(Math.random()-.5)*6);
+  }
+  particles(900,0xc4ff9c,.025,8);
+  return t=>{world.rotation.y=t*.2;world.rotation.x=t*.12;};
+}
+function scene24() {
+  const m=addMesh(new THREE.TorusKnotGeometry(1.5,.5,260,24,5,9),mat(0xffa36d,.75,.12,0x663011));
+  const outer=addMesh(new THREE.TorusGeometry(2.7,.012,8,200),new THREE.MeshBasicMaterial({color:0xb27bff}));
+  outer.rotation.x=Math.PI/2;
+  particles(1400,0xffb58b,.025,8);
+  return t=>{m.rotation.y=t*.3;m.rotation.x=t*.22;outer.rotation.z=t*.2;};
+}
+function scene25() {
+  const core=addMesh(new THREE.IcosahedronGeometry(1.25,2),mat(0xa8b4ff,.75,.12,0x292b80));
+  const wire=addMesh(new THREE.IcosahedronGeometry(2.1,2),new THREE.MeshBasicMaterial({color:0x55eaff,wireframe:true,transparent:true,opacity:.35}));
+  for(let i=0;i<12;i++) {
+    const r=addMesh(new THREE.TorusGeometry(2.6+i*.1,.01,8,140),new THREE.MeshBasicMaterial({color:i%2?0x9b8cff:0x5ceaff}));
+    r.rotation.set(i*.4,i*.3,i*.2);
+  }
+  particles(1800,0xa4dfff,.026,9,'sphere');
+  return t=>{core.rotation.y=t*.35;core.rotation.x=t*.2;wire.rotation.y=-t*.25;world.rotation.z=Math.sin(t*.2)*.1;};
+}
 
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(entry=>{
-    if(entry.isIntersecting) {
-      const index=sectionList.indexOf(entry.target);
-      loadScene(entry.target.dataset.scene,index);
+const builders=[
+ scene01,scene02,scene03,scene04,scene05,
+ scene06,scene07,scene08,scene09,scene10,
+ scene11,scene12,scene13,scene14,scene15,
+ scene16,scene17,scene18,scene19,scene20,
+ scene21,scene22,scene23,scene24,scene25
+];
+
+let animateScene=()=>{};
+function loadScene(index) {
+  if(index===active) return;
+  active=index;
+  clearWorld();
+  currentPalette=palettes[index];
+  glowLights(currentPalette);
+  animateScene=builders[index]();
+  counter.textContent=String(index+1).padStart(2,'0')+' / 25';
+  gsap.fromTo(world.scale,{x:.82,y:.82,z:.82},{x:1,y:1,z:1,duration:1.5,ease:'power3.out'});
+  gsap.fromTo(camera.position,{z:12},{z:9.5,duration:1.5,ease:'power3.out'});
+  transition=0;
+  gsap.to({v:0},{v:1,duration:1.4,ease:'power2.out',onUpdate:function(){transition=this.targets()[0].v;}});
+}
+
+sections.forEach((section,index)=>{
+  ScrollTrigger.create({
+    trigger:section,
+    start:'top 55%',
+    end:'bottom 45%',
+    onEnter:()=>loadScene(index),
+    onEnterBack:()=>loadScene(index)
+  });
+  ScrollTrigger.create({
+    trigger:section,
+    start:'top bottom',
+    end:'bottom top',
+    onUpdate:self=>{
+      if(index===active) {
+        scrollProgress=self.progress;
+      }
     }
   });
-},{
-  threshold:.45
 });
 
-sectionList.forEach(section=>observer.observe(section));
-
-/* =========================================
-   POINTER INTERACTION
-========================================= */
-
-window.addEventListener('pointermove',event=>{
-  pointerX=(event.clientX/innerWidth-.5)*2;
-  pointerY=(event.clientY/innerHeight-.5)*2;
-},{passive:true});
-
-/* =========================================
-   ANIMATION LOOP
-========================================= */
-
-const clock=new THREE.Clock();
-
-function animate() {
-  requestAnimationFrame(animate);
-
-  const delta=Math.min(clock.getDelta(),.04);
-  elapsed+=delta;
-
-  smoothX+=(pointerX-smoothX)*.025;
-  smoothY+=(pointerY-smoothY)*.025;
-
-  if(activeGroup.userData.update) {
-    activeGroup.userData.update(elapsed);
+let lastTime=0;
+function render(time) {
+  requestAnimationFrame(render);
+  const dt=Math.min((time-lastTime)/1000,.05);
+  lastTime=time;
+  sceneClock+=dt;
+  if(active>=0) {
+    animateScene(sceneClock);
+    world.rotation.y += dt*.018;
+    world.position.y=Math.sin(sceneClock*.35)*.08;
+    camera.position.x=gsap.utils.interpolate(camera.position.x,Math.sin(scrollProgress*Math.PI*2)*.25,.025);
+    camera.position.y=gsap.utils.interpolate(camera.position.y,Math.cos(scrollProgress*Math.PI*2)*.18,.025);
+    camera.lookAt(0,0,0);
   }
-
-  activeGroup.scale.lerp(
-    new THREE.Vector3(1,1,1),
-    .025
-  );
-
-  camera.position.x+=(smoothX*.32-camera.position.x)*.025;
-  camera.position.y+=(-smoothY*.24-camera.position.y)*.025;
-  camera.lookAt(0,0,0);
-
-  keyLight.position.x=Math.sin(elapsed*.35)*4;
-  keyLight.position.y=Math.cos(elapsed*.4)*3;
-
   composer.render();
 }
+requestAnimationFrame(render);
 
-loadScene('geometry',0);
-animate();
+document.getElementById('enter').addEventListener('click',async()=>{
+  intro.classList.add('hide');
+  document.body.classList.remove('locked');
+  experience.classList.add('ready');
+  hud.classList.add('visible');
+  document.getElementById('scrollHint').classList.add('visible');
 
-/* =========================================
-   RESIZE
-========================================= */
-
-window.addEventListener('resize',()=>{
-  camera.aspect=innerWidth/innerHeight;
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(innerWidth,innerHeight);
-  renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
-
-  composer.setSize(innerWidth,innerHeight);
-  bloom.setSize(innerWidth,innerHeight);
-});
-
-/* =========================================
-   OPENING + MUSIC
-========================================= */
-
-const intro=document.getElementById('intro');
-const main=document.getElementById('main');
-const enter=document.getElementById('enter');
-const music=document.getElementById('music');
-const sound=document.getElementById('sound');
-const soundLabel=document.getElementById('soundLabel');
-
-music.volume=.38;
-
-enter.addEventListener('click',async()=>{
-  enter.disabled=true;
-  enter.textContent='ENTERING THE UNIVERSE...';
-
-  main.classList.add('show');
-  document.body.classList.remove('intro-open');
-
-  try {
-    await music.play();
-    sound.classList.add('playing');
-    soundLabel.textContent='SOUND ON';
-  } catch(error) {
-    sound.classList.remove('playing');
-    soundLabel.textContent='PLAY SOUND';
-    console.warn('Music playback failed:',error);
+  if(isSound) {
+    try {
+      music.volume=.55;
+      await music.play();
+      soundBtn.textContent='SOUND ON';
+    } catch(e) {
+      soundBtn.textContent='SOUND OFF';
+    }
   }
-
-  intro.classList.add('exit');
-
-  window.scrollTo({
-    top:0,
-    behavior:'instant'
-  });
+  setTimeout(()=>{
+    window.scrollTo({top:0,behavior:'auto'});
+    ScrollTrigger.refresh();
+    loadScene(0);
+  },250);
 });
 
-sound.addEventListener('click',async()=>{
+soundBtn.addEventListener('click',async()=>{
   if(music.paused) {
     try {
       await music.play();
-      sound.classList.add('playing');
-      soundLabel.textContent='SOUND ON';
-    } catch(error) {
-      soundLabel.textContent='PLAY SOUND';
+      soundBtn.textContent='SOUND ON';
+    } catch(e) {
+      soundBtn.textContent='SOUND OFF';
     }
   } else {
     music.pause();
-    sound.classList.remove('playing');
-    soundLabel.textContent='SOUND OFF';
+    soundBtn.textContent='SOUND OFF';
   }
 });
 
+function resize() {
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setPixelRatio(Math.min(devicePixelRatio||1,isMobile?1.35:1.8));
+  renderer.setSize(innerWidth,innerHeight);
+  composer.setSize(innerWidth,innerHeight);
+  bloom.setSize(innerWidth,innerHeight);
+  ScrollTrigger.refresh();
+}
+addEventListener('resize',resize);
 </script>
 </body>
 </html>
