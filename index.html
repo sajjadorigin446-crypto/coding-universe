@@ -3,1663 +3,1695 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#050409">
-<title>OBSCURA — The Art of Impossible Worlds</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050505">
+<title>MAMUN CODING FANTASY — Beyond Imagination</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-
-:root{
- --bg:#050409;
- --gold:#c6a45a;
- --gold2:#edcf91;
- --violet:#9b65dc;
- --text:#e8dfd0;
- --muted:#827b83;
- --panel:rgba(12,10,17,.88);
- --border:rgba(198,164,90,.22);
+:root {
+  --bg:#050505;
+  --gold:#c9a45c;
+  --gold-light:#f0d69b;
+  --white:#eee9df;
+  --muted:#8b867c;
 }
 
-*{box-sizing:border-box;margin:0;padding:0}
-
-body{
- background:var(--bg);
- color:var(--text);
- font-family:Inter,sans-serif;
- overflow:hidden;
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
-button{font-family:inherit;cursor:pointer}
-
-#stage{
- position:fixed;
- inset:0;
- z-index:0;
+html {
+  scroll-behavior:smooth;
+  background:var(--bg);
 }
 
-canvas{display:block}
-
-.overlay{
- position:fixed;
- inset:0;
- z-index:2;
- pointer-events:none;
- display:flex;
- flex-direction:column;
+body {
+  background:var(--bg);
+  color:var(--white);
+  font-family:'Inter',sans-serif;
+  overflow-x:hidden;
 }
 
-nav{
- pointer-events:auto;
- height:76px;
- display:flex;
- align-items:center;
- justify-content:space-between;
- padding:0 5%;
- background:linear-gradient(#050409dd,transparent);
+body.locked {
+  overflow:hidden;
 }
 
-.brand{
- font-family:Cinzel,serif;
- font-size:21px;
- letter-spacing:5px;
- color:var(--gold2);
+button {
+  font:inherit;
 }
 
-.brand small{
- display:block;
- font:8px Inter;
- letter-spacing:3px;
- color:var(--muted);
- margin-top:3px;
+/* GLOBAL CANVAS */
+
+#world {
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
 }
 
-.nav-right{
- display:flex;
- align-items:center;
- gap:23px;
+#world canvas {
+  width:100%;
+  height:100%;
+  display:block;
 }
 
-.nav-right button{
- background:none;
- border:0;
- color:#b9a98f;
- font-size:10px;
- letter-spacing:2px;
+/* AMBIENT LIGHT */
+
+.ambient {
+  position:fixed;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse at 50% 50%, transparent 15%, rgba(0,0,0,.35) 100%),
+    linear-gradient(180deg,rgba(0,0,0,.15),transparent 40%,rgba(0,0,0,.55));
 }
 
-.hero{
- margin:auto;
- width:100%;
- text-align:center;
- padding:20px;
- transform:translateY(-8px);
+/* INTRO */
+
+#intro {
+  position:fixed;
+  inset:0;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  overflow:hidden;
+  background:#030303;
+  transition:opacity 1.1s ease,visibility 1.1s ease;
 }
 
-.kicker{
- font-size:9px;
- letter-spacing:7px;
- color:var(--gold);
- margin-bottom:20px;
+#intro.hide {
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
 }
 
-.hero h1{
- font:400 clamp(38px,7vw,85px) Cinzel,serif;
- letter-spacing:12px;
- color:#eee0c2;
- text-shadow:0 0 40px #9b65dc55;
+.intro-glow {
+  position:absolute;
+  width:min(75vw,650px);
+  aspect-ratio:1;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(194,148,72,.13),transparent 68%);
+  filter:blur(20px);
+  animation:breathe 5s ease-in-out infinite;
 }
 
-.hero p{
- margin:20px auto 0;
- font-size:10px;
- letter-spacing:5px;
- color:#a69a9e;
+.portal {
+  position:absolute;
+  width:min(65vw,440px);
+  aspect-ratio:1;
+  border:1px solid rgba(211,174,106,.3);
+  border-radius:50%;
+  box-shadow:
+    0 0 30px rgba(202,161,91,.08),
+    inset 0 0 35px rgba(202,161,91,.06);
+  animation:portalRotate 25s linear infinite;
 }
 
-.world-name{
- font:14px Cinzel,serif;
- color:var(--gold2);
- letter-spacing:5px;
- margin-top:45px;
+.portal::before,
+.portal::after {
+  content:"";
+  position:absolute;
+  inset:18px;
+  border:1px dashed rgba(220,185,118,.35);
+  border-radius:50%;
 }
 
-.world-description{
- font-size:11px;
- color:#aaa0a8;
- letter-spacing:1px;
- margin-top:12px;
+.portal::after {
+  inset:42px;
+  border-style:solid;
+  border-color:rgba(220,185,118,.12);
+  animation:portalRotate 18s linear infinite reverse;
 }
 
-.bottom{
- pointer-events:auto;
- padding:20px 5% 28px;
- background:linear-gradient(transparent,#050409f5);
+.intro-content {
+  position:relative;
+  z-index:2;
+  padding:25px;
+  animation:rise 1.4s ease both;
 }
 
-.worlds{
- display:flex;
- gap:9px;
- overflow-x:auto;
- padding-bottom:15px;
- scrollbar-width:none;
+.intro-kicker {
+  font-size:10px;
+  letter-spacing:6px;
+  color:var(--gold);
+  text-transform:uppercase;
+  margin-bottom:28px;
 }
 
-.worlds button{
- flex-shrink:0;
- padding:12px 17px;
- color:#a69ba0;
- background:#111019dd;
- border:1px solid var(--border);
- font-size:9px;
- letter-spacing:1.5px;
- transition:.3s;
+.intro-title {
+  font-family:'Cinzel',serif;
+  font-size:clamp(34px,7vw,82px);
+  font-weight:500;
+  letter-spacing:4px;
+  line-height:1.18;
+  color:#eee7d9;
+  text-shadow:0 0 35px rgba(210,169,100,.18);
 }
 
-.worlds button.active,
-.worlds button:hover{
- color:var(--gold2);
- border-color:var(--gold);
- background:#261c24;
+.intro-title span {
+  display:block;
+  color:var(--gold-light);
 }
 
-.world-footer{
- display:flex;
- justify-content:space-between;
- align-items:center;
- border-top:1px solid var(--border);
- padding-top:16px;
+.intro-description {
+  color:#8f887b;
+  font-size:12px;
+  letter-spacing:2px;
+  margin-top:22px;
 }
 
-.world-footer span{
- font-size:9px;
- letter-spacing:2px;
- color:var(--muted);
+.enter-btn {
+  margin-top:48px;
+  padding:17px 34px;
+  border:1px solid rgba(210,173,105,.65);
+  background:rgba(190,145,67,.06);
+  color:var(--gold-light);
+  letter-spacing:4px;
+  font-size:10px;
+  cursor:pointer;
+  transition:.4s;
+  position:relative;
+  overflow:hidden;
 }
 
-.actions{
- display:flex;
- gap:9px;
+.enter-btn:hover {
+  background:var(--gold);
+  color:#080808;
+  box-shadow:0 0 35px rgba(201,164,92,.25);
 }
 
-.action{
- background:#17121b;
- border:1px solid var(--border);
- color:var(--gold2);
- padding:11px 16px;
- font-size:9px;
- letter-spacing:1.5px;
+.intro-footer {
+  position:absolute;
+  bottom:28px;
+  left:0;
+  width:100%;
+  color:#514b41;
+  font-size:9px;
+  letter-spacing:3px;
 }
 
-.action:hover{
- background:#392832;
+/* MAIN */
+
+#main {
+  position:relative;
+  z-index:2;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity 1.2s ease;
 }
 
-.panel{
- pointer-events:auto;
- position:fixed;
- right:20px;
- top:100px;
- width:min(420px,calc(100% - 40px));
- max-height:calc(100vh - 130px);
- overflow:auto;
- background:var(--panel);
- border:1px solid var(--border);
- backdrop-filter:blur(20px);
- padding:22px;
- display:none;
- z-index:5;
+#main.visible {
+  opacity:1;
+  visibility:visible;
 }
 
-.panel.open{display:block}
-
-.panel-head{
- display:flex;
- justify-content:space-between;
- align-items:center;
- margin-bottom:20px;
+.topbar {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:76px;
+  padding:0 6%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  z-index:10;
+  border-bottom:1px solid rgba(255,255,255,.055);
+  background:linear-gradient(180deg,rgba(4,4,4,.85),transparent);
+  backdrop-filter:blur(8px);
 }
 
-.panel-head h2{
- font:18px Cinzel,serif;
- color:var(--gold2);
- letter-spacing:3px;
+.brand {
+  font-family:'Cinzel',serif;
+  letter-spacing:3px;
+  color:var(--gold-light);
+  font-size:13px;
 }
 
-.close{
- background:none;
- color:var(--gold);
- border:0;
- font-size:22px;
+.nav {
+  display:flex;
+  gap:27px;
 }
 
-.panel p{
- font-size:11px;
- line-height:1.8;
- color:#aaa0a8;
- margin-bottom:16px;
+.nav a {
+  color:#aaa397;
+  font-size:9px;
+  letter-spacing:2px;
+  text-decoration:none;
+  transition:.3s;
 }
 
-pre{
- white-space:pre-wrap;
- overflow-wrap:anywhere;
- background:#08070c;
- border:1px solid #27202d;
- padding:15px;
- font:11px/1.8 'JetBrains Mono',monospace;
- color:#cdbb9b;
- overflow:auto;
+.nav a:hover {
+  color:var(--gold-light);
 }
 
-textarea{
- width:100%;
- min-height:190px;
- resize:vertical;
- background:#08070c;
- border:1px solid #392b40;
- color:#e7d6bd;
- padding:15px;
- font:11px/1.8 'JetBrains Mono',monospace;
- outline:none;
+.sound-control {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border:1px solid rgba(201,164,92,.3);
+  background:rgba(0,0,0,.45);
+  padding:10px 13px;
+  color:var(--gold-light);
+  font-size:9px;
+  letter-spacing:2px;
+  cursor:pointer;
 }
 
-textarea:focus{border-color:var(--gold)}
-
-.output{
- min-height:55px;
- background:#09080d;
- padding:13px;
- margin-top:12px;
- color:#b7d5a0;
- font:11px/1.8 'JetBrains Mono',monospace;
- white-space:pre-wrap;
+.sound-bars {
+  display:flex;
+  align-items:center;
+  gap:3px;
+  height:13px;
 }
 
-.panel-button{
- background:#332538;
- border:1px solid var(--gold);
- color:var(--gold2);
- padding:12px 18px;
- margin-top:12px;
- font-size:10px;
- letter-spacing:2px;
+.sound-bars i {
+  width:2px;
+  height:5px;
+  background:var(--gold);
 }
 
-label{
- display:block;
- font-size:10px;
- color:var(--gold);
- margin:15px 0 7px;
- letter-spacing:2px;
+.sound-control.playing .sound-bars i {
+  animation:musicBars .7s ease-in-out infinite alternate;
 }
 
-input[type=range]{
- width:100%;
- accent-color:var(--gold);
+.sound-bars i:nth-child(2) {animation-delay:.2s}
+.sound-bars i:nth-child(3) {animation-delay:.4s}
+.sound-bars i:nth-child(4) {animation-delay:.1s}
+
+.hero {
+  min-height:100svh;
+  position:relative;
+  display:flex;
+  align-items:center;
+  padding:130px 10% 90px;
 }
 
-#loading{
- position:fixed;
- inset:0;
- z-index:10;
- background:#050409;
- display:grid;
- place-items:center;
- text-align:center;
- transition:opacity 1s;
+.hero-content {
+  position:relative;
+  z-index:3;
+  max-width:650px;
+  pointer-events:none;
 }
 
-#loading h2{
- font:25px Cinzel,serif;
- letter-spacing:7px;
- color:var(--gold2);
+.eyebrow {
+  color:var(--gold);
+  font-size:10px;
+  letter-spacing:5px;
+  margin-bottom:26px;
 }
 
-#loading p{
- margin-top:15px;
- font-size:9px;
- letter-spacing:4px;
- color:#8c7a84;
+.hero h1 {
+  font-family:'Cinzel',serif;
+  font-size:clamp(42px,8vw,100px);
+  line-height:1.13;
+  font-weight:500;
+  letter-spacing:2px;
 }
 
-@media(max-width:600px){
- nav{height:65px;padding:0 18px}
- .brand{font-size:17px}
- .nav-right{gap:12px}
- .nav-right button{font-size:8px}
- .hero h1{letter-spacing:6px}
- .hero p{letter-spacing:2px;line-height:2}
- .world-name{margin-top:25px}
- .bottom{padding:12px 15px 20px}
- .world-footer span{font-size:8px}
- .action{padding:10px}
- .panel{top:75px;right:10px;width:calc(100% - 20px)}
+.hero h1 span {
+  display:block;
+  color:var(--gold-light);
+}
+
+.hero p {
+  color:#aaa397;
+  max-width:440px;
+  font-size:13px;
+  line-height:2;
+  margin-top:30px;
+}
+
+.hero-link {
+  display:inline-block;
+  margin-top:35px;
+  color:var(--gold-light);
+  font-size:10px;
+  letter-spacing:3px;
+  text-decoration:none;
+  border-bottom:1px solid rgba(201,164,92,.5);
+  padding-bottom:10px;
+  pointer-events:auto;
+}
+
+.scroll-indicator {
+  position:absolute;
+  bottom:35px;
+  left:10%;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  color:#777064;
+  font-size:9px;
+  letter-spacing:3px;
+}
+
+.scroll-line {
+  height:1px;
+  width:45px;
+  background:var(--gold);
+  animation:linePulse 2s infinite;
+}
+
+/* SCENE SECTIONS */
+
+.scene-section {
+  position:relative;
+  min-height:100svh;
+  display:flex;
+  align-items:center;
+  padding:100px 10%;
+  border-top:1px solid rgba(255,255,255,.035);
+  overflow:hidden;
+}
+
+.scene-section:nth-of-type(even) {
+  justify-content:flex-end;
+}
+
+.scene-copy {
+  position:relative;
+  z-index:3;
+  max-width:390px;
+  padding:25px;
+  background:linear-gradient(90deg,rgba(5,5,5,.82),rgba(5,5,5,.25));
+  pointer-events:none;
+}
+
+.scene-number {
+  font-size:10px;
+  letter-spacing:4px;
+  color:var(--gold);
+  margin-bottom:20px;
+}
+
+.scene-copy h2 {
+  font-family:'Cinzel',serif;
+  font-weight:400;
+  font-size:clamp(30px,5vw,54px);
+  line-height:1.2;
+  color:#eee7da;
+}
+
+.scene-copy p {
+  color:#9c9589;
+  font-size:12px;
+  line-height:2;
+  margin-top:22px;
+}
+
+.scene-tag {
+  display:inline-block;
+  margin-top:27px;
+  border:1px solid rgba(201,164,92,.3);
+  color:var(--gold);
+  padding:9px 13px;
+  font-size:8px;
+  letter-spacing:2px;
+}
+
+.scene-hint {
+  position:absolute;
+  bottom:35px;
+  right:7%;
+  z-index:3;
+  color:#70695e;
+  font-size:9px;
+  letter-spacing:2px;
+}
+
+/* END */
+
+.final-section {
+  min-height:85svh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  position:relative;
+  padding:100px 20px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+
+.final-section h2 {
+  font-family:'Cinzel',serif;
+  font-size:clamp(35px,7vw,75px);
+  font-weight:400;
+  color:var(--gold-light);
+}
+
+.final-section p {
+  color:#888174;
+  font-size:11px;
+  letter-spacing:3px;
+  margin-top:25px;
+}
+
+footer {
+  position:relative;
+  z-index:3;
+  text-align:center;
+  padding:30px 15px;
+  border-top:1px solid rgba(255,255,255,.06);
+  color:#6f685d;
+  font-size:9px;
+  letter-spacing:2px;
+}
+
+/* ANIMATIONS */
+
+@keyframes breathe {
+  0%,100% {transform:scale(.85);opacity:.5}
+  50% {transform:scale(1.15);opacity:1}
+}
+
+@keyframes portalRotate {
+  to {transform:rotate(360deg)}
+}
+
+@keyframes rise {
+  from {opacity:0;transform:translateY(35px)}
+  to {opacity:1;transform:translateY(0)}
+}
+
+@keyframes musicBars {
+  from {height:3px}
+  to {height:13px}
+}
+
+@keyframes linePulse {
+  0%,100% {opacity:.3;transform:scaleX(.6);transform-origin:left}
+  50% {opacity:1;transform:scaleX(1)}
+}
+
+@media(max-width:700px) {
+  .topbar {height:65px;padding:0 5%}
+  .brand {font-size:10px;letter-spacing:2px}
+  .nav {display:none}
+  .sound-control {padding:9px;font-size:8px}
+  .hero {padding:110px 7% 100px}
+  .hero h1 {font-size:clamp(40px,12vw,65px)}
+  .hero p {font-size:12px}
+  .scroll-indicator {left:7%}
+  .scene-section {
+    padding:90px 5%;
+    align-items:flex-end;
+    padding-bottom:110px;
+  }
+  .scene-section:nth-of-type(even) {
+    justify-content:flex-start;
+  }
+  .scene-copy {
+    padding:18px;
+    background:linear-gradient(0deg,rgba(4,4,4,.93),rgba(4,4,4,.3));
+    max-width:100%;
+  }
+  .scene-copy h2 {font-size:35px}
+  .scene-copy p {font-size:11px}
+  .scene-hint {bottom:25px;right:5%;font-size:8px}
+  .intro-kicker {letter-spacing:3px}
+  .intro-description {line-height:2}
 }
 </style>
 </head>
 
-<body>
+<body class="locked">
 
-<div id="loading">
- <div>
-  <h2>OBSCURA</h2>
-  <p>GENERATING IMPOSSIBLE WORLDS</p>
- </div>
-</div>
+<div id="world"></div>
+<div class="ambient"></div>
 
-<div id="stage"></div>
+<!-- OPENING PAGE -->
 
-<div class="overlay">
+<div id="intro">
+  <div class="intro-glow"></div>
+  <div class="portal"></div>
 
-<nav>
- <div class="brand">
-  OBSCURA
-  <small>THE ART OF IMPOSSIBLE WORLDS</small>
- </div>
+  <div class="intro-content">
+    <div class="intro-kicker">AN EXPERIMENT BEYOND REALITY</div>
 
- <div class="nav-right">
-  <button id="labBtn">CODE LAB</button>
-  <button id="shaderBtn">SHADER LAB</button>
-  <button id="fullBtn">FULLSCREEN</button>
- </div>
-</nav>
+    <h1 class="intro-title">
+      MAMUN
+      <span>CODING FANTASY</span>
+    </h1>
 
-<section class="hero">
- <div class="kicker">BEYOND THE LIMITS OF IMAGINATION</div>
- <h1>OBSCURA</h1>
- <p>WHERE CODE BECOMES ANOTHER REALITY</p>
+    <div class="intro-description">
+      WHERE CODE BECOMES MAGIC
+    </div>
 
- <div class="world-name" id="worldName">THE GOTHIC KINGDOM</div>
- <div class="world-description" id="worldDesc">
-  A kingdom suspended between darkness and eternity.
- </div>
-</section>
-
-<div class="bottom">
-
- <div class="worlds" id="worlds">
-  <button class="active" data-world="castle">01 · KINGDOM</button>
-  <button data-world="dragon">02 · DRAGON REALM</button>
-  <button data-world="portal">03 · VOID PORTAL</button>
-  <button data-world="forest">04 · DARK FOREST</button>
-  <button data-world="islands">05 · DIMENSIONS</button>
-  <button data-world="flower">06 · ETERNAL BLOOM</button>
-  <button data-world="nebula">07 · COSMOS</button>
- </div>
-
- <div class="world-footer">
-  <span>REAL-TIME PROCEDURAL EXPERIENCE</span>
-  <div class="actions">
-   <button class="action" id="magicBtn">✦ CAST MAGIC</button>
-   <button class="action" id="autoBtn">AUTO: ON</button>
+    <button class="enter-btn" id="enterBtn">
+      ENTER THE EXPERIENCE
+    </button>
   </div>
- </div>
 
-</div>
-</div>
-
-<!-- PYTHON LAB -->
-
-<div class="panel" id="codePanel">
- <div class="panel-head">
-  <h2>PYTHON LAB</h2>
-  <button class="close" data-close="codePanel">×</button>
- </div>
-
- <p>
-  Explore procedural mathematics, fractals and generative art.
-  Python runs in your browser through Pyodide.
- </p>
-
- <label>PYTHON SOURCE CODE</label>
-
- <textarea id="pythonCode" spellcheck="false">import math
-
-print("OBSCURA - PYTHON ENGINE")
-print("-----------------------")
-
-# Generate a fantasy spiral
-for i in range(1, 16):
-    angle = i * 0.45
-    radius = i * 0.25
-
-    x = radius * math.cos(angle)
-    y = radius * math.sin(angle)
-
-    print(
-        f"Particle {i:02}: "
-        f"x={x:.3f}, y={y:.3f}"
-    )
-
-print("\\nFANTASY GEOMETRY GENERATED.")</textarea>
-
- <button class="panel-button" id="runPython">▶ RUN PYTHON</button>
-
- <div class="output" id="pythonOutput">
-  Python engine ready to initialize...
- </div>
-
- <label>MORE PYTHON EXPERIMENTS</label>
-
- <pre># Mandelbrot-style iteration
-z = 0
-c = complex(-0.4, 0.6)
-
-for i in range(50):
-    z = z*z + c
-
-print(z)</pre>
-
- <p>
-  Try changing the values, writing your own loops and exploring
-  mathematical patterns.
- </p>
+  <div class="intro-footer">
+    A DIGITAL UNIVERSE BY MAMUN
+  </div>
 </div>
 
-<!-- SHADER LAB -->
+<!-- MAIN WEBSITE -->
 
-<div class="panel" id="shaderPanel">
- <div class="panel-head">
-  <h2>VISUAL ENGINE</h2>
-  <button class="close" data-close="shaderPanel">×</button>
- </div>
+<main id="main">
 
- <p>Control the live environment in real time.</p>
+  <header class="topbar">
+    <div class="brand">MAMUN / FANTASY</div>
 
- <label>MAGICAL ENERGY</label>
- <input type="range" id="energySlider" min="0" max="100" value="75">
+    <nav class="nav">
+      <a href="#home">HOME</a>
+      <a href="#cube">CUBE</a>
+      <a href="#flower">FLOWER</a>
+      <a href="#worlds">WORLDS</a>
+    </nav>
 
- <label>ATMOSPHERIC GLOW</label>
- <input type="range" id="glowSlider" min="0" max="100" value="70">
+    <button class="sound-control playing" id="soundBtn">
+      <span class="sound-bars">
+        <i></i><i></i><i></i><i></i>
+      </span>
+      <span id="soundText">SOUND ON</span>
+    </button>
+  </header>
 
- <label>PARTICLE DENSITY</label>
- <input type="range" id="particleSlider" min="0" max="100" value="75">
+  <!-- HERO -->
 
- <label>CAMERA ZOOM</label>
- <input type="range" id="zoomSlider" min="7" max="25" value="14">
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <div class="eyebrow">WELCOME TO ANOTHER REALITY</div>
 
- <label>RENDERING TECHNIQUES</label>
- <pre>
-THREE.JS
-PROCEDURAL GEOMETRY
-PHYSICAL MATERIALS
-PARTICLE SYSTEMS
-POST-PROCESSING BLOOM
-ANIMATED LIGHTING
-REAL-TIME CAMERA
- </pre>
-</div>
+      <h1>
+        MAMUN
+        <span>CODING FANTASY</span>
+      </h1>
 
-<script type="importmap">
-{
- "imports":{
-  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
- }
-}
-</script>
+      <p>
+        Beyond the limits of imagination.
+        A world where geometry breathes,
+        matter transforms and impossible
+        creations come alive through code.
+      </p>
+
+      <a href="#cube" class="hero-link">
+        EXPLORE THE UNIVERSE ↓
+      </a>
+    </div>
+
+    <div class="scroll-indicator">
+      <span class="scroll-line"></span>
+      SCROLL TO DISCOVER
+    </div>
+  </section>
+
+  <!-- 01 -->
+
+  <section class="scene-section" id="cube" data-scene="cube">
+    <div class="scene-copy">
+      <div class="scene-number">01 / GEOMETRIC MATTER</div>
+      <h2>The Dark Cube</h2>
+      <p>
+        A mysterious geometric structure suspended in
+        the void. It fractures into countless fragments,
+        rotates through impossible dimensions and
+        reconstructs itself.
+      </p>
+      <span class="scene-tag">FRACTURE / REBUILD</span>
+    </div>
+    <div class="scene-hint">SCROLL TO TRANSFORM</div>
+  </section>
+
+  <!-- 02 -->
+
+  <section class="scene-section" id="flower" data-scene="flower">
+    <div class="scene-copy">
+      <div class="scene-number">02 / ORGANIC MAGIC</div>
+      <h2>The Eternal Bloom</h2>
+      <p>
+        An enchanted flower born from darkness.
+        Its petals unfold, float through the air
+        and dance around an ancient golden core.
+      </p>
+      <span class="scene-tag">BLOOM / DECAY / REBIRTH</span>
+    </div>
+    <div class="scene-hint">A NEW FORM OF LIFE</div>
+  </section>
+
+  <!-- 03 -->
+
+  <section class="scene-section" data-scene="liquid">
+    <div class="scene-copy">
+      <div class="scene-number">03 / LIQUID DIMENSION</div>
+      <h2>The Liquid Soul</h2>
+      <p>
+        A living metallic entity. Its surface
+        constantly changes, stretches and folds
+        into shapes that should not exist.
+      </p>
+      <span class="scene-tag">MORPHING MATTER</span>
+    </div>
+    <div class="scene-hint">MATTER WITHOUT LIMITS</div>
+  </section>
+
+  <!-- 04 -->
+
+  <section class="scene-section" data-scene="clock">
+    <div class="scene-copy">
+      <div class="scene-number">04 / MECHANICAL FANTASY</div>
+      <h2>The Time Machine</h2>
+      <p>
+        An ancient mechanism with rotating rings,
+        floating gears and a mysterious core.
+        Every component moves in its own rhythm.
+      </p>
+      <span class="scene-tag">TIME / MOTION / PRECISION</span>
+    </div>
+    <div class="scene-hint">BEYOND TIME</div>
+  </section>
+
+  <!-- 05 -->
+
+  <section class="scene-section" data-scene="butterfly">
+    <div class="scene-copy">
+      <div class="scene-number">05 / LIVING ENERGY</div>
+      <h2>The Shadow Butterfly</h2>
+      <p>
+        A supernatural creature with crystalline
+        wings. It opens, closes and dissolves into
+        a cloud of golden particles.
+      </p>
+      <span class="scene-tag">FLIGHT / PARTICLES</span>
+    </div>
+    <div class="scene-hint">BORN FROM SHADOW</div>
+  </section>
+
+  <!-- 06 -->
+
+  <section class="scene-section" data-scene="dimension">
+    <div class="scene-copy">
+      <div class="scene-number">06 / IMPOSSIBLE ARCHITECTURE</div>
+      <h2>The Impossible Dimension</h2>
+      <p>
+        Floating structures, rotating platforms
+        and architectural forms that challenge
+        gravity and ordinary perception.
+      </p>
+      <span class="scene-tag">GRAVITY / DIMENSIONS</span>
+    </div>
+    <div class="scene-hint">NOTHING IS IMPOSSIBLE</div>
+  </section>
+
+  <!-- 07 -->
+
+  <section class="scene-section" data-scene="eye">
+    <div class="scene-copy">
+      <div class="scene-number">07 / COSMIC INTELLIGENCE</div>
+      <h2>The All-Seeing Eye</h2>
+      <p>
+        A mysterious eye surrounded by rotating
+        metallic rings. Its gaze follows the
+        movement of your cursor.
+      </p>
+      <span class="scene-tag">OBSERVE / FOLLOW / AWAKEN</span>
+    </div>
+    <div class="scene-hint">IT SEES EVERYTHING</div>
+  </section>
+
+  <!-- 08 -->
+
+  <section class="scene-section" data-scene="dragon">
+    <div class="scene-copy">
+      <div class="scene-number">08 / ANCIENT CREATURES</div>
+      <h2>The Forgotten Dragon</h2>
+      <p>
+        An ancient skeletal dragon emerges
+        from the darkness. Its wings unfold
+        as its eyes awaken with golden energy.
+      </p>
+      <span class="scene-tag">ANCIENT / MYTH / POWER</span>
+    </div>
+    <div class="scene-hint">AWAKEN THE LEGEND</div>
+  </section>
+
+  <section class="final-section" id="worlds">
+    <div>
+      <div class="eyebrow">THE END IS ANOTHER BEGINNING</div>
+      <h2>IMAGINATION<br>HAS NO LIMITS.</h2>
+      <p>CREATED THROUGH CODE. BROUGHT TO LIFE BY FANTASY.</p>
+    </div>
+  </section>
+
+  <footer>
+    MAMUN CODING FANTASY · AN EXPERIMENT IN DIGITAL ART
+  </footer>
+
+</main>
+
+<audio id="backgroundMusic" src="music.mp3" loop preload="auto"></audio>
 
 <script type="module">
-
 import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-import {EffectComposer}
-from 'three/addons/postprocessing/EffectComposer.js';
+/* ------------------------------------------------
+   BASIC THREE.JS SETUP
+------------------------------------------------ */
 
-import {RenderPass}
-from 'three/addons/postprocessing/RenderPass.js';
+const mount = document.getElementById('world');
 
-import {UnrealBloomPass}
-from 'three/addons/postprocessing/UnrealBloomPass.js';
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x050505);
+scene.fog = new THREE.FogExp2(0x050505,0.025);
 
-import {OutputPass}
-from 'three/addons/postprocessing/OutputPass.js';
-
-// ======================================
-// ENGINE
-// ======================================
-
-const stage=document.getElementById('stage');
-
-const scene=new THREE.Scene();
-
-scene.background=new THREE.Color('#050409');
-scene.fog=new THREE.FogExp2('#09050e',.025);
-
-const camera=new THREE.PerspectiveCamera(
- 45,innerWidth/innerHeight,.1,150
+const camera = new THREE.PerspectiveCamera(
+  45,
+  innerWidth/innerHeight,
+  0.1,
+  100
 );
 
-camera.position.set(0,4,14);
-camera.lookAt(0,2,0);
+camera.position.set(0,0,9);
 
-const renderer=new THREE.WebGLRenderer({
- antialias:true,
- powerPreference:'high-performance'
+const renderer = new THREE.WebGLRenderer({
+  antialias:true,
+  alpha:true,
+  powerPreference:'high-performance'
 });
 
-renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
-renderer.outputColorSpace=THREE.SRGBColorSpace;
-renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.15;
+renderer.setSize(innerWidth,innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
 
-stage.appendChild(renderer.domElement);
+mount.appendChild(renderer.domElement);
 
-// POST PROCESSING
-
-const composer=new EffectComposer(renderer);
-
+const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene,camera));
 
-const bloom=new UnrealBloomPass(
- new THREE.Vector2(innerWidth,innerHeight),
- 1.2,.6,.15
+const bloom = new UnrealBloomPass(
+  new THREE.Vector2(innerWidth,innerHeight),
+  0.75,
+  0.55,
+  0.15
 );
 
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
 
-// ======================================
-// LIGHTS
-// ======================================
+/* LIGHTS */
 
-scene.add(new THREE.AmbientLight('#87718e',.5));
+scene.add(new THREE.AmbientLight(0x88765b,1.2));
 
-const goldLight=new THREE.PointLight('#d8a65e',180,40);
-goldLight.position.set(2,8,5);
+const goldLight = new THREE.PointLight(0xd7a85e,90,30);
+goldLight.position.set(3,3,5);
 scene.add(goldLight);
 
-const violetLight=new THREE.PointLight('#8d3aff',180,40);
-violetLight.position.set(-7,4,-5);
-scene.add(violetLight);
+const rimLight = new THREE.PointLight(0x70523a,65,30);
+rimLight.position.set(-5,-2,-4);
+scene.add(rimLight);
 
-const redLight=new THREE.PointLight('#b32c5a',100,30);
-redLight.position.set(5,3,-5);
-scene.add(redLight);
+const frontLight = new THREE.PointLight(0xffd99b,40,20);
+frontLight.position.set(0,4,5);
+scene.add(frontLight);
 
-// ======================================
-// ENVIRONMENT
-// ======================================
+/* ------------------------------------------------
+   GLOBAL STATE
+------------------------------------------------ */
 
-const floor=new THREE.Mesh(
- new THREE.CircleGeometry(100,80),
- new THREE.MeshStandardMaterial({
-  color:'#100b14',
-  roughness:.6,
-  metalness:.4
- })
-);
+let activeGroup = new THREE.Group();
+scene.add(activeGroup);
 
-floor.rotation.x=-Math.PI/2;
-floor.position.y=-1;
-scene.add(floor);
+let currentScene = '';
+let sceneTime = 0;
+let mouseX = 0;
+let mouseY = 0;
+let targetX = 0;
+let targetY = 0;
+let scrollProgress = 0;
 
-// Star field
+const clock = new THREE.Clock();
 
-const starCount=3000;
-const starPositions=new Float32Array(starCount*3);
+const gold = new THREE.MeshStandardMaterial({
+  color:0x98713b,
+  metalness:0.9,
+  roughness:0.23,
+  emissive:0x291806,
+  emissiveIntensity:0.6
+});
 
-for(let i=0;i<starCount;i++){
- starPositions[i*3]=(Math.random()-.5)*90;
- starPositions[i*3+1]=Math.random()*35-5;
- starPositions[i*3+2]=(Math.random()-.5)*90;
-}
+const darkMetal = new THREE.MeshStandardMaterial({
+  color:0x171513,
+  metalness:0.95,
+  roughness:0.19
+});
 
-const starGeo=new THREE.BufferGeometry();
-
-starGeo.setAttribute(
- 'position',
- new THREE.BufferAttribute(starPositions,3)
-);
-
-const stars=new THREE.Points(
- starGeo,
- new THREE.PointsMaterial({
-  color:'#d9bce8',
-  size:.055,
+const crystal = new THREE.MeshPhysicalMaterial({
+  color:0x27201b,
+  metalness:0.45,
+  roughness:0.12,
+  transmission:0.25,
+  thickness:1,
   transparent:true,
-  opacity:.8
- })
-);
-
-scene.add(stars);
-
-// ======================================
-// WORLD MANAGEMENT
-// ======================================
-
-const worlds={};
-let currentWorld='castle';
-
-function newWorld(name){
- const group=new THREE.Group();
- group.name=name;
- scene.add(group);
- worlds[name]=group;
- return group;
-}
-
-// ======================================
-// MATERIALS
-// ======================================
-
-const obsidian=new THREE.MeshStandardMaterial({
- color:'#17121e',
- roughness:.25,
- metalness:.75
+  opacity:0.92
 });
 
-const stone=new THREE.MeshStandardMaterial({
- color:'#332735',
- roughness:.85,
- metalness:.1
+const glowMaterial = new THREE.MeshBasicMaterial({
+  color:0xe4bd76
 });
 
-const gold=new THREE.MeshStandardMaterial({
- color:'#d4a35b',
- metalness:.85,
- roughness:.2,
- emissive:'#5d3312',
- emissiveIntensity:.6
-});
+/* HELPERS */
 
-const magic=new THREE.MeshStandardMaterial({
- color:'#8b38d5',
- emissive:'#701dba',
- emissiveIntensity:2,
- metalness:.4,
- roughness:.2
-});
-
-const green=new THREE.MeshStandardMaterial({
- color:'#234b34',
- roughness:.4
-});
-
-// ======================================
-// SHARED OBJECT HELPERS
-// ======================================
-
-function box(parent,x,y,z,sx,sy,sz,mat){
- const m=new THREE.Mesh(
-  new THREE.BoxGeometry(sx,sy,sz),mat
- );
- m.position.set(x,y,z);
- parent.add(m);
- return m;
+function addMesh(parent,geometry,material,x=0,y=0,z=0) {
+  const mesh = new THREE.Mesh(geometry,material);
+  mesh.position.set(x,y,z);
+  parent.add(mesh);
+  return mesh;
 }
 
-function sphere(parent,x,y,z,r,mat,detail=2){
- const m=new THREE.Mesh(
-  new THREE.IcosahedronGeometry(r,detail),mat
- );
- m.position.set(x,y,z);
- parent.add(m);
- return m;
+function addRing(parent,radius,tube,x=0,y=0,z=0,material=gold) {
+  const mesh = addMesh(
+    parent,
+    new THREE.TorusGeometry(radius,tube,12,100),
+    material,x,y,z
+  );
+  return mesh;
 }
 
-function cone(parent,x,y,z,r,h,mat,segments=8){
- const m=new THREE.Mesh(
-  new THREE.ConeGeometry(r,h,segments),mat
- );
- m.position.set(x,y,z);
- parent.add(m);
- return m;
-}
-
-function torus(parent,x,y,z,r,t,mat){
- const m=new THREE.Mesh(
-  new THREE.TorusGeometry(r,t,8,100),mat
- );
- m.position.set(x,y,z);
- parent.add(m);
- return m;
-}
-
-// ======================================
-// 01. GOTHIC KINGDOM
-// ======================================
-
-{
- const g=newWorld('castle');
-
- // Castle base
-
- box(g,0,1.1,0,5,3,4,stone);
-
- // Main towers
-
- const towerPositions=[
-  [-2.4,2,-1.8],
-  [2.4,2,-1.8],
-  [-2.4,2,1.8],
-  [2.4,2,1.8]
- ];
-
- towerPositions.forEach(([x,y,z])=>{
-
-  const t=new THREE.Mesh(
-   new THREE.CylinderGeometry(.5,.7,4,12),
-   obsidian
-  );
-
-  t.position.set(x,y,z);
-  g.add(t);
-
-  cone(g,x,4.6,z,.75,1.6,obsidian,8);
-
-  sphere(g,x,3.9,z,.09,gold);
- });
-
- // Central keep
-
- box(g,0,2,0,2,4,2,obsidian);
-
- cone(g,0,4.8,0,1.3,2,obsidian,9);
-
- // Windows
-
- for(let x=-1;x<=1;x+=2){
-  for(let y=1;y<=3;y+=1.2){
-
-   const w=new THREE.Mesh(
-    new THREE.BoxGeometry(.12,.6,.05),
-    magic
-   );
-
-   w.position.set(x,y,1.03);
-   g.add(w);
-  }
- }
-
- // Floating ruins
-
- for(let i=0;i<9;i++){
-
-  const a=i/9*Math.PI*2;
-  const r=6+Math.random()*2;
-
-  const rock=sphere(
-   g,Math.cos(a)*r,
-   Math.random()*2+1,
-   Math.sin(a)*r,
-   .7,stone,1
-  );
-
-  rock.scale.set(1.4,.65,1);
- }
-}
-
-// ======================================
-// 02. DRAGON REALM
-// ======================================
-
-const dragonParts=[];
-
-{
- const g=newWorld('dragon');
-
- const dragon=new THREE.Group();
- g.add(dragon);
-
- const body=sphere(dragon,0,3,0,1,obsidian,3);
- body.scale.set(1.7,.7,.8);
-
- const neck=sphere(dragon,0,3.5,1, .48,obsidian,2);
- neck.scale.set(.7,1,1.4);
-
- const head=sphere(dragon,0,4.1,2,.45,obsidian,2);
-
- // Snout
-
- box(dragon,0,3.95,2.5,.4,.25,.7,obsidian);
-
- // Horns
-
- cone(dragon,-.3,4.7,1.9,.15,.8,gold);
- cone(dragon,.3,4.7,1.9,.15,.8,gold);
-
- // Eyes
-
- sphere(dragon,-.35,4.2,2.3,.09,magic);
- sphere(dragon,.35,4.2,2.3,.09,magic);
-
- // Wings
-
- const wingMaterial=new THREE.MeshStandardMaterial({
-  color:'#30152e',
-  roughness:.45,
-  metalness:.4,
-  side:THREE.DoubleSide
- });
-
- for(let side of [-1,1]){
-
-  const wing=new THREE.Group();
-  wing.position.set(side*.5,3.4,0);
-
-  const shape=new THREE.Shape();
-
-  shape.moveTo(0,0);
-  shape.lineTo(side*2.8,.9);
-  shape.lineTo(side*3.4,-.3);
-  shape.lineTo(side*2,-.1);
-  shape.lineTo(side*1.4,-1.2);
-  shape.lineTo(side*.7,-.4);
-  shape.closePath();
-
-  const mesh=new THREE.Mesh(
-   new THREE.ShapeGeometry(shape),
-   wingMaterial
-  );
-
-  wing.add(mesh);
-  dragon.add(wing);
-
-  dragonParts.push({wing,side});
- }
-
- // Tail
-
- const tailCurve=new THREE.CatmullRomCurve3([
-  new THREE.Vector3(0,2.9,-.5),
-  new THREE.Vector3(.3,2.4,-1.7),
-  new THREE.Vector3(-.1,2.6,-2.7),
-  new THREE.Vector3(0,3.1,-3.5)
- ]);
-
- dragon.add(new THREE.Mesh(
-  new THREE.TubeGeometry(tailCurve,40,.12,8,false),
-  obsidian
- ));
-
- dragon.position.y=.3;
- dragon.userData.dragon=true;
-}
-
-// ======================================
-// 03. VOID PORTAL
-// ======================================
-
-{
- const g=newWorld('portal');
-
- // Portal frame
-
- const frame=new THREE.Group();
- g.add(frame);
-
- torus(frame,0,3,0,2.4,.16,gold);
-
- torus(frame,0,3,0,2.15,.04,magic);
-
- // Portal energy rings
-
- const portalRings=[];
-
- for(let i=0;i<5;i++){
-
-  const ring=torus(
-   frame,0,3,-.1+i*.035,
-   1.6+i*.13,.018,
-   i%2?gold:magic
-  );
-
-  portalRings.push(ring);
- }
-
- frame.userData.rings=portalRings;
-
- // Central vortex
-
- const vortex=new THREE.Mesh(
-  new THREE.CircleGeometry(1.95,80),
-  new THREE.MeshBasicMaterial({
-   color:'#250b3f',
-   transparent:true,
-   opacity:.7,
-   side:THREE.DoubleSide
-  })
- );
-
- vortex.position.set(0,3,-.15);
- g.add(vortex);
-
- const inner=new THREE.Mesh(
-  new THREE.TorusGeometry(1.5,.12,12,100),
-  magic
- );
-
- inner.position.set(0,3,.05);
- g.add(inner);
-
- frame.userData.inner=inner;
-
- // Floating symbols
-
- for(let i=0;i<12;i++){
-
-  const a=i/12*Math.PI*2;
-
-  sphere(
-   g,Math.cos(a)*3.1,
-   3+Math.sin(a)*3.1,
-   0,.13,gold,1
-  );
- }
-}
-
-// ======================================
-// 04. DARK FOREST
-// ======================================
-
-{
- const g=newWorld('forest');
-
- for(let i=0;i<36;i++){
-
-  const a=Math.random()*Math.PI*2;
-  const r=3+Math.random()*8;
-
-  const x=Math.cos(a)*r;
-  const z=Math.sin(a)*r;
-
-  const height=3+Math.random()*4;
-
-  const trunk=new THREE.Mesh(
-   new THREE.CylinderGeometry(.18,.4,height,8),
-   stone
-  );
-
-  trunk.position.set(x,height/2,z);
-  g.add(trunk);
-
-  const branches=new THREE.Mesh(
-   new THREE.ConeGeometry(
-    1.3+Math.random(),
-    3+Math.random()*2,
-    7
-   ),
-   green
-  );
-
-  branches.position.set(x,height+1,z);
-  g.add(branches);
-
-  if(i%3===0){
-
-   sphere(
-    g,x+1,height*.45,z,
-    .12,magic,1
-   );
-  }
- }
-
- // Glowing mushrooms
-
- for(let i=0;i<35;i++){
-
-  const x=(Math.random()-.5)*14;
-  const z=(Math.random()-.5)*14;
-
-  const stem=new THREE.Mesh(
-   new THREE.CylinderGeometry(.025,.04,.3,6),
-   gold
-  );
-
-  stem.position.set(x,.15,z);
-  g.add(stem);
-
-  sphere(g,x,.34,z,.13,magic,1);
- }
-}
-
-// ======================================
-// 05. FLOATING DIMENSIONS
-// ======================================
-
-{
- const g=newWorld('islands');
-
- for(let i=0;i<8;i++){
-
-  const a=i/8*Math.PI*2;
-  const r=4+Math.random()*4;
-
-  const island=new THREE.Group();
-
-  island.position.set(
-   Math.cos(a)*r,
-   1+Math.random()*4,
-   Math.sin(a)*r
-  );
-
-  g.add(island);
-
-  const rock=new THREE.Mesh(
-   new THREE.ConeGeometry(1.5,3,7),
-   stone
-  );
-
-  rock.rotation.x=Math.PI;
-  island.add(rock);
-
-  const top=new THREE.Mesh(
-   new THREE.CylinderGeometry(1.5,1.2,.25,8),
-   green
-  );
-
-  top.position.y=1.2;
-  island.add(top);
-
-  cone(island,0,2,0,.5,1.5,obsidian);
-
-  island.userData.float=true;
-  island.userData.phase=Math.random()*5;
- }
-}
-
-// ======================================
-// 06. ETERNAL BLOOM
-// ======================================
-
-const bloomPetals=[];
-
-{
- const g=newWorld('flower');
-
- const head=new THREE.Group();
- head.position.y=4;
- g.add(head);
-
- function petalGeometry(){
-
-  const points=[];
-  const indices=[];
-
-  const rows=25,cols=18;
-
-  for(let i=0;i<=rows;i++){
-
-   const t=i/rows;
-
-   for(let j=0;j<=cols;j++){
-
-    const u=j/cols*2-1;
-    const w=.6*Math.sin(Math.PI*t);
-
-    points.push(
-     u*w,
-     .3*t*t+.2*Math.sin(Math.PI*t)*(1-u*u),
-     t*2
-    );
-   }
+function addParticles(parent,count=500,spread=12) {
+  const positions = new Float32Array(count*3);
+
+  for(let i=0;i<count;i++) {
+    positions[i*3]=(Math.random()-.5)*spread;
+    positions[i*3+1]=(Math.random()-.5)*spread;
+    positions[i*3+2]=(Math.random()-.5)*spread;
   }
 
-  for(let i=0;i<rows;i++){
-   for(let j=0;j<cols;j++){
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(positions,3));
 
-    const a=i*(cols+1)+j;
-    const b=a+cols+1;
-
-    indices.push(a,b,a+1,b,b+1,a+1);
-   }
-  }
-
-  const geo=new THREE.BufferGeometry();
-
-  geo.setAttribute(
-   'position',
-   new THREE.Float32BufferAttribute(points,3)
-  );
-
-  geo.setIndex(indices);
-  geo.computeVertexNormals();
-
-  return geo;
- }
-
- const material=new THREE.MeshPhysicalMaterial({
-  color:'#9e367c',
-  emissive:'#30102e',
-  emissiveIntensity:.7,
-  roughness:.22,
-  metalness:.2,
-  side:THREE.DoubleSide,
-  clearcoat:1
- });
-
- for(let layer=0;layer<3;layer++){
-
-  for(let i=0;i<12;i++){
-
-   const a=i/12*Math.PI*2;
-
-   const group=new THREE.Group();
-
-   group.rotation.y=a;
-   group.rotation.x=-.3-layer*.3;
-
-   const mesh=new THREE.Mesh(
-    petalGeometry(),material
-   );
-
-   group.add(mesh);
-
-   group.scale.setScalar(.8+layer*.08);
-
-   head.add(group);
-
-   bloomPetals.push(group);
-  }
- }
-
- sphere(head,0,.1,0,.38,gold,3);
-
- // Stem
-
- const stem=new THREE.Mesh(
-  new THREE.CylinderGeometry(.08,.13,4,12),
-  green
- );
-
- stem.position.y=2;
- g.add(stem);
-}
-
-// ======================================
-// 07. COSMOS / NEBULA
-// ======================================
-
-{
- const g=newWorld('nebula');
-
- const nebulaColors=[
-  '#6b36c0','#b12b74','#d39b58'
- ];
-
- for(let j=0;j<3;j++){
-
-  const positions=new Float32Array(1800*3);
-
-  for(let i=0;i<1800;i++){
-
-   const a=Math.random()*Math.PI*2;
-   const r=Math.random()*7;
-
-   positions[i*3]=Math.cos(a)*r;
-   positions[i*3+1]=(Math.random()-.5)*4;
-   positions[i*3+2]=Math.sin(a)*r;
-  }
-
-  const geo=new THREE.BufferGeometry();
-
-  geo.setAttribute(
-   'position',
-   new THREE.BufferAttribute(positions,3)
-  );
-
-  const cloud=new THREE.Points(
-   geo,
-   new THREE.PointsMaterial({
-    color:nebulaColors[j],
-    size:.075+j*.025,
+  const mat = new THREE.PointsMaterial({
+    color:0xc7a064,
+    size:0.025,
     transparent:true,
-    opacity:.35,
-    blending:THREE.AdditiveBlending,
-    depthWrite:false
-   })
+    opacity:0.65,
+    sizeAttenuation:true
+  });
+
+  const points = new THREE.Points(geo,mat);
+  parent.add(points);
+  return points;
+}
+
+function clearScene() {
+  scene.remove(activeGroup);
+
+  activeGroup.traverse(obj=>{
+    if(obj.geometry) obj.geometry.dispose();
+  });
+
+  activeGroup = new THREE.Group();
+  scene.add(activeGroup);
+}
+
+/* ------------------------------------------------
+   SCENE 01 - DARK CUBE
+------------------------------------------------ */
+
+function createCube() {
+  const group = new THREE.Group();
+
+  const cubeGroup = new THREE.Group();
+  group.add(cubeGroup);
+
+  const core = addMesh(
+    cubeGroup,
+    new THREE.BoxGeometry(2.1,2.1,2.1),
+    darkMetal
   );
 
-  g.add(cloud);
- }
+  const edges = new THREE.EdgesGeometry(core.geometry);
+  const lines = new THREE.LineSegments(
+    edges,
+    new THREE.LineBasicMaterial({
+      color:0xe0b96d,
+      transparent:true,
+      opacity:0.85
+    })
+  );
 
- const planet=sphere(g,0,2,0,1.7,obsidian,4);
+  cubeGroup.add(lines);
 
- planet.material=new THREE.MeshPhysicalMaterial({
-  color:'#21132e',
-  roughness:.3,
-  metalness:.6,
-  emissive:'#2a0c43',
-  emissiveIntensity:.4
- });
+  const fragments=[];
 
- torus(g,0,2,0,2.4,.045,gold).rotation.x=.7;
+  for(let i=0;i<24;i++) {
+    const piece=addMesh(
+      cubeGroup,
+      new THREE.BoxGeometry(
+        .22+Math.random()*.35,
+        .22+Math.random()*.35,
+        .22+Math.random()*.35
+      ),
+      i%3===0?gold:darkMetal
+    );
+
+    const direction = new THREE.Vector3(
+      Math.random()-.5,
+      Math.random()-.5,
+      Math.random()-.5
+    ).normalize();
+
+    fragments.push({
+      mesh:piece,
+      direction,
+      speed:.5+Math.random()*1.4,
+      phase:Math.random()*Math.PI*2
+    });
+  }
+
+  const ring1=addRing(group,2.3,.012,0,0,0,gold);
+  const ring2=addRing(group,2.7,.009,0,0,0,glowMaterial);
+
+  ring1.rotation.x=1;
+  ring2.rotation.y=1;
+
+  addParticles(group,450,12);
+
+  group.userData.update=t=>{
+    cubeGroup.rotation.x=t*.22;
+    cubeGroup.rotation.y=t*.34;
+
+    const explode=(Math.sin(t*.8)+1)/2;
+
+    core.scale.setScalar(1-explode*.13);
+
+    fragments.forEach(f=>{
+      const distance=explode*.9;
+
+      f.mesh.position.copy(
+        f.direction.clone().multiplyScalar(distance*f.speed)
+      );
+
+      f.mesh.rotation.x=t*.6+f.phase;
+      f.mesh.rotation.y=t*.7+f.phase;
+    });
+
+    ring1.rotation.z=t*.3;
+    ring2.rotation.x=t*.2;
+  };
+
+  return group;
 }
 
-// ======================================
-// GLOBAL MAGIC PARTICLES
-// ======================================
+/* ------------------------------------------------
+   SCENE 02 - ETERNAL BLOOM
+------------------------------------------------ */
 
-const particleCount=2400;
+function createFlower() {
+  const group=new THREE.Group();
+  const flower=new THREE.Group();
+  group.add(flower);
 
-const particlePositions=new Float32Array(particleCount*3);
-const particleSpeeds=[];
+  const stem=addMesh(
+    flower,
+    new THREE.CylinderGeometry(.045,.07,2.7,12),
+    darkMetal,
+    0,-1.2,0
+  );
 
-for(let i=0;i<particleCount;i++){
+  stem.rotation.z=-.08;
 
- particlePositions[i*3]=(Math.random()-.5)*28;
- particlePositions[i*3+1]=Math.random()*14-2;
- particlePositions[i*3+2]=(Math.random()-.5)*25;
+  const core=addMesh(
+    flower,
+    new THREE.SphereGeometry(.3,32,32),
+    gold,
+    0,.2,0
+  );
 
- particleSpeeds.push(.1+Math.random()*.7);
+  const petals=[];
+
+  for(let i=0;i<12;i++) {
+    const angle=(i/12)*Math.PI*2;
+
+    const geo=new THREE.SphereGeometry(
+      1,32,24,0,Math.PI*2,0,Math.PI*.75
+    );
+
+    geo.scale(.33,.95,.15);
+
+    const petal=addMesh(
+      flower,geo,crystal,
+      Math.cos(angle)*.25,
+      .25,
+      Math.sin(angle)*.25
+    );
+
+    petal.rotation.z=-Math.PI/2;
+    petal.rotation.y=-angle;
+
+    petals.push({
+      mesh:petal,
+      angle,
+      offset:Math.random()
+    });
+  }
+
+  const halo=addRing(group,1.8,.012);
+  halo.rotation.x=1.1;
+
+  addParticles(group,350,9);
+
+  group.userData.update=t=>{
+    flower.rotation.y=t*.18;
+
+    petals.forEach(p=>{
+      const open=(Math.sin(t*.8)+1)/2;
+
+      p.mesh.position.x=Math.cos(p.angle)*(.2+open*.55);
+      p.mesh.position.z=Math.sin(p.angle)*(.2+open*.55);
+
+      p.mesh.rotation.z=-1.2+open*.8;
+      p.mesh.rotation.x=Math.sin(t+p.offset)*.15;
+    });
+
+    core.scale.setScalar(1+Math.sin(t*2)*.08);
+    halo.rotation.z=t*.25;
+  };
+
+  return group;
 }
 
-const particleGeometry=new THREE.BufferGeometry();
+/* ------------------------------------------------
+   SCENE 03 - LIQUID SOUL
+------------------------------------------------ */
 
-particleGeometry.setAttribute(
- 'position',
- new THREE.BufferAttribute(particlePositions,3)
-);
+function createLiquid() {
+  const group=new THREE.Group();
 
-const particleSystem=new THREE.Points(
- particleGeometry,
- new THREE.PointsMaterial({
-  color:'#d8adff',
-  size:.035,
-  transparent:true,
-  opacity:.75,
-  blending:THREE.AdditiveBlending,
-  depthWrite:false
- })
-);
+  const sphere=addMesh(
+    group,
+    new THREE.IcosahedronGeometry(1.35,5),
+    new THREE.MeshPhysicalMaterial({
+      color:0x8b7759,
+      metalness:1,
+      roughness:.12,
+      clearcoat:1,
+      clearcoatRoughness:.05
+    })
+  );
 
-scene.add(particleSystem);
+  const rings=[];
 
-// ======================================
-// WORLD SWITCHING
-// ======================================
+  for(let i=0;i<4;i++) {
+    const ring=addRing(group,2+i*.3,.014);
+    ring.rotation.set(
+      Math.random()*Math.PI,
+      Math.random()*Math.PI,
+      Math.random()*Math.PI
+    );
+    rings.push(ring);
+  }
 
-const descriptions={
- castle:['THE GOTHIC KINGDOM',
- 'A kingdom suspended between darkness and eternity.'],
- dragon:['THE DRAGON REALM',
- 'Where ancient beasts guard the secrets of creation.'],
- portal:['THE VOID PORTAL',
- 'A gateway between realities and forgotten dimensions.'],
- forest:['THE ENCHANTED FOREST',
- 'Where every shadow hides another living world.'],
- islands:['FLOATING DIMENSIONS',
- 'Fragments of lost worlds drifting through eternity.'],
- flower:['THE ETERNAL BLOOM',
- 'A living artifact born from ancient magic.'],
- nebula:['THE COSMIC ABYSS',
- 'Infinite stars, forgotten galaxies and cosmic energy.']
+  addParticles(group,500,11);
+
+  group.userData.update=t=>{
+    const position=sphere.geometry.attributes.position;
+
+    for(let i=0;i<position.count;i++) {
+      const x=position.getX(i);
+      const y=position.getY(i);
+      const z=position.getZ(i);
+
+      const wave=
+        1+
+        Math.sin(x*3+t*1.4)*.09+
+        Math.cos(y*4+t)*.07+
+        Math.sin(z*3-t)*.06;
+
+      position.setXYZ(i,x*wave,y*wave,z*wave);
+    }
+
+    position.needsUpdate=true;
+    sphere.geometry.computeVertexNormals();
+
+    sphere.rotation.y=t*.24;
+    sphere.rotation.x=Math.sin(t*.3)*.2;
+
+    rings.forEach((r,i)=>{
+      r.rotation.x+=.003*(i+1);
+      r.rotation.y+=.006*(i+1);
+    });
+  };
+
+  return group;
+}
+
+/* ------------------------------------------------
+   SCENE 04 - TIME MACHINE
+------------------------------------------------ */
+
+function createClock() {
+  const group=new THREE.Group();
+
+  const central=addMesh(
+    group,
+    new THREE.CylinderGeometry(.55,.55,.16,64),
+    darkMetal
+  );
+
+  central.rotation.x=Math.PI/2;
+
+  const rings=[];
+
+  for(let i=0;i<5;i++) {
+    const ring=addRing(group,1.25+i*.38,.035,i%2===0?0:.1);
+    ring.rotation.set(i*.7,i*.45,i*.3);
+    rings.push(ring);
+  }
+
+  const gears=[];
+
+  for(let i=0;i<8;i++) {
+    const gear=new THREE.Group();
+
+    const body=addMesh(
+      gear,
+      new THREE.CylinderGeometry(.3,.3,.1,12),
+      gold
+    );
+
+    body.rotation.x=Math.PI/2;
+
+    for(let j=0;j<12;j++) {
+      const a=j/12*Math.PI*2;
+
+      addMesh(
+        gear,
+        new THREE.BoxGeometry(.1,.14,.12),
+        gold,
+        Math.cos(a)*.34,
+        Math.sin(a)*.34,
+        0
+      );
+    }
+
+    gear.position.set(
+      Math.cos(i/8*Math.PI*2)*1.2,
+      Math.sin(i/8*Math.PI*2)*1.2,
+      (i%3-1)*.3
+    );
+
+    group.add(gear);
+    gears.push(gear);
+  }
+
+  addParticles(group,300,10);
+
+  group.userData.update=t=>{
+    rings.forEach((r,i)=>{
+      r.rotation.x=t*(.12+i*.08);
+      r.rotation.y=t*(.2+i*.05);
+      r.rotation.z=t*(.16+i*.06);
+    });
+
+    gears.forEach((g,i)=>{
+      g.rotation.z=t*(i%2===0?.6:-.6);
+    });
+
+    central.rotation.z=t*.2;
+  };
+
+  return group;
+}
+
+/* ------------------------------------------------
+   SCENE 05 - SHADOW BUTTERFLY
+------------------------------------------------ */
+
+function createButterfly() {
+  const group=new THREE.Group();
+
+  const body=addMesh(
+    group,
+    new THREE.CapsuleGeometry(.09,.9,6,12),
+    darkMetal
+  );
+
+  body.rotation.x=Math.PI/2;
+
+  const wings=[];
+
+  for(let side of [-1,1]) {
+    for(let i=0;i<2;i++) {
+      const wing=addMesh(
+        group,
+        new THREE.SphereGeometry(1,32,32),
+        crystal
+      );
+
+      wing.scale.set(.8-i*.18,.58-i*.12,.07);
+      wing.position.set(side*.55,.35-i*.6,0);
+      wing.rotation.z=side*.3;
+
+      wings.push({mesh:wing,side,i});
+    }
+  }
+
+  const particles=addParticles(group,700,7);
+
+  group.userData.update=t=>{
+    wings.forEach(w=>{
+      w.mesh.rotation.y=
+        w.side*(Math.sin(t*5)*.75+.15);
+
+      w.mesh.rotation.z=
+        w.side*(.2+Math.sin(t*5)*.12);
+    });
+
+    group.position.y=Math.sin(t*1.3)*.3;
+    group.rotation.y=Math.sin(t*.5)*.3;
+
+    particles.rotation.y=t*.08;
+  };
+
+  return group;
+}
+
+/* ------------------------------------------------
+   SCENE 06 - IMPOSSIBLE DIMENSION
+------------------------------------------------ */
+
+function createDimension() {
+  const group=new THREE.Group();
+
+  const structures=[];
+
+  for(let i=0;i<7;i++) {
+    const platform=addMesh(
+      group,
+      new THREE.BoxGeometry(
+        1.3+i*.18,
+        .12,
+        1.3+i*.18
+      ),
+      i%2===0?gold:darkMetal,
+      Math.sin(i*1.4)*1.3,
+      i*.55-1.7,
+      Math.cos(i*1.4)*1.3
+    );
+
+    platform.rotation.y=i*.3;
+    structures.push(platform);
+  }
+
+  const center=addMesh(
+    group,
+    new THREE.OctahedronGeometry(.6,2),
+    crystal,
+    0,.5,0
+  );
+
+  const ring1=addRing(group,2.5,.02);
+  const ring2=addRing(group,3,.012);
+
+  ring1.rotation.x=1.1;
+  ring2.rotation.y=1.2;
+
+  addParticles(group,500,13);
+
+  group.userData.update=t=>{
+    structures.forEach((p,i)=>{
+      p.rotation.y=t*.1+i*.3;
+      p.position.y=i*.55-1.7+Math.sin(t+i)*.12;
+    });
+
+    center.rotation.x=t*.3;
+    center.rotation.y=t*.5;
+
+    ring1.rotation.z=t*.2;
+    ring2.rotation.x=t*.18;
+  };
+
+  return group;
+}
+
+/* ------------------------------------------------
+   SCENE 07 - ALL SEEING EYE
+------------------------------------------------ */
+
+function createEye() {
+  const group=new THREE.Group();
+
+  const eyeball=addMesh(
+    group,
+    new THREE.SphereGeometry(1.05,48,48),
+    new THREE.MeshPhysicalMaterial({
+      color:0xc1a77d,
+      roughness:.15,
+      metalness:.25,
+      clearcoat:1
+    })
+  );
+
+  eyeball.scale.set(1.5,.7,.6);
+
+  const pupil=addMesh(
+    group,
+    new THREE.SphereGeometry(.38,32,32),
+    darkMetal,
+    0,0,.53
+  );
+
+  const iris=addRing(group,.45,.06,0,0,.54,gold);
+
+  const rings=[];
+
+  for(let i=0;i<5;i++) {
+    const ring=addRing(group,1.6+i*.38,.016);
+    ring.rotation.set(i*.5,i*.7,i*.3);
+    rings.push(ring);
+  }
+
+  const centerLight=addMesh(
+    group,
+    new THREE.SphereGeometry(.1,24,24),
+    glowMaterial,
+    0,0,.88
+  );
+
+  addParticles(group,400,12);
+
+  group.userData.update=t=>{
+    rings.forEach((r,i)=>{
+      r.rotation.x=t*(.1+i*.06);
+      r.rotation.y=t*(.15+i*.04);
+    });
+
+    pupil.position.x+=(mouseX*.35-pupil.position.x)*.04;
+    pupil.position.y+=(-mouseY*.2-pupil.position.y)*.04;
+
+    iris.position.x=pupil.position.x;
+    iris.position.y=pupil.position.y;
+  };
+
+  return group;
+}
+
+/* ------------------------------------------------
+   SCENE 08 - FORGOTTEN DRAGON
+------------------------------------------------ */
+
+function createDragon() {
+  const group=new THREE.Group();
+
+  const dragon=new THREE.Group();
+  group.add(dragon);
+
+  // Skull
+  const skull=addMesh(
+    dragon,
+    new THREE.IcosahedronGeometry(.8,2),
+    darkMetal,
+    0,.2,0
+  );
+
+  skull.scale.set(1.15,.8,1);
+
+  // Snout
+  const snout=addMesh(
+    dragon,
+    new THREE.ConeGeometry(.36,.9,8),
+    darkMetal,
+    0,-.15,.75
+  );
+
+  snout.rotation.x=-Math.PI/2;
+
+  // Horns
+  for(let side of [-1,1]) {
+    const horn=addMesh(
+      dragon,
+      new THREE.ConeGeometry(.14,.85,8),
+      gold,
+      side*.58,.85,-.2
+    );
+
+    horn.rotation.z=-side*.45;
+  }
+
+  // Eyes
+  for(let side of [-1,1]) {
+    addMesh(
+      dragon,
+      new THREE.SphereGeometry(.13,20,20),
+      glowMaterial,
+      side*.38,.32,.65
+    );
+  }
+
+  // Neck
+  const neck=addMesh(
+    dragon,
+    new THREE.CylinderGeometry(.3,.48,1.4,12),
+    darkMetal,
+    0,-.85,-.25
+  );
+
+  neck.rotation.x=.4;
+
+  // Wings
+  const wings=[];
+
+  for(let side of [-1,1]) {
+    const wing=new THREE.Group();
+
+    const bone=addMesh(
+      wing,
+      new THREE.ConeGeometry(.13,2.4,8),
+      gold,
+      side*.65,.8,0
+    );
+
+    bone.rotation.z=-side*.65;
+
+    for(let i=0;i<3;i++) {
+      const rib=addMesh(
+        wing,
+        new THREE.CylinderGeometry(.018,.035,1.4,6),
+        darkMetal,
+        side*(.5+i*.35),.15,-.1
+      );
+
+      rib.rotation.z=-side*(.5+i*.22);
+    }
+
+    wing.position.set(side*.65,.1,-.1);
+    dragon.add(wing);
+    wings.push({wing,side});
+  }
+
+  addParticles(group,550,12);
+
+  group.userData.update=t=>{
+    dragon.rotation.y=Math.sin(t*.35)*.4;
+    dragon.position.y=Math.sin(t*1.1)*.18;
+
+    wings.forEach(w=>{
+      w.wing.rotation.z=
+        w.side*(Math.sin(t*2.1)*.3+.25);
+    });
+  };
+
+  return group;
+}
+
+/* ------------------------------------------------
+   SCENE MANAGER
+------------------------------------------------ */
+
+const scenes={
+  cube:createCube,
+  flower:createFlower,
+  liquid:createLiquid,
+  clock:createClock,
+  butterfly:createButterfly,
+  dimension:createDimension,
+  eye:createEye,
+  dragon:createDragon
 };
 
-function switchWorld(name){
+function loadScene(name) {
+  if(name===currentScene) return;
 
- if(!worlds[name])return;
+  currentScene=name;
+  clearScene();
 
- currentWorld=name;
+  if(scenes[name]) {
+    const object=scenes[name]();
+    activeGroup.add(object);
 
- Object.entries(worlds).forEach(([key,g])=>{
-  g.visible=key===name;
- });
-
- const [title,description]=descriptions[name];
-
- document.getElementById('worldName').textContent=title;
- document.getElementById('worldDesc').textContent=description;
-
- document.querySelectorAll('.worlds button').forEach(b=>{
-  b.classList.toggle('active',b.dataset.world===name);
- });
-
- camera.position.set(0,4,14);
- camera.lookAt(0,2,0);
+    activeGroup.userData.animate=object.userData.update;
+  }
 }
 
-document.querySelectorAll('.worlds button').forEach(button=>{
- button.addEventListener('click',()=>{
-  switchWorld(button.dataset.world);
- });
+/* ------------------------------------------------
+   SCROLL DETECTION
+------------------------------------------------ */
+
+const sections=[
+  ...document.querySelectorAll('[data-scene]')
+];
+
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting) {
+      loadScene(entry.target.dataset.scene);
+    }
+  });
+},{
+  threshold:.45
 });
 
-// ======================================
-// INTERACTIVE CAMERA
-// ======================================
+sections.forEach(section=>observer.observe(section));
 
-let drag=false;
-let lastX=0,lastY=0;
-let targetX=0,targetY=0;
-let autoRotate=true;
+/* ------------------------------------------------
+   MOUSE INTERACTION
+------------------------------------------------ */
 
-renderer.domElement.addEventListener('pointerdown',e=>{
- drag=true;
- lastX=e.clientX;
- lastY=e.clientY;
- renderer.domElement.setPointerCapture(e.pointerId);
-});
-
-renderer.domElement.addEventListener('pointermove',e=>{
-
- if(!drag)return;
-
- targetY+=(e.clientX-lastX)*.005;
- targetX+=(e.clientY-lastY)*.003;
-
- targetX=THREE.MathUtils.clamp(targetX,-.5,.5);
-
- lastX=e.clientX;
- lastY=e.clientY;
-});
-
-renderer.domElement.addEventListener('pointerup',()=>{
- drag=false;
-});
-
-renderer.domElement.addEventListener('pointercancel',()=>{
- drag=false;
-});
-
-renderer.domElement.addEventListener('wheel',e=>{
-
- camera.position.z=THREE.MathUtils.clamp(
-  camera.position.z+e.deltaY*.008,7,25
- );
-
+window.addEventListener('pointermove',e=>{
+  targetX=(e.clientX/innerWidth-.5)*2;
+  targetY=(e.clientY/innerHeight-.5)*2;
 },{passive:true});
 
-document.getElementById('autoBtn').onclick=function(){
+/* ------------------------------------------------
+   ANIMATION LOOP
+------------------------------------------------ */
 
- autoRotate=!autoRotate;
+function animate() {
+  requestAnimationFrame(animate);
 
- this.textContent=autoRotate?'AUTO: ON':'AUTO: OFF';
-};
+  const delta=Math.min(clock.getDelta(),.05);
+  const elapsed=clock.elapsedTime;
 
-// ======================================
-// MAGIC SPELL
-// ======================================
+  sceneTime+=delta;
 
-let spellTime=0;
-let spellPower=0;
+  mouseX+=(targetX-mouseX)*.035;
+  mouseY+=(targetY-mouseY)*.035;
 
-document.getElementById('magicBtn').onclick=()=>{
+  if(activeGroup.userData.animate) {
+    activeGroup.userData.animate(elapsed);
+  }
 
- spellTime=0;
- spellPower=1;
+  // Gentle camera movement
+  camera.position.x+=(mouseX*.38-camera.position.x)*.025;
+  camera.position.y+=(-mouseY*.28-camera.position.y)*.025;
 
- violetLight.intensity=450;
- goldLight.intensity=350;
-};
+  camera.lookAt(0,0,0);
 
-// ======================================
-// PANELS
-// ======================================
+  goldLight.position.x=Math.sin(elapsed*.4)*4;
+  goldLight.position.y=Math.cos(elapsed*.5)*3;
 
-function togglePanel(id){
-
- document.getElementById(id).classList.toggle('open');
+  composer.render();
 }
-
-document.getElementById('labBtn').onclick=()=>{
- togglePanel('codePanel');
-};
-
-document.getElementById('shaderBtn').onclick=()=>{
- togglePanel('shaderPanel');
-};
-
-document.querySelectorAll('[data-close]').forEach(btn=>{
- btn.onclick=()=>{
-  document.getElementById(btn.dataset.close).classList.remove('open');
- };
-});
-
-document.getElementById('fullBtn').onclick=()=>{
-
- if(!document.fullscreenElement){
-  document.documentElement.requestFullscreen?.();
- }else{
-  document.exitFullscreen?.();
- }
-};
-
-// ======================================
-// PYTHON RUNTIME
-// ======================================
-
-let pyodide=null;
-
-document.getElementById('runPython').onclick=async function(){
-
- const output=document.getElementById('pythonOutput');
- const code=document.getElementById('pythonCode').value;
-
- this.disabled=true;
- this.textContent='LOADING PYTHON...';
-
- try{
-
-  if(!pyodide){
-
-   output.textContent='Initializing Python runtime...';
-
-   const loadPyodide=await import(
-    'https://cdn.jsdelivr.net/pyodide/v0.27.2/full/pyodide.mjs'
-   );
-
-   pyodide=await loadPyodide.loadPyodide();
-  }
-
-  let result='';
-
-  pyodide.setStdout({
-   batched:(text)=>{
-    result+=text+'\n';
-   }
-  });
-
-  await pyodide.runPythonAsync(code);
-
-  output.textContent=result||'Python executed successfully.';
-
- }catch(error){
-
-  output.textContent='ERROR: '+error.message;
-
- }finally{
-
-  this.disabled=false;
-  this.textContent='▶ RUN PYTHON';
- }
-};
-
-// ======================================
-// LIVE VISUAL CONTROLS
-// ======================================
-
-document.getElementById('energySlider').oninput=e=>{
-
- const v=Number(e.target.value)/100;
-
- violetLight.intensity=50+v*300;
- goldLight.intensity=50+v*170;
-};
-
-document.getElementById('glowSlider').oninput=e=>{
-
- bloom.strength=Number(e.target.value)/45;
-};
-
-document.getElementById('particleSlider').oninput=e=>{
-
- particleSystem.material.opacity=
-  Number(e.target.value)/100;
-};
-
-document.getElementById('zoomSlider').oninput=e=>{
-
- camera.position.z=Number(e.target.value);
-};
-
-// ======================================
-// MASTER ANIMATION LOOP
-// ======================================
-
-const clock=new THREE.Clock();
-let elapsed=0;
-
-function animate(){
-
- requestAnimationFrame(animate);
-
- const dt=Math.min(clock.getDelta(),.05);
- elapsed+=dt;
-
- // Camera orbit
-
- if(autoRotate&&!drag){
-  targetY+=dt*.06;
- }
-
- camera.position.x=THREE.MathUtils.damp(
-  camera.position.x,
-  Math.sin(targetY)*.5,
-  3,dt
- );
-
- camera.position.y=THREE.MathUtils.damp(
-  camera.position.y,
-  4+targetX*3,
-  3,dt
- );
-
- camera.lookAt(0,2.2,0);
-
- // Floating particles
-
- const p=particleGeometry.attributes.position.array;
-
- for(let i=0;i<particleCount;i++){
-
-  p[i*3+1]+=particleSpeeds[i]*dt*.25;
-
-  if(p[i*3+1]>12){
-   p[i*3+1]=-2;
-  }
- }
-
- particleGeometry.attributes.position.needsUpdate=true;
-
- // Dragon animation
-
- const dragon=worlds.dragon;
-
- if(dragon.visible){
-
-  const d=dragon.children.find(
-   child=>child.userData.dragon
-  );
-
-  if(d){
-   d.position.y=.3+Math.sin(elapsed*1.4)*.15;
-   d.rotation.y=Math.sin(elapsed*.4)*.1;
-  }
-
-  dragonParts.forEach(({wing,side})=>{
-
-   wing.rotation.z=
-    side*(.18+Math.sin(elapsed*3)*.2);
-  });
- }
-
- // Portal
-
- if(worlds.portal.visible){
-
-  const frame=worlds.portal.children.find(
-   c=>c.userData.rings
-  );
-
-  if(frame){
-
-   frame.userData.rings.forEach((r,i)=>{
-    r.rotation.z+=dt*(i%2?.4:-.3);
-   });
-
-   frame.userData.inner.rotation.z+=dt*.3;
-  }
- }
-
- // Floating islands
-
- worlds.islands.children.forEach((obj)=>{
-
-  if(obj.userData.float){
-
-   obj.position.y+=
-    Math.sin(elapsed+obj.userData.phase)*dt*.1;
-
-   obj.rotation.y+=dt*.05;
-  }
- });
-
- // Flower
-
- if(worlds.flower.visible){
-
-  bloomPetals.forEach((p,i)=>{
-
-   p.rotation.z=Math.sin(elapsed+i)*.008;
-  });
- }
-
- // Global magic effect
-
- if(spellPower>0){
-
-  spellTime+=dt;
-
-  spellPower=Math.max(0,1-spellTime/1.8);
-
-  violetLight.intensity=100+350*spellPower;
-  goldLight.intensity=70+300*spellPower;
- }
-
- // Lights
-
- goldLight.position.x=Math.sin(elapsed*.4)*4;
- violetLight.position.z=Math.cos(elapsed*.4)*4;
-
- // Stars
-
- stars.rotation.y+=dt*.003;
-
- composer.render();
-}
-
-// ======================================
-// RESPONSIVE
-// ======================================
-
-window.addEventListener('resize',()=>{
-
- camera.aspect=innerWidth/innerHeight;
- camera.updateProjectionMatrix();
-
- renderer.setSize(innerWidth,innerHeight);
-
- composer.setSize(innerWidth,innerHeight);
-
- renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
-});
-
-// INITIALIZE
-
-switchWorld('castle');
 
 animate();
 
-document.getElementById('loading').style.opacity='0';
+/* ------------------------------------------------
+   RESPONSIVE
+------------------------------------------------ */
 
-setTimeout(()=>{
- document.getElementById('loading').style.display='none';
-},1100);
+window.addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+
+  composer.setSize(innerWidth,innerHeight);
+  bloom.setSize(innerWidth,innerHeight);
+});
+
+/* ------------------------------------------------
+   MUSIC + ENTER EXPERIENCE
+------------------------------------------------ */
+
+const intro=document.getElementById('intro');
+const main=document.getElementById('main');
+const enterBtn=document.getElementById('enterBtn');
+
+const audio=document.getElementById('backgroundMusic');
+const soundBtn=document.getElementById('soundBtn');
+const soundText=document.getElementById('soundText');
+
+audio.volume=.35;
+
+let musicStarted=false;
+
+enterBtn.addEventListener('click',async()=>{
+  enterBtn.disabled=true;
+  enterBtn.textContent='ENTERING...';
+
+  main.classList.add('visible');
+  document.body.classList.remove('locked');
+
+  // Start music from the user's click
+  try {
+    await audio.play();
+    musicStarted=true;
+    soundBtn.classList.add('playing');
+    soundText.textContent='SOUND ON';
+  } catch(error) {
+    musicStarted=false;
+    soundBtn.classList.remove('playing');
+    soundText.textContent='PLAY SOUND';
+    console.warn('Music playback was blocked:',error);
+  }
+
+  // Load initial scene
+  loadScene('cube');
+
+  setTimeout(()=>{
+    intro.classList.add('hide');
+    window.scrollTo({top:0,behavior:'instant'});
+  },350);
+});
+
+/* SOUND CONTROL */
+
+soundBtn.addEventListener('click',async()=>{
+  if(audio.paused) {
+    try {
+      await audio.play();
+      soundBtn.classList.add('playing');
+      soundText.textContent='SOUND ON';
+    } catch(error) {
+      soundText.textContent='PLAY SOUND';
+    }
+  } else {
+    audio.pause();
+    soundBtn.classList.remove('playing');
+    soundText.textContent='SOUND OFF';
+  }
+});
+
+/* INITIAL SCENE */
+
+loadScene('cube');
 
 </script>
-
 </body>
 </html>
