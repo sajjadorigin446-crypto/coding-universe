@@ -2595,6 +2595,390 @@ window.addEventListener('webglcontextlost',event=>{
 })();
 </script>
 
-<!-- PART 4: CINEMATIC JOURNEY AND FINAL SYSTEM WILL BE INSERTED HERE -->
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = (s, root=document) => root.querySelector(s);
+  const $$ = (s, root=document) => [...root.querySelectorAll(s)];
+
+  const worlds = window.FANTASY_WORLDS || [];
+  const total = worlds.length || 25;
+  const audio = $("#fantasyMusic");
+  const intro = $("#introScreen") || $(".intro-screen");
+  const enterButton = $("#enterExperience") || $("#enterBtn") ||
+                      $(".enter-experience");
+  const loading = $("#loadingScreen") || $(".loading-screen");
+  const finale = $("#finaleScreen") || $(".finale-screen");
+  const sections = $("#worldSections");
+  const nav = $("#navDots") || $(".nav-dots");
+  const counter = $("#worldCounter") || $(".world-counter");
+  const title = $("#worldTitle") || $(".world-title");
+  const description = $("#worldDescription") || $(".world-description");
+  const chapter = $("#worldChapter") || $(".world-chapter");
+  const soundButton = $("#soundToggle") || $(".sound-toggle");
+  const restartButton = $("#restartExperience") || $("#restartBtn") ||
+                       $(".restart-experience");
+
+  let entered = false;
+  let soundOn = false;
+  let currentWorld = -1;
+  let scrollFrame = 0;
+  let lastScroll = 0;
+  let transitionTimer = 0;
+
+  const style = document.createElement("style");
+  style.textContent = `
+    html { scroll-behavior: smooth; }
+    body.fantasy-active { overflow-x:hidden; }
+    #worldSections { position:relative; width:100%; }
+    .world-section { min-height:100svh; height:100svh; }
+    .fantasy-nav-dot {
+      appearance:none; border:1px solid rgba(255,255,255,.35);
+      background:rgba(255,255,255,.15); width:6px; height:6px;
+      border-radius:50%; padding:0; margin:5px 0; cursor:pointer;
+      transition:transform .35s,background .35s,box-shadow .35s;
+    }
+    .fantasy-nav-dot.active {
+      transform:scale(1.8); background:#fff;
+      box-shadow:0 0 12px rgba(255,255,255,.8);
+    }
+    .fantasy-world-transition {
+      position:fixed; inset:0; z-index:9990; pointer-events:none;
+      opacity:0; background:radial-gradient(circle at center,
+      rgba(255,255,255,.22),rgba(7,9,22,.92));
+      transition:opacity .65s ease;
+    }
+    .fantasy-world-transition.active { opacity:1; }
+    .fantasy-progress {
+      position:fixed; left:0; top:0; height:2px; width:0%;
+      z-index:10010; background:linear-gradient(90deg,#9de8ef,#e4c8ff,#fff);
+      box-shadow:0 0 12px rgba(190,220,255,.7);
+      pointer-events:none;
+    }
+    .fantasy-finale-glow {
+      position:fixed; inset:0; z-index:9980; pointer-events:none;
+      opacity:0; background:radial-gradient(ellipse at center,
+      rgba(226,213,255,.22),rgba(5,7,20,.84));
+      transition:opacity 1.8s ease;
+    }
+    .fantasy-finale-glow.active { opacity:1; }
+    .fantasy-sound-state {
+      display:inline-block; width:6px; height:6px; border-radius:50%;
+      margin-right:7px; background:rgba(255,255,255,.35);
+      vertical-align:middle;
+    }
+    .fantasy-sound-state.on {
+      background:#d8f6e9; box-shadow:0 0 9px #d8f6e9;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior:auto; }
+      *,*::before,*::after { transition-duration:.01ms !important; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  const transition = document.createElement("div");
+  transition.className = "fantasy-world-transition";
+  document.body.appendChild(transition);
+
+  const progress = document.createElement("div");
+  progress.className = "fantasy-progress";
+  document.body.appendChild(progress);
+
+  const finaleGlow = document.createElement("div");
+  finaleGlow.className = "fantasy-finale-glow";
+  document.body.appendChild(finaleGlow);
+
+  /* Create navigation if Part 1 did not already provide it. */
+  if (!nav) {
+    const generatedNav = document.createElement("div");
+    generatedNav.id = "navDots";
+    generatedNav.className = "nav-dots";
+    generatedNav.style.cssText =
+      "position:fixed;right:18px;top:50%;transform:translateY(-50%);" +
+      "z-index:1000;display:flex;flex-direction:column;align-items:center;";
+    document.body.appendChild(generatedNav);
+  }
+  const navContainer = $("#navDots") || $(".nav-dots");
+
+  if (navContainer && !navContainer.dataset.fantasyBuilt) {
+    navContainer.dataset.fantasyBuilt = "true";
+    navContainer.innerHTML = "";
+    worlds.forEach((world,i) => {
+      const dot = document.createElement("button");
+      dot.className = "fantasy-nav-dot";
+      dot.type = "button";
+      dot.title = `${String(i+1).padStart(2,"0")} · ${world.title}`;
+      dot.setAttribute("aria-label",`Go to ${world.title}`);
+      dot.addEventListener("click",() => goToWorld(i));
+      navContainer.appendChild(dot);
+    });
+  }
+
+  function worldAtScroll() {
+    const maxScroll = Math.max(1,
+      document.documentElement.scrollHeight - window.innerHeight);
+    const ratio = Math.min(1,Math.max(0,window.scrollY/maxScroll));
+    return Math.min(total-1,Math.floor(ratio*total));
+  }
+
+  function updateWorldUI(index) {
+    index = Math.max(0,Math.min(total-1,index));
+    if (index === currentWorld) return;
+
+    const previous = currentWorld;
+    currentWorld = index;
+
+    const data = worlds[index] || {};
+    if (counter) counter.textContent =
+      `${String(index+1).padStart(2,"0")} / ${String(total).padStart(2,"0")}`;
+    if (title) title.textContent = data.title || `World ${index+1}`;
+    if (description) description.textContent = data.description || "";
+    if (chapter) chapter.textContent = data.chapter || "";
+
+    $$(".fantasy-nav-dot",navContainer || document).forEach((dot,i) => {
+      dot.classList.toggle("active",i===index);
+      dot.setAttribute("aria-current",i===index ? "step" : "false");
+    });
+
+    document.body.dataset.currentWorld = String(index);
+    document.body.dataset.currentChapter = String(Math.floor(index/5)+1);
+
+    window.dispatchEvent(new CustomEvent("fantasy:chapterchange",{
+      detail:{index,previous,world:data}
+    }));
+
+    if (previous >= 0 && previous !== index) {
+      clearTimeout(transitionTimer);
+      transition.classList.add("active");
+      transitionTimer = setTimeout(() => {
+        transition.classList.remove("active");
+      },360);
+    }
+
+    if (index === total-1) {
+      finaleGlow.classList.add("active");
+      if (finale) finale.classList.add("visible","active");
+    } else {
+      finaleGlow.classList.remove("active");
+      if (finale) finale.classList.remove("visible","active");
+    }
+  }
+
+  function updateProgress() {
+    const maxScroll = Math.max(1,
+      document.documentElement.scrollHeight - window.innerHeight);
+    const percent = Math.min(100,Math.max(0,window.scrollY/maxScroll*100));
+    progress.style.width = percent + "%";
+
+    if (entered) updateWorldUI(worldAtScroll());
+
+    const direction = window.scrollY >= lastScroll ? "down" : "up";
+    lastScroll = window.scrollY;
+    document.body.dataset.scrollDirection = direction;
+  }
+
+  function onScroll() {
+    if (scrollFrame) return;
+    scrollFrame = requestAnimationFrame(() => {
+      updateProgress();
+      scrollFrame = 0;
+    });
+  }
+  window.addEventListener("scroll",onScroll,{passive:true});
+  window.addEventListener("resize",onScroll,{passive:true});
+
+  function goToWorld(index) {
+    index = Math.max(0,Math.min(total-1,index));
+    const target = sections?.children?.[index];
+    const maxScroll = Math.max(1,
+      document.documentElement.scrollHeight - window.innerHeight);
+    const y = target
+      ? target.getBoundingClientRect().top + window.scrollY
+      : maxScroll*(index/(total-1));
+
+    window.scrollTo({
+      top:y,
+      behavior:matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto" : "smooth"
+    });
+    updateWorldUI(index);
+  }
+
+  /* Sound begins only after a real user gesture. */
+  async function enableSound() {
+    if (!audio) return;
+    try {
+      audio.volume = 0;
+      audio.loop = true;
+      await audio.play();
+      soundOn = true;
+
+      let volume = 0;
+      const fade = setInterval(() => {
+        volume = Math.min(.48,volume+.025);
+        audio.volume = volume;
+        if (volume >= .48) clearInterval(fade);
+      },100);
+      updateSoundButton();
+    } catch(error) {
+      soundOn = false;
+      updateSoundButton();
+    }
+  }
+
+  function disableSound() {
+    if (!audio) return;
+    soundOn = false;
+    const fade = setInterval(() => {
+      audio.volume = Math.max(0,audio.volume-.06);
+      if (audio.volume <= .01) {
+        clearInterval(fade);
+        audio.pause();
+      }
+    },70);
+    updateSoundButton();
+  }
+
+  function updateSoundButton() {
+    if (!soundButton) return;
+    soundButton.setAttribute("aria-pressed",String(soundOn));
+    soundButton.title = soundOn ? "Mute music" : "Enable music";
+    const state = $(".fantasy-sound-state",soundButton);
+    if (state) state.classList.toggle("on",soundOn);
+    const label = soundButton.querySelector("[data-sound-label]");
+    if (label) label.textContent = soundOn ? "SOUND ON" : "SOUND OFF";
+  }
+
+  if (soundButton) {
+    if (!$(".fantasy-sound-state",soundButton)) {
+      const state = document.createElement("span");
+      state.className = "fantasy-sound-state";
+      soundButton.prepend(state);
+    }
+    soundButton.addEventListener("click",() => {
+      if (soundOn) disableSound();
+      else enableSound();
+    });
+    updateSoundButton();
+  }
+
+  /* Enter the experience */
+  function enterExperience() {
+    if (entered) return;
+    entered = true;
+    document.body.classList.add("fantasy-active");
+    window.FANTASY_STATE = window.FANTASY_STATE || {};
+    window.FANTASY_STATE.entered = true;
+
+    if (loading) {
+      loading.classList.remove("active","visible");
+      loading.style.opacity = "0";
+      loading.style.pointerEvents = "none";
+    }
+    if (intro) {
+      intro.classList.add("leaving");
+      intro.style.transition = "opacity 1.2s ease, transform 1.2s ease";
+      intro.style.opacity = "0";
+      intro.style.pointerEvents = "none";
+      intro.style.transform = "scale(1.04)";
+      setTimeout(() => {
+        intro.style.display = "none";
+      },1250);
+    }
+
+    window.scrollTo({top:0,behavior:"auto"});
+    enableSound();
+    updateWorldUI(0);
+    window.dispatchEvent(new CustomEvent("fantasy:experience-start"));
+  }
+
+  if (enterButton) {
+    enterButton.addEventListener("click",enterExperience);
+  }
+  window.addEventListener("fantasy:enter",enterExperience);
+
+  /* Restart from the beginning */
+  function restartExperience() {
+    if (finale) finale.classList.remove("visible","active");
+    finaleGlow.classList.remove("active");
+    transition.classList.remove("active");
+    window.scrollTo({top:0,behavior:"smooth"});
+    updateWorldUI(0);
+    if (!soundOn) enableSound();
+    window.dispatchEvent(new CustomEvent("fantasy:restart"));
+  }
+
+  if (restartButton) restartButton.addEventListener("click",restartExperience);
+
+  /* Keyboard world navigation */
+  window.addEventListener("keydown",event => {
+    if (!entered) return;
+    if (["INPUT","TEXTAREA"].includes(document.activeElement?.tagName)) return;
+
+    if (event.key === "ArrowDown" || event.key === "PageDown") {
+      event.preventDefault();
+      goToWorld(Math.min(total-1,currentWorld+1));
+    } else if (event.key === "ArrowUp" || event.key === "PageUp") {
+      event.preventDefault();
+      goToWorld(Math.max(0,currentWorld-1));
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      goToWorld(0);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      goToWorld(total-1);
+    }
+  });
+
+  /* Touch swipe navigation — vertical page scrolling remains enabled. */
+  let touchStartY = 0;
+  let touchStartX = 0;
+  window.addEventListener("touchstart",event => {
+    const t=event.touches[0];
+    touchStartY=t.clientY;
+    touchStartX=t.clientX;
+  },{passive:true});
+
+  window.addEventListener("touchend",event => {
+    if (!entered) return;
+    const t=event.changedTouches[0];
+    const dy=t.clientY-touchStartY;
+    const dx=t.clientX-touchStartX;
+    if (Math.abs(dy)>90 && Math.abs(dy)>Math.abs(dx)*1.25) {
+      /* Native touch scrolling is preserved; no forced page jump. */
+      document.body.dataset.lastSwipe = dy<0 ? "forward" : "backward";
+    }
+  },{passive:true});
+
+  /* Respond to world changes coming from the Three.js engine. */
+  window.addEventListener("fantasy:worldchange",event => {
+    const index = event.detail?.index ?? event.detail?.worldIndex;
+    if (Number.isInteger(index)) updateWorldUI(index);
+  });
+
+  /* Finale actions */
+  const finaleRestart = finale?.querySelector(
+    "#restartExperience, #restartBtn, .restart-experience"
+  );
+  if (finaleRestart) finaleRestart.addEventListener("click",restartExperience);
+
+  /* Expose a small control API for optional future extensions. */
+  window.FantasyJourney = {
+    enter:enterExperience,
+    goToWorld,
+    restart:restartExperience,
+    enableSound,
+    disableSound,
+    get currentWorld(){return currentWorld;},
+    get entered(){return entered;}
+  };
+
+  updateProgress();
+})();
+</script>
+
 </body>
 </html>
