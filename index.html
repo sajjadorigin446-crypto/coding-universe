@@ -3,927 +3,1908 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#080910">
-<title>MAMUN CODING FANTASY — When Imagination Meets Python</title>
-<meta name="description" content="A cinematic journey through 25 imaginary worlds. MAMUN CODING FANTASY.">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#070811">
+<meta name="description" content="MAMUN CODING FANTASY — When Imagination Meets Python. Explore 25 cinematic fantasy dimensions.">
+<title>MAMUN CODING FANTASY — Ultimate Edition</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <style>
 :root{
-  --gold:#d8b66a;
-  --white:#f5f1e9;
-  --muted:rgba(245,241,233,.62);
-  --dark:#080910;
+ --black:#070811;
+ --white:#f4f1ec;
+ --gold:#d6b779;
+ --muted:rgba(244,241,236,.55);
+ --line:rgba(255,255,255,.15);
+ --glass:rgba(12,14,24,.48);
+ --serif:"Cinzel",serif;
+ --sans:"DM Sans",sans-serif;
+ --smooth:cubic-bezier(.19,1,.22,1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;background:var(--dark)}
+html{
+ background:var(--black);
+ color:var(--white);
+ scroll-behavior:smooth;
+ scrollbar-width:none;
+}
+html::-webkit-scrollbar{display:none}
 body{
-  background:var(--dark);color:var(--white);
-  font-family:Inter,Arial,sans-serif;overflow-x:hidden;
+ min-height:100%;
+ background:var(--black);
+ font-family:var(--sans);
+ overflow-x:hidden;
+ overscroll-behavior-y:contain;
 }
-#experience{position:relative}
-#worldCanvas{
-  position:fixed;inset:0;width:100%;height:100%;
-  display:block;z-index:0;pointer-events:none;
+button{font:inherit}
+button:focus-visible{
+ outline:1px solid var(--gold);
+ outline-offset:5px;
 }
+::selection{background:var(--gold);color:#080910}
+
+/* =========================================
+   GLOBAL EXPERIENCE LAYERS
+========================================= */
+#universe{
+ position:relative;
+ width:100%;
+ min-height:100vh;
+ isolation:isolate;
+}
+#renderSurface{
+ position:fixed;
+ inset:0;
+ width:100%;
+ height:100%;
+ z-index:0;
+ display:block;
+ pointer-events:none;
+}
+#atmosphere{
+ position:fixed;
+ inset:0;
+ z-index:1;
+ pointer-events:none;
+ background:
+ radial-gradient(ellipse at 50% 45%,transparent 20%,rgba(4,5,13,.2) 75%,rgba(4,5,13,.65)),
+ linear-gradient(180deg,rgba(5,6,13,.12),transparent 30%,rgba(5,6,13,.2));
+}
+#filmGrain{
+ position:fixed;
+ inset:-50%;
+ z-index:2;
+ pointer-events:none;
+ opacity:.045;
+ background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+ animation:grainShift .25s steps(2) infinite;
+}
+@keyframes grainShift{
+ 0%{transform:translate(0,0)}
+ 25%{transform:translate(-2%,1%)}
+ 50%{transform:translate(1%,-2%)}
+ 75%{transform:translate(2%,2%)}
+ 100%{transform:translate(-1%,1%)}
+}
+#vignette{
+ position:fixed;
+ inset:0;
+ z-index:3;
+ pointer-events:none;
+ box-shadow:inset 0 0 180px 35px rgba(0,0,0,.35);
+}
+#worldTrack{
+ position:relative;
+ z-index:4;
+}
+
+/* =========================================
+   INTRO CINEMATIC
+========================================= */
 #intro{
-  position:fixed;inset:0;z-index:20;
-  display:flex;align-items:center;justify-content:center;
-  flex-direction:column;text-align:center;padding:28px;
-  background:
-    radial-gradient(ellipse at 50% 45%,rgba(81,67,111,.22),transparent 55%),
-    linear-gradient(145deg,#090a12,#11101b 55%,#080910);
-  transition:opacity 1.2s ease,visibility 1.2s ease;
+ position:fixed;
+ inset:0;
+ z-index:100;
+ overflow:hidden;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ background:
+ radial-gradient(ellipse at 50% 50%,rgba(68,65,103,.25),transparent 40%),
+ radial-gradient(ellipse at 50% 110%,rgba(29,40,65,.35),transparent 60%),
+ #070811;
+ transition:opacity 1.6s var(--smooth),visibility 1.6s;
 }
-#intro.hide{opacity:0;visibility:hidden;pointer-events:none}
-.intro-orb{
-  width:150px;height:150px;border-radius:50%;
-  border:1px solid rgba(216,182,106,.4);
-  box-shadow:0 0 45px rgba(216,182,106,.14),inset 0 0 35px rgba(216,182,106,.12);
-  position:absolute;top:18%;
-  animation:orb 12s linear infinite;
+#intro.isLeaving{
+ opacity:0;
+ visibility:hidden;
+ pointer-events:none;
 }
-.intro-orb:before,.intro-orb:after{
-  content:"";position:absolute;inset:18px;border:1px solid rgba(216,182,106,.25);
-  border-radius:50%;transform:rotateX(65deg) rotateY(25deg) scale(1.5);
+.intro-stars{
+ position:absolute;
+ inset:0;
+ pointer-events:none;
+ overflow:hidden;
 }
-.intro-orb:after{transform:rotateX(-65deg) rotateY(-25deg) scale(1.5)}
-@keyframes orb{to{transform:rotate(360deg)}}
-.eyebrow{
-  color:var(--gold);letter-spacing:5px;font-size:10px;
-  text-transform:uppercase;margin-bottom:22px;
+.intro-star{
+ position:absolute;
+ width:2px;
+ height:2px;
+ border-radius:50%;
+ background:#fff;
+ opacity:.35;
+ box-shadow:0 0 8px #fff;
+ animation:starPulse 3s ease-in-out infinite alternate;
 }
-#intro h1{
-  font-family:Cinzel,serif;font-weight:500;
-  font-size:clamp(30px,7vw,76px);letter-spacing:3px;
-  line-height:1.2;text-shadow:0 0 35px rgba(216,182,106,.16);
-  max-width:950px;
+@keyframes starPulse{
+ from{opacity:.12;transform:scale(.6)}
+ to{opacity:.9;transform:scale(1.5)}
 }
-#intro .tagline{
-  color:var(--muted);letter-spacing:4px;font-size:11px;
-  margin-top:20px;
+.intro-vortex{
+ position:absolute;
+ width:min(76vw,620px);
+ aspect-ratio:1;
+ border-radius:50%;
+ border:1px solid rgba(214,183,121,.2);
+ box-shadow:
+  0 0 80px rgba(109,119,186,.08),
+  inset 0 0 90px rgba(110,91,160,.1);
+ animation:vortexRotate 45s linear infinite;
 }
-#enterButton{
-  margin-top:55px;padding:16px 30px;
-  color:var(--gold);background:rgba(216,182,106,.04);
-  border:1px solid rgba(216,182,106,.55);
-  letter-spacing:3px;font-size:10px;cursor:pointer;
-  transition:.35s;text-transform:uppercase;
+.intro-vortex:before,
+.intro-vortex:after{
+ content:"";
+ position:absolute;
+ inset:9%;
+ border-radius:50%;
+ border:1px solid rgba(214,183,121,.15);
+ transform:rotateX(68deg) rotateY(24deg) scale(1.25);
 }
-#enterButton:hover{background:var(--gold);color:#111;box-shadow:0 0 35px #d8b66a55}
-#intro small{margin-top:22px;color:#777;font-size:10px;letter-spacing:1px}
-#hud{
-  position:fixed;z-index:10;top:0;left:0;width:100%;
-  padding:22px 30px;display:flex;justify-content:space-between;
-  align-items:center;pointer-events:none;opacity:0;transition:1s;
+.intro-vortex:after{
+ inset:18%;
+ transform:rotateX(-68deg) rotateY(-24deg) scale(1.45);
+ border-color:rgba(161,177,221,.17);
 }
-#hud.visible{opacity:1}
-.brand{font-family:Cinzel,serif;font-size:12px;letter-spacing:2px;color:var(--gold)}
-.hud-right{display:flex;gap:18px;align-items:center;pointer-events:auto}
-.hud-button{
-  color:var(--white);background:rgba(10,10,16,.45);
-  border:1px solid rgba(255,255,255,.17);padding:9px 12px;
-  font-size:10px;letter-spacing:1px;cursor:pointer;backdrop-filter:blur(10px);
+@keyframes vortexRotate{to{transform:rotate(360deg)}}
+.intro-core{
+ position:absolute;
+ width:clamp(100px,24vw,210px);
+ aspect-ratio:1;
+ border-radius:50%;
+ background:radial-gradient(circle,rgba(236,221,194,.24),rgba(115,105,162,.1) 30%,transparent 72%);
+ filter:blur(5px);
+ animation:coreBreath 5s ease-in-out infinite alternate;
 }
-#progressWrap{
-  position:fixed;right:25px;top:50%;transform:translateY(-50%);
-  z-index:11;display:flex;flex-direction:column;gap:8px;
-  opacity:0;transition:1s;
+@keyframes coreBreath{
+ from{transform:scale(.85);opacity:.5}
+ to{transform:scale(1.25);opacity:1}
 }
-#progressWrap.visible{opacity:1}
-.progress-dot{
-  width:5px;height:5px;border-radius:50%;background:#777;
-  border:0;padding:0;cursor:pointer;transition:.3s;
+.intro-content{
+ position:relative;
+ z-index:2;
+ text-align:center;
+ width:min(90%,900px);
+ display:flex;
+ flex-direction:column;
+ align-items:center;
 }
-.progress-dot.active{background:var(--gold);transform:scale(1.8);box-shadow:0 0 12px var(--gold)}
-#sceneInfo{
-  position:fixed;z-index:8;left:7%;bottom:9%;
-  max-width:480px;pointer-events:none;opacity:0;transition:opacity .5s;
-  text-shadow:0 2px 25px #000;
+.intro-overline{
+ color:var(--gold);
+ font-size:9px;
+ letter-spacing:7px;
+ text-transform:uppercase;
+ margin-bottom:28px;
+ opacity:0;
+ animation:fadeUp 1.2s .4s forwards;
 }
-#sceneInfo.visible{opacity:1}
-#sceneNumber{color:var(--gold);font-size:10px;letter-spacing:4px;margin-bottom:14px}
-#sceneTitle{
-  font-family:Cinzel,serif;font-size:clamp(24px,4vw,46px);
-  font-weight:400;line-height:1.2;margin-bottom:13px;
+.intro-title{
+ font-family:var(--serif);
+ font-size:clamp(31px,7.5vw,84px);
+ font-weight:400;
+ line-height:1.2;
+ letter-spacing:clamp(1px,.6vw,7px);
+ text-shadow:0 0 55px rgba(215,195,160,.16);
+ opacity:0;
+ animation:fadeUp 1.4s .7s forwards;
 }
-#sceneDescription{font-size:12px;line-height:1.8;color:rgba(255,255,255,.72);max-width:390px}
-#scrollHint{
-  position:fixed;bottom:25px;right:30px;z-index:8;
-  font-size:9px;letter-spacing:3px;color:rgba(255,255,255,.55);
-  opacity:0;transition:1s;
+.intro-title span{
+ display:block;
+ color:#e6d7bd;
 }
-#scrollHint.visible{opacity:1}
-#scrollHint span{color:var(--gold);display:block;text-align:right;margin-top:7px;font-size:15px}
-#soundState{font-size:9px;color:var(--gold);letter-spacing:1px}
-.world-section{height:100vh;position:relative;z-index:1;pointer-events:none}
-#endScreen{
-  height:100vh;display:flex;align-items:center;justify-content:center;
-  flex-direction:column;text-align:center;position:relative;z-index:2;
-  pointer-events:none;
+.intro-subtitle{
+ margin-top:24px;
+ color:rgba(244,241,236,.58);
+ font-size:clamp(9px,1.4vw,12px);
+ letter-spacing:clamp(2px,.7vw,6px);
+ font-weight:300;
+ opacity:0;
+ animation:fadeUp 1.2s 1s forwards;
 }
-#endScreen h2{
-  font-family:Cinzel,serif;font-weight:400;
-  font-size:clamp(30px,7vw,70px);letter-spacing:3px;
-  text-shadow:0 0 35px rgba(216,182,106,.25);
+.intro-divider{
+ width:50px;
+ height:1px;
+ background:var(--gold);
+ margin-top:35px;
+ opacity:0;
+ animation:fadeUp 1s 1.3s forwards;
 }
-#endScreen p{margin-top:18px;color:var(--muted);font-size:11px;letter-spacing:4px}
-#endScreen .signature{margin-top:45px;color:var(--gold);font-size:10px;letter-spacing:4px}
-#loading{
-  position:fixed;inset:0;z-index:30;background:#080910;
-  display:flex;align-items:center;justify-content:center;
-  flex-direction:column;transition:opacity .8s;
+#enterExperience{
+ margin-top:35px;
+ min-width:230px;
+ padding:17px 27px;
+ background:rgba(214,183,121,.035);
+ border:1px solid rgba(214,183,121,.55);
+ color:var(--gold);
+ font-size:9px;
+ letter-spacing:3px;
+ text-transform:uppercase;
+ cursor:pointer;
+ position:relative;
+ overflow:hidden;
+ opacity:0;
+ animation:fadeUp 1.2s 1.5s forwards;
+ transition:color .4s,border-color .4s,box-shadow .4s;
 }
-#loading.done{opacity:0;pointer-events:none}
-.loader-ring{
-  width:45px;height:45px;border:1px solid #51442b;
-  border-top-color:var(--gold);border-radius:50%;
-  animation:spin 1s linear infinite;
+#enterExperience:before{
+ content:"";
+ position:absolute;
+ top:0;
+ left:-120%;
+ width:100%;
+ height:100%;
+ background:linear-gradient(100deg,transparent,rgba(255,255,255,.18),transparent);
+ transition:left .8s var(--smooth);
 }
-@keyframes spin{to{transform:rotate(360deg)}}
-#loading p{margin-top:18px;font-size:9px;letter-spacing:4px;color:var(--gold)}
-#fallback{display:none;position:fixed;inset:0;z-index:5;background:#10101a;color:white;padding:40px;text-align:center}
-@media(max-width:650px){
-  #hud{padding:17px 15px}
-  .brand{font-size:9px;letter-spacing:1px}
-  .hud-right{gap:7px}
-  .hud-button{padding:8px;font-size:9px}
-  #progressWrap{right:12px;gap:7px}
-  #sceneInfo{left:7%;bottom:10%;max-width:80%}
-  #sceneDescription{font-size:11px}
-  #scrollHint{right:14px;bottom:20px;font-size:8px}
-  .intro-orb{width:110px;height:110px;top:19%}
+#enterExperience:hover:before{left:120%}
+#enterExperience:hover{
+ color:#fff;
+ border-color:#f0d5a0;
+ box-shadow:0 0 35px rgba(214,183,121,.14);
+}
+.intro-footnote{
+ position:absolute;
+ bottom:35px;
+ color:rgba(255,255,255,.32);
+ font-size:8px;
+ letter-spacing:3px;
+ text-align:center;
+ width:100%;
+}
+@keyframes fadeUp{
+ from{opacity:0;transform:translateY(22px)}
+ to{opacity:1;transform:translateY(0)}
+}
+
+/* =========================================
+   LOADING SCREEN
+========================================= */
+#loadingScreen{
+ position:fixed;
+ inset:0;
+ z-index:110;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ background:#070811;
+ transition:opacity .8s,visibility .8s;
+}
+#loadingScreen.loaded{
+ opacity:0;
+ visibility:hidden;
+ pointer-events:none;
+}
+.loading-symbol{
+ width:42px;
+ height:42px;
+ border:1px solid rgba(214,183,121,.2);
+ border-top-color:var(--gold);
+ border-radius:50%;
+ animation:loadingSpin 1.2s linear infinite;
+}
+@keyframes loadingSpin{to{transform:rotate(360deg)}}
+.loading-label{
+ margin-top:20px;
+ font-size:8px;
+ letter-spacing:4px;
+ color:var(--gold);
+}
+.loading-progress{
+ width:150px;
+ height:1px;
+ background:rgba(255,255,255,.12);
+ margin-top:18px;
+ overflow:hidden;
+}
+.loading-progress span{
+ display:block;
+ height:100%;
+ width:0;
+ background:var(--gold);
+ transition:width .4s;
+}
+
+/* =========================================
+   EXPERIENCE NAVIGATION
+========================================= */
+#interface{
+ position:fixed;
+ z-index:30;
+ inset:0;
+ pointer-events:none;
+ opacity:0;
+ transition:opacity 1.2s;
+}
+#interface.active{opacity:1}
+.topbar{
+ position:absolute;
+ top:0;
+ left:0;
+ width:100%;
+ padding:25px clamp(16px,4vw,55px);
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+}
+.brand-mark{
+ font-family:var(--serif);
+ color:var(--gold);
+ font-size:11px;
+ letter-spacing:2px;
+}
+.brand-caption{
+ display:block;
+ margin-top:5px;
+ color:rgba(255,255,255,.4);
+ font-family:var(--sans);
+ font-size:7px;
+ letter-spacing:2px;
+}
+.top-actions{
+ display:flex;
+ align-items:center;
+ gap:9px;
+ pointer-events:auto;
+}
+.interface-btn{
+ padding:10px 13px;
+ color:rgba(255,255,255,.8);
+ background:rgba(7,8,17,.28);
+ border:1px solid rgba(255,255,255,.16);
+ backdrop-filter:blur(15px);
+ -webkit-backdrop-filter:blur(15px);
+ font-size:8px;
+ letter-spacing:1.5px;
+ cursor:pointer;
+ transition:.3s;
+}
+.interface-btn:hover{
+ border-color:var(--gold);
+ color:var(--gold);
+}
+#soundLabel{color:var(--gold)}
+#worldCounter{
+ position:absolute;
+ top:50%;
+ left:clamp(15px,4vw,55px);
+ transform:translateY(-50%);
+ color:rgba(255,255,255,.42);
+ font-size:8px;
+ letter-spacing:3px;
+ writing-mode:vertical-rl;
+}
+#worldCounter strong{
+ color:var(--gold);
+ font-weight:400;
+}
+#worldNavigation{
+ position:absolute;
+ right:clamp(14px,3vw,40px);
+ top:50%;
+ transform:translateY(-50%);
+ display:flex;
+ flex-direction:column;
+ gap:10px;
+ pointer-events:auto;
+}
+.world-nav-dot{
+ width:5px;
+ height:5px;
+ border-radius:50%;
+ padding:0;
+ border:0;
+ background:rgba(255,255,255,.35);
+ cursor:pointer;
+ transition:transform .35s,background .35s,box-shadow .35s;
+}
+.world-nav-dot.active{
+ background:var(--gold);
+ transform:scale(1.8);
+ box-shadow:0 0 12px var(--gold);
+}
+#worldCaption{
+ position:absolute;
+ left:clamp(25px,8vw,120px);
+ bottom:clamp(65px,11vh,110px);
+ max-width:min(520px,75vw);
+ text-shadow:0 3px 25px rgba(0,0,0,.7);
+ transition:opacity .5s,transform .5s;
+}
+#worldCaption.changing{
+ opacity:0;
+ transform:translateY(15px);
+}
+#captionIndex{
+ color:var(--gold);
+ font-size:9px;
+ letter-spacing:4px;
+ margin-bottom:17px;
+}
+#captionTitle{
+ font-family:var(--serif);
+ font-weight:400;
+ font-size:clamp(25px,4.5vw,54px);
+ line-height:1.2;
+}
+#captionDescription{
+ max-width:420px;
+ margin-top:15px;
+ color:rgba(255,255,255,.72);
+ font-size:11px;
+ line-height:1.9;
+ font-weight:300;
+}
+#scrollGuide{
+ position:absolute;
+ right:clamp(20px,4vw,55px);
+ bottom:38px;
+ color:rgba(255,255,255,.55);
+ font-size:8px;
+ letter-spacing:3px;
+ text-align:right;
+}
+#scrollGuide span{
+ display:block;
+ font-size:18px;
+ color:var(--gold);
+ margin-top:10px;
+ animation:guideFloat 2s ease-in-out infinite;
+}
+@keyframes guideFloat{
+ 0%,100%{transform:translateY(0)}
+ 50%{transform:translateY(7px)}
+}
+
+/* =========================================
+   WORLD CONTENT STRUCTURE
+========================================= */
+.world-section{
+ position:relative;
+ height:100svh;
+ min-height:600px;
+ width:100%;
+ pointer-events:none;
+}
+#finale{
+ position:relative;
+ z-index:5;
+ height:100svh;
+ min-height:600px;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ text-align:center;
+ pointer-events:none;
+}
+#finale h2{
+ font-family:var(--serif);
+ font-size:clamp(30px,7vw,76px);
+ font-weight:400;
+ line-height:1.3;
+ letter-spacing:3px;
+}
+#finale p{
+ margin-top:20px;
+ color:rgba(255,255,255,.55);
+ font-size:9px;
+ letter-spacing:5px;
+}
+#finale .final-signature{
+ margin-top:55px;
+ color:var(--gold);
+ font-size:9px;
+ letter-spacing:4px;
+}
+
+/* =========================================
+   TRANSITION OVERLAY
+========================================= */
+#transitionCurtain{
+ position:fixed;
+ inset:0;
+ z-index:25;
+ pointer-events:none;
+ opacity:0;
+ background:#070811;
+ transition:opacity .7s;
+}
+#transitionCurtain.active{opacity:.35}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+@media(max-width:700px){
+ .topbar{padding:17px 14px}
+ .brand-mark{font-size:9px;letter-spacing:1px}
+ .brand-caption{font-size:6px;letter-spacing:1px}
+ .interface-btn{padding:9px;font-size:7px}
+ #worldCounter{left:10px;font-size:7px}
+ #worldNavigation{right:10px;gap:8px}
+ .world-nav-dot{width:4px;height:4px}
+ #worldCaption{
+  left:24px;
+  bottom:85px;
+  max-width:calc(100vw - 65px);
+ }
+ #captionTitle{font-size:clamp(25px,8vw,39px)}
+ #captionDescription{font-size:10px;max-width:85%}
+ #scrollGuide{right:15px;bottom:20px;font-size:7px}
+ .intro-footnote{bottom:20px;font-size:7px;letter-spacing:2px}
+ #finale{min-height:100svh}
+}
+@media(orientation:landscape) and (max-height:500px){
+ #worldCaption{bottom:35px}
+ #captionTitle{font-size:30px}
+ #captionDescription{margin-top:7px}
+ .topbar{padding:12px 20px}
 }
 @media(prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  *,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+ *,*:before,*:after{
+  scroll-behavior:auto!important;
+  animation-duration:.01ms!important;
+  animation-iteration-count:1!important;
+  transition-duration:.01ms!important;
+ }
 }
 </style>
 </head>
+
 <body>
-<div id="loading"><div class="loader-ring"></div><p>PREPARING THE UNIVERSE</p></div>
-<div id="intro">
-  <div class="intro-orb"></div>
-  <div class="eyebrow">A JOURNEY BEYOND REALITY</div>
-  <h1>MAMUN CODING<br>FANTASY</h1>
-  <div class="tagline">WHEN IMAGINATION MEETS PYTHON</div>
-  <button id="enterButton" onclick="window.enterFantasy()">ENTER THE EXPERIENCE</button>
-  <small>25 WORLDS · ONE INFINITE JOURNEY</small>
-</div>
+<div id="universe">
 
-<header id="hud">
-  <div class="brand">MAMUN CODING FANTASY</div>
-  <div class="hud-right">
-    <span id="soundState">SOUND OFF</span>
-    <button class="hud-button" id="soundButton">♫ SOUND</button>
-    <button class="hud-button" id="topButton">EXIT ↑</button>
+ <canvas id="renderSurface"></canvas>
+ <div id="atmosphere"></div>
+ <div id="filmGrain"></div>
+ <div id="vignette"></div>
+
+ <div id="loadingScreen">
+  <div class="loading-symbol"></div>
+  <div class="loading-label">PREPARING YOUR UNIVERSE</div>
+  <div class="loading-progress"><span id="loadingBar"></span></div>
+ </div>
+
+ <section id="intro">
+  <div class="intro-stars" id="introStars"></div>
+  <div class="intro-vortex"></div>
+  <div class="intro-core"></div>
+
+  <div class="intro-content">
+   <div class="intro-overline">A DIGITAL JOURNEY BEYOND REALITY</div>
+   <h1 class="intro-title">
+    MAMUN CODING
+    <span>FANTASY</span>
+   </h1>
+   <div class="intro-subtitle">WHEN IMAGINATION MEETS PYTHON</div>
+   <div class="intro-divider"></div>
+   <button id="enterExperience" type="button">
+    ENTER THE EXPERIENCE
+   </button>
   </div>
-</header>
 
-<div id="progressWrap"></div>
-<div id="sceneInfo">
-  <div id="sceneNumber">WORLD 01 / 25</div>
-  <div id="sceneTitle">The Lost Sky Kingdom</div>
-  <div id="sceneDescription">A kingdom suspended between clouds and dreams.</div>
-</div>
-<div id="scrollHint">SCROLL TO EXPLORE <span>↓</span></div>
+  <div class="intro-footnote">
+   25 DIMENSIONS · ONE INFINITE IMAGINATION
+  </div>
+ </section>
 
-<div id="experience">
-  <canvas id="worldCanvas"></canvas>
-  <div id="sections"></div>
-  <section id="endScreen">
-    <h2>THE END IS<br>ANOTHER BEGINNING</h2>
-    <p>IMAGINATION HAS NO BOUNDARIES</p>
-    <div class="signature">MAMUN CODING FANTASY</div>
+ <div id="transitionCurtain"></div>
+
+ <header id="interface">
+  <div class="topbar">
+   <div class="brand-mark">
+    MAMUN CODING FANTASY
+    <span class="brand-caption">AN EXPERIMENTAL DIGITAL UNIVERSE</span>
+   </div>
+
+   <div class="top-actions">
+    <button class="interface-btn" id="soundButton" type="button">
+     ♫ <span id="soundLabel">SOUND OFF</span>
+    </button>
+    <button class="interface-btn" id="restartButton" type="button">
+     ↺ RESTART
+    </button>
+   </div>
+  </div>
+
+  <div id="worldCounter">
+   WORLD <strong id="currentWorldNumber">01</strong> / 25
+  </div>
+
+  <nav id="worldNavigation" aria-label="World navigation"></nav>
+
+  <div id="worldCaption">
+   <div id="captionIndex">CHAPTER I — DISCOVERY</div>
+   <h2 id="captionTitle">THE LOST SKY KINGDOM</h2>
+   <p id="captionDescription">
+    Beyond the edge of the known world, an ancient kingdom floats among the clouds.
+   </p>
+  </div>
+
+  <div id="scrollGuide">
+   SCROLL TO TRAVEL
+   <span>↓</span>
+  </div>
+ </header>
+
+ <main id="worldTrack">
+  <div id="worldSections"></div>
+
+  <section id="finale">
+   <h2>THE END IS<br>ANOTHER BEGINNING</h2>
+   <p>IMAGINATION HAS NO BOUNDARIES</p>
+   <div class="final-signature">MAMUN CODING FANTASY</div>
   </section>
-</div>
-<div id="fallback">
-  <h2>THE FANTASY IS WAITING</h2>
-  <p style="margin-top:15px">Please enable an internet connection and reload to load the 3D experience.</p>
-</div>
+ </main>
 
-<audio id="bgMusic" src="music.mp3" loop preload="none"></audio>
+ <audio id="fantasyMusic" src="music.mp3" loop preload="none"></audio>
+</div>
 
 <script>
-/* The intro works independently from the 3D module. */
-(function(){
-  let entered=false;
-  window.enterFantasy=function(){
-    if(entered)return;
-    entered=true;
-    document.getElementById('intro').classList.add('hide');
-    document.getElementById('hud').classList.add('visible');
-    document.getElementById('progressWrap').classList.add('visible');
-    document.getElementById('sceneInfo').classList.add('visible');
-    document.getElementById('scrollHint').classList.add('visible');
-    window.dispatchEvent(new Event('fantasy-enter'));
-  };
-  document.getElementById('topButton').addEventListener('click',()=>{
-    window.scrollTo({top:0,behavior:'smooth'});
-  });
-  document.getElementById('soundButton').addEventListener('click',async()=>{
-    const audio=document.getElementById('bgMusic');
-    const label=document.getElementById('soundState');
-    if(audio.paused){
-      try{await audio.play();label.textContent='SOUND ON';}
-      catch(e){label.textContent='ADD music.mp3';}
-    }else{audio.pause();label.textContent='SOUND OFF';}
-  });
+/* =========================================
+   INTRO BOOTSTRAP — INDEPENDENT OF WEBGL
+========================================= */
+(()=>{
+ const stars=document.getElementById("introStars");
+ for(let i=0;i<100;i++){
+  const star=document.createElement("i");
+  star.className="intro-star";
+  star.style.left=(Math.random()*100)+"%";
+  star.style.top=(Math.random()*100)+"%";
+  star.style.animationDelay=(Math.random()*4)+"s";
+  star.style.animationDuration=(2+Math.random()*4)+"s";
+  stars.appendChild(star);
+ }
+
+ window.FANTASY_STATE={
+  entered:false,
+  audioEnabled:false,
+  world:0,
+  progress:0,
+  engineReady:false
+ };
+
+ const enter=document.getElementById("enterExperience");
+ enter.addEventListener("click",()=>{
+  if(window.FANTASY_STATE.entered)return;
+  window.FANTASY_STATE.entered=true;
+  document.getElementById("intro").classList.add("isLeaving");
+  document.getElementById("interface").classList.add("active");
+  document.body.classList.add("experience-started");
+  window.dispatchEvent(new CustomEvent("fantasy:enter"));
+ });
+
+ document.getElementById("soundButton").addEventListener("click",async()=>{
+  const audio=document.getElementById("fantasyMusic");
+  const label=document.getElementById("soundLabel");
+  try{
+   if(audio.paused){
+    await audio.play();
+    window.FANTASY_STATE.audioEnabled=true;
+    label.textContent="SOUND ON";
+   }else{
+    audio.pause();
+    window.FANTASY_STATE.audioEnabled=false;
+    label.textContent="SOUND OFF";
+   }
+  }catch(error){
+   label.textContent="MUSIC UNAVAILABLE";
+  }
+ });
+
+ document.getElementById("restartButton").addEventListener("click",()=>{
+  window.scrollTo({top:0,behavior:"smooth"});
+ });
+
+ window.addEventListener("load",()=>{
+  setTimeout(()=>{
+   const loader=document.getElementById("loadingScreen");
+   if(loader)loader.classList.add("loaded");
+  },450);
+ });
 })();
 </script>
 
+
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js';
+/* =========================================================
+   MAMUN CODING FANTASY
+   PART 02 — ADVANCED THREE.JS WORLD ENGINE
+   ========================================================= */
 
-const $=id=>document.getElementById(id);
-const isMobile=matchMedia('(max-width: 700px)').matches;
-const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+import * as THREE from
+'https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js';
 
-const worlds=[
-['The Lost Sky Kingdom','Floating islands, ancient palaces and waterfalls suspended above an endless sea of clouds.','#8c9bc5'],
-['The Enchanted Forest','A living forest of giant trees, luminous flowers and mysterious paths.','#254d45'],
-['The Forgotten Ocean','A submerged civilisation hidden beneath a deep blue world of glowing sea life.','#124e75'],
-['Stairway to Infinity','An impossible architecture of floating stairs, open doors and endless skies.','#9b8bbd'],
-['The Dreaming Desert','A moonlit desert where glowing rivers cross purple dunes.','#75506f'],
-['The Infinite Library','A timeless library filled with floating books and doors to other universes.','#624b39'],
-['Crystal Valley','A valley of enormous crystals, luminous rivers and dancing auroras.','#3b8294'],
-['The Impossible World','A gravity-defying city where roads, buildings and rivers turn upside down.','#685b89'],
-['The Garden of Light','A dream garden where giant flowers glow and seeds drift through the air.','#527d57'],
-['Kingdom Above the Clouds','An ancient castle rises above a moving ocean of clouds.','#8d9db7'],
-['The Cosmic Ocean','Nebulae drift like ocean currents through a sea of stars.','#473d83'],
-['Planet X','An unknown world with strange trees, distant moons and alien landscapes.','#66508e'],
-['The Moon Temple','A celestial sanctuary surrounded by floating stones and silver light.','#5b648d'],
-['The Edge of Time','A cosmic gateway where starlight bends around the edge of time.','#593d62'],
-['The Celestial Kingdom','A kingdom among the stars with floating temples and heavenly waterfalls.','#4b639b'],
-['The Forgotten Time','A lost clockwork city frozen between yesterday and tomorrow.','#71634c'],
-['The Mirror Dimension','A world of endless reflections and impossible mirrored landscapes.','#526477'],
-['The World Tree','One colossal tree connects the earth, sky and distant floating worlds.','#3e7054'],
-['The Sky Ocean','Whales drift through clouds above islands that float like ships.','#4e7c9e'],
-['The City of Forgotten Dreams','An abandoned city where glowing portals awaken forgotten memories.','#61526d'],
-['The Butterfly Dimension','A valley filled with enormous butterflies and drifting luminous petals.','#8d6383'],
-['The Upside Down River','A river flows upward from the mountains and disappears into the sky.','#397c85'],
-['The Last Dream','A quiet world of rose clouds, glowing seas and distant mountains.','#987a9c'],
-['The Gateway of Realities','A labyrinth of portals, each revealing a different reality.','#665a9b'],
-['The Infinite Imagination','Every world meets at one horizon of light, wonder and possibility.','#b18a55']
-];
+/* ---------------------------------------------------------
+   01. DEVICE & PERFORMANCE CONFIGURATION
+--------------------------------------------------------- */
 
-const sections=$('sections');
-worlds.forEach((w,i)=>{
-  const s=document.createElement('section');
-  s.className='world-section';
-  s.dataset.index=i;
-  sections.appendChild(s);
+const DEVICE = {
+ mobile: matchMedia('(max-width:700px)').matches,
+ tablet: matchMedia('(min-width:701px) and (max-width:1100px)').matches,
+ reduced: matchMedia('(prefers-reduced-motion: reduce)').matches,
+ pixelRatio: Math.min(
+  window.devicePixelRatio || 1,
+  matchMedia('(max-width:700px)').matches ? 1.35 : 1.8
+ ),
+ particles: matchMedia('(max-width:700px)').matches ? 0.45 : 1,
+ shadows: !matchMedia('(max-width:700px)').matches
+};
+
+const CONFIG = {
+ worldCount:25,
+ worldSpacing:100,
+ fogDensity:.006,
+ cameraFov:55,
+ cameraNear:.1,
+ cameraFar:500,
+ exposure:1.2,
+ maxDelta:.04
+};
+
+/* ---------------------------------------------------------
+   02. CORE THREE.JS OBJECTS
+--------------------------------------------------------- */
+
+const canvas=document.getElementById('renderSurface');
+
+const renderer=new THREE.WebGLRenderer({
+ canvas,
+ antialias:!DEVICE.mobile,
+ alpha:false,
+ powerPreference:'high-performance',
+ stencil:false,
+ depth:true
 });
-const progress=$('progressWrap');
-worlds.forEach((w,i)=>{
-  const b=document.createElement('button');
-  b.className='progress-dot';
-  b.title=w[0];
-  b.setAttribute('aria-label','Go to world '+(i+1));
-  b.addEventListener('click',()=>window.scrollTo({top:i*innerHeight,behavior:'smooth'}));
-  progress.appendChild(b);
-});
 
-let renderer,scene,camera,clock;
-let groups=[];
-let entered=false,activeIndex=0,scrollProgress=0;
-let pointerX=0,pointerY=0,targetX=0,targetY=0;
-let animationReady=false;
+renderer.setPixelRatio(DEVICE.pixelRatio);
+renderer.setSize(innerWidth,innerHeight);
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=CONFIG.exposure;
 
-const mat=(color,emissive=0x000000,intensity=0)=>{
+const scene=new THREE.Scene();
+
+scene.background=new THREE.Color(0x101522);
+scene.fog=new THREE.FogExp2(0x101522,CONFIG.fogDensity);
+
+const camera=new THREE.PerspectiveCamera(
+ CONFIG.cameraFov,
+ innerWidth/innerHeight,
+ CONFIG.cameraNear,
+ CONFIG.cameraFar
+);
+
+camera.position.set(0,2,20);
+camera.lookAt(0,0,-10);
+
+const clock=new THREE.Clock();
+
+const worldRoot=new THREE.Group();
+scene.add(worldRoot);
+
+const environmentLights=new THREE.Group();
+scene.add(environmentLights);
+
+/* ---------------------------------------------------------
+   03. LIGHTING ARCHITECTURE
+--------------------------------------------------------- */
+
+const ambientLight=new THREE.HemisphereLight(
+ 0xb9d7ff,
+ 0x171525,
+ 1.8
+);
+scene.add(ambientLight);
+
+const mainSun=new THREE.DirectionalLight(0xffe5c2,2.4);
+mainSun.position.set(-15,25,12);
+scene.add(mainSun);
+
+const rimLight=new THREE.DirectionalLight(0x8ba8ff,1.1);
+rimLight.position.set(15,8,-30);
+scene.add(rimLight);
+
+const atmosphereLight=new THREE.PointLight(
+ 0x879bff,30,120,2
+);
+atmosphereLight.position.set(0,8,-35);
+scene.add(atmosphereLight);
+
+const fillLight=new THREE.PointLight(
+ 0xffd5a1,18,90,2
+);
+fillLight.position.set(-12,4,-25);
+scene.add(fillLight);
+
+const LIGHT_PRESETS={
+ sunset:{
+  ambient:0x9d9abb,
+  ground:0x382b35,
+  sun:0xffc18d,
+  sunPower:2.6,
+  fog:0xd29b9d
+ },
+ forest:{
+  ambient:0x9bc7b3,
+  ground:0x142e27,
+  sun:0xd8e8bb,
+  sunPower:1.5,
+  fog:0x244a3c
+ },
+ ocean:{
+  ambient:0x86c8e5,
+  ground:0x102a43,
+  sun:0x9adfff,
+  sunPower:1.5,
+  fog:0x155477
+ },
+ moon:{
+  ambient:0xa9b8e5,
+  ground:0x191a32,
+  sun:0xd7dfff,
+  sunPower:1.8,
+  fog:0x3c456c
+ },
+ cosmic:{
+  ambient:0x9a8fca,
+  ground:0x15112b,
+  sun:0xd3b7ff,
+  sunPower:1.7,
+  fog:0x30234f
+ },
+ dream:{
+  ambient:0xf0c9df,
+  ground:0x47374c,
+  sun:0xffd7e6,
+  sunPower:2,
+  fog:0x8e6d91
+ },
+ default:{
+  ambient:0xb9d7ff,
+  ground:0x171525,
+  sun:0xffe5c2,
+  sunPower:2.4,
+  fog:0x101522
+ }
+};
+
+/* ---------------------------------------------------------
+   04. MATERIAL FACTORY
+--------------------------------------------------------- */
+
+const MATERIALS={};
+
+function standardMaterial(options={}){
  return new THREE.MeshStandardMaterial({
-  color,roughness:.82,metalness:.08,
-  emissive,emissiveIntensity:intensity
+  color:options.color??0xffffff,
+  roughness:options.roughness??.8,
+  metalness:options.metalness??.05,
+  emissive:options.emissive??0x000000,
+  emissiveIntensity:options.emissiveIntensity??0,
+  transparent:options.transparent??false,
+  opacity:options.opacity??1,
+  side:options.side??THREE.FrontSide,
+  flatShading:options.flatShading??false
  });
-};
-const glow=(color,intensity=1)=>{
- return new THREE.MeshBasicMaterial({color,transparent:true,opacity:.88});
-};
-const sphereGeo=new THREE.SphereGeometry(1,16,12);
-const boxGeo=new THREE.BoxGeometry(1,1,1);
-const coneGeo=new THREE.ConeGeometry(1,1,8);
-const cylinderGeo=new THREE.CylinderGeometry(1,1,1,12);
-const torusGeo=new THREE.TorusGeometry(1,.045,8,32);
+}
 
-function addMesh(g,geo,material,x,y,z,sx=1,sy=1,sz=1,opts={}){
- const m=new THREE.Mesh(geo,material);
- m.position.set(x,y,z);m.scale.set(sx,sy,sz);
- m.rotation.set(opts.rx||0,opts.ry||0,opts.rz||0);
- m.castShadow=false;m.receiveShadow=false;
- if(opts.float){m.userData.float=true;m.userData.baseY=y;m.userData.phase=Math.random()*6.28}
- if(opts.spin){m.userData.spin=opts.spin}
- g.add(m);return m;
+function glowingMaterial(color,intensity=1,opacity=1){
+ return new THREE.MeshBasicMaterial({
+  color,
+  transparent:opacity<1,
+  opacity,
+  depthWrite:opacity>=1
+ });
 }
-function ball(g,x,y,z,s,material,opts={}){
- return addMesh(g,sphereGeo,material,x,y,z,s,s,s,opts);
+
+function createMaterial(name,options={}){
+ const material=standardMaterial(options);
+ MATERIALS[name]=material;
+ return material;
 }
-function block(g,x,y,z,sx,sy,sz,material,opts={}){
- return addMesh(g,boxGeo,material,x,y,z,sx,sy,sz,opts);
+
+function getMaterial(name){
+ return MATERIALS[name]||standardMaterial({color:0x888888});
 }
-function cone(g,x,y,z,r,h,material,opts={}){
- return addMesh(g,coneGeo,material,x,y,z,r,h,r,opts);
-}
-function cylinder(g,x,y,z,r1,r2,h,material,opts={}){
- return addMesh(g,cylinderGeo,material,x,y,z,r1,h,r2,opts);
-}
-function ring(g,x,y,z,r,material,rx=0,ry=0,rz=0){
- return addMesh(g,torusGeo,material,x,y,z,r,r,r,{rx,ry,rz,spin:.001});
-}
-function line(g,a,b,material,r=.025){
- const start=new THREE.Vector3(...a),end=new THREE.Vector3(...b);
- const d=new THREE.Vector3().subVectors(end,start);
- const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,d.length(),6),material);
- m.position.copy(start).add(end).multiplyScalar(.5);
- m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());
- g.add(m);return m;
-}
-function makeGround(g,color,y=-4){
- const m=new THREE.Mesh(new THREE.PlaneGeometry(100,100,1,1),mat(color));
- m.rotation.x=-Math.PI/2;m.position.set(0,y,0);g.add(m);
-}
-function terrain(g,color,y=-3.8,seed=0){
- const geo=new THREE.PlaneGeometry(75,75,32,32);
- const p=geo.attributes.position;
- for(let i=0;i<p.count;i++){
-  const x=p.getX(i),z=p.getY(i);
-  p.setZ(i,Math.sin(x*.16+seed)*.28+Math.cos(z*.19+seed)*.24+
-    Math.sin((x+z)*.11)*.2);
- }
- geo.computeVertexNormals();
- const m=new THREE.Mesh(geo,mat(color));m.rotation.x=-Math.PI/2;
- m.position.y=y;g.add(m);return m;
-}
-function mountain(g,x,z,h,color,w=3){
- const m=cone(g,x,-4+h/2,z,w,h,mat(color),{ry:Math.random()*6.2});
- return m;
-}
-function tree(g,x,z,h,color,leafColor){
- cylinder(g,x,-4+h*.24,z,.13,.22,h*.48,mat(color));
- const crown=cone(g,x,-4+h*.67,z,h*.3,h*.65,mat(leafColor),{float:true});
- cone(g,x,-4+h*.85,z,h*.23,h*.5,mat(leafColor));
- return crown;
-}
-function cloud(g,x,y,z,s,color=0xdde5f4){
- const group=new THREE.Group();group.position.set(x,y,z);
- for(let i=0;i<5;i++){
-  const m=new THREE.Mesh(sphereGeo,mat(color));
-  m.position.set((i-2)*s*.28,Math.sin(i*2)*s*.08,Math.cos(i)*s*.12);
-  m.scale.set(s*.38,s*.2,s*.26);group.add(m);
- }
- group.userData.float=true;group.userData.baseY=y;group.userData.phase=Math.random()*6;
- g.add(group);return group;
-}
-function island(g,x,y,z,s,color){
- const top=addMesh(g,new THREE.DodecahedronGeometry(s,1),mat(color),x,y,z,s*1.3,s*.28,s,{ry:.2});
- cone(g,x,y-s*.6,z,s*.6,s*1.4,mat(0x302b3d));
- return top;
-}
-function waterfall(g,x,y,z,h,color){
- const m=addMesh(g,new THREE.CylinderGeometry(.18,.35,h,12,1,true),
- new THREE.MeshBasicMaterial({color,transparent:true,opacity:.52,side:THREE.DoubleSide}),
- x,y-h/2,z,1,1,1,{float:true});
- ring(g,x,y-h,z,.55,glow(color),Math.PI/2);
- return m;
-}
-function portal(g,x,y,z,r,color){
- const frame=ring(g,x,y,z,r,glow(color),0,0,0);
- const inner=addMesh(g,new THREE.CircleGeometry(r*.85,32),
- new THREE.MeshBasicMaterial({color,transparent:true,opacity:.13,side:THREE.DoubleSide}),
- x,y,z-.025);
- return frame;
-}
-function stars(g,count,color=0xffffff,spread=35){
- const geo=new THREE.BufferGeometry(),arr=[];
- for(let i=0;i<count;i++){
-  arr.push((Math.random()-.5)*spread,(Math.random()-.5)*spread,(Math.random()-.5)*spread);
- }
- geo.setAttribute('position',new THREE.Float32BufferAttribute(arr,3));
- const points=new THREE.Points(geo,new THREE.PointsMaterial({color,size:.075,transparent:true,opacity:.8}));
- g.add(points);points.userData.twinkle=true;return points;
-}
-function particles(g,count,color,spread=25){
- const geo=new THREE.BufferGeometry(),arr=[];
- for(let i=0;i<count;i++)arr.push((Math.random()-.5)*spread,(Math.random()-.5)*spread,(Math.random()-.5)*spread);
- geo.setAttribute('position',new THREE.Float32BufferAttribute(arr,3));
- const p=new THREE.Points(geo,new THREE.PointsMaterial({color,size:.11,transparent:true,opacity:.7}));
- p.userData.drift=true;g.add(p);return p;
-}
-function arch(g,x,y,z,r,color){
- const a=addMesh(g,new THREE.TorusGeometry(r,.16,8,32,Math.PI),mat(color),x,y,z,1,1,1,{rz:Math.PI});
- return a;
-}
-function building(g,x,z,h,color){
- block(g,x,-4+h/2,z,1.1,h,1.1,mat(color));
- cone(g,x,-4+h+.45,z,.9,.9,mat(0xbda16a));
- for(let j=0;j<3;j++)block(g,x,-4+h*.25+j*h*.2,z+.57,.18,.12,.04,glow(0xffd98c));
-}
-function water(g,x,y,z,s,color){
- const m=addMesh(g,new THREE.PlaneGeometry(s,s,16,16),
- new THREE.MeshStandardMaterial({color,metalness:.4,roughness:.18,transparent:true,opacity:.72,emissive:color,emissiveIntensity:.12}),
- x,y,z,s/2,1,s/2,{rx:-Math.PI/2});
- m.userData.water=true;
- return m;
-}
-function book(g,x,y,z,color){
- const b=block(g,x,y,z,.8,.13,.55,mat(color),{float:true});
- block(g,x,y+.09,z,.7,.018,.48,mat(0xe6d8b8));
- return b;
-}
-function crystal(g,x,y,z,h,color){
- return addMesh(g,new THREE.OctahedronGeometry(1,0),mat(color,color,.4),x,y,z,.45,h,.45,{ry:Math.random()*2,float:true});
-}
-function butterfly(g,x,y,z,color){
- const b=new THREE.Group();b.position.set(x,y,z);
- const m=glow(color);
- addMesh(b,boxGeo,m,-.18,0,0,.28,.18,.035,{rz:.4});
- addMesh(b,boxGeo,m,.18,0,0,.28,.18,.035,{rz:-.4});
- cylinder(b,0,0,0,.025,.025,.5,mat(0x222222));
- b.userData.float=true;b.userData.baseY=y;b.userData.phase=Math.random()*6;
- g.add(b);
-}
-function whale(g,x,y,z,s,color){
- const body=ball(g,x,y,z,s,mat(color),{float:true});
- body.scale.set(s*1.8,s*.65,s*.7);
- cone(g,x-s*1.7,y,z,s*.45,s*.9,mat(color),{rz:Math.PI/2});
- for(let i=0;i<3;i++)ball(g,x-s*.2+i*.3,y-s*.1,z+s*.6,.035,glow(0xb8eaff));
- return body;
-}
-function addTower(g,x,z,h,color){
- cylinder(g,x,-4+h/2,z,.55,.75,h,mat(color));
- cone(g,x,-4+h+.6,z,.8,1.2,mat(0xc4a56c));
- for(let k=0;k<4;k++)ring(g,x,-4+h*.25+k*h*.15,z,.58,glow(0xf2ce87),Math.PI/2);
-}
-function addPath(g,color){
- for(let i=0;i<13;i++){
-  const x=Math.sin(i*.5)*2.5;
-  block(g,x,-3.85,-9+i*1.5,1.4,.12,1.2,mat(color));
- }
-}
-function makeGroup(i){
+
+createMaterial('stone',{color:0x777786});
+createMaterial('ancientStone',{color:0x746b65,roughness:.95});
+createMaterial('darkStone',{color:0x272a39});
+createMaterial('wood',{color:0x68452e});
+createMaterial('grass',{color:0x345b3f});
+createMaterial('sand',{color:0x9a795c});
+createMaterial('snow',{color:0xe3e9ef});
+createMaterial('crystal',{color:0x8bd5ee,metalness:.35,roughness:.18});
+createMaterial('water',{color:0x1b82ad,metalness:.4,roughness:.2});
+createMaterial('gold',{color:0xd6b779,metalness:.65,roughness:.25});
+createMaterial('cloud',{color:0xe3e9f3,roughness:1});
+createMaterial('leaf',{color:0x36714d,roughness:1});
+createMaterial('bark',{color:0x533c30,roughness:1});
+createMaterial('portal',{color:0x9d8bff,emissive:0x6755ff,emissiveIntensity:1.3});
+createMaterial('ice',{color:0x9bd8ee,metalness:.3,roughness:.12});
+createMaterial('architecture',{color:0x8a8191,roughness:.75});
+createMaterial('darkArchitecture',{color:0x333347,roughness:.8});
+
+/* ---------------------------------------------------------
+   05. WORLD MANAGEMENT
+--------------------------------------------------------- */
+
+const worldRegistry=[];
+const animationRegistry=[];
+const particleRegistry=[];
+const disposableRegistry=[];
+
+let activeWorld=0;
+let entered=false;
+let scrollPosition=0;
+let pointer={x:0,y:0};
+let pointerTarget={x:0,y:0};
+let previousWorld=-1;
+
+function createWorld(index){
  const group=new THREE.Group();
- group.position.z=-i*78;
- group.userData.index=i;
- scene.add(group);
+ group.name='WORLD_'+String(index+1).padStart(2,'0');
+ group.position.z=-index*CONFIG.worldSpacing;
+ group.userData.worldIndex=index;
+ worldRoot.add(group);
+ worldRegistry[index]=group;
  return group;
 }
 
-/* WORLD 01 — FLOATING SKY KINGDOM */
-function world01(g){
- const gold=mat(0xb99a5d),stone=mat(0x7c8197),cloudMat=mat(0xd7e0ef);
- for(let i=0;i<9;i++){
-  const x=(i%3-1)*8,z=-10+Math.floor(i/3)*8;
-  cloud(g,x,-1.8+(i%2),z,4);
- }
- island(g,-7,-1,-2,3,0x697b8d);island(g,6,-.3,-8,3.5,0x657a8d);
- island(g,0,-2,-15,5,0x7b8291);
- building(g,0,-15,7,0x8b8190);addTower(g,-2,-15,9,0x9e8d76);
- for(let i=0;i<3;i++)waterfall(g,-7+i*6,-1,-2-i*3,4+i,0x91d7f4);
- for(let i=0;i<10;i++)ball(g,(Math.random()-.5)*22,Math.random()*10-2,-Math.random()*28,.12,glow(0xffd88c),{float:true});
- stars(g,120,0xe4edff);
+function getWorld(index){
+ return worldRegistry[index]||null;
 }
 
-/* WORLD 02 — ENCHANTED FOREST */
-function world02(g){
- terrain(g,0x183b32,-4,2);
- for(let i=0;i<42;i++){
-  const x=(Math.random()-.5)*35,z=(Math.random()-.5)*42;
-  const h=4+Math.random()*7;
-  tree(g,x,z,h,0x493c32,[0x1e5944,0x2d7252,0x397b5c][i%3]);
- }
- for(let i=0;i<28;i++){
-  const x=(Math.random()-.5)*28,z=(Math.random()-.5)*32;
-  ball(g,x,-3.4,z,.13,glow([0x8fffd0,0xffc2e4,0xb4a5ff][i%3]),{float:true});
- }
- addPath(g,0x8a7353);particles(g,160,0x8dffd0,28);
+function addToWorld(index,object){
+ const group=getWorld(index);
+ if(group)group.add(object);
+ return object;
 }
 
-/* WORLD 03 — FORGOTTEN OCEAN */
-function world03(g){
- water(g,0,-3.7,-4,45,0x07527c);
- for(let i=0;i<16;i++){
-  const x=(i%4-1.5)*5,z=-12+Math.floor(i/4)*7;
-  building(g,x,z,2+Math.random()*4,0x234b64);
-  for(let j=0;j<3;j++)ball(g,x+j*.4,-1-j*.5,z,.15,glow(0x5eeaff),{float:true});
- }
- for(let i=0;i<9;i++){
-  const x=(Math.random()-.5)*24,y=(Math.random()-.5)*9,z=-Math.random()*25;
-  const jelly=ball(g,x,y,z,.8,glow(0x9a8bff),{float:true});
-  jelly.scale.set(.8,1.1,.8);
-  for(let t=0;t<5;t++)line(g,[x+(t-2)*.2,y-.7,z],[x+(t-2)*.35,y-2.2-Math.random(),z],glow(0x67ddff),.025);
- }
- for(let i=0;i<15;i++)crystal(g,(Math.random()-.5)*25,-3.5,-Math.random()*30,1+Math.random()*2,0x38b9c9);
- particles(g,220,0x8ceaff,35);
+/* ---------------------------------------------------------
+   06. GEOMETRY FACTORY
+--------------------------------------------------------- */
+
+const GEOMETRIES={
+ sphere:new THREE.SphereGeometry(1,32,24),
+ lowSphere:new THREE.SphereGeometry(1,16,12),
+ cube:new THREE.BoxGeometry(1,1,1),
+ cone:new THREE.ConeGeometry(1,1,16),
+ cylinder:new THREE.CylinderGeometry(1,1,1,24),
+ plane:new THREE.PlaneGeometry(1,1),
+ torus:new THREE.TorusGeometry(1,.05,10,48),
+ octahedron:new THREE.OctahedronGeometry(1,0),
+ dodecahedron:new THREE.DodecahedronGeometry(1,1)
+};
+
+function mesh(
+ geometry,
+ material,
+ position=[0,0,0],
+ scale=[1,1,1],
+ rotation=[0,0,0]
+){
+ const object=new THREE.Mesh(geometry,material);
+ object.position.set(...position);
+ object.scale.set(...scale);
+ object.rotation.set(...rotation);
+ object.castShadow=false;
+ object.receiveShadow=false;
+ disposableRegistry.push(object);
+ return object;
 }
 
-/* WORLD 04 — INFINITE STAIRWAY */
-function world04(g){
- for(let i=0;i<38;i++){
-  const y=-4+i*.29,z=8-i*.95,x=Math.sin(i*.23)*3;
-  block(g,x,y,z,3,.18,1.1,mat(0xb6a5c5),{float:true});
-  if(i%5===0)portal(g,x+2,y+1,z,1.2,0xd6baff);
+function addPrimitive(group,type,options={}){
+ const geometry=GEOMETRIES[type]||GEOMETRIES.sphere;
+ const material=options.material||getMaterial('stone');
+ const object=mesh(
+  geometry,
+  material,
+  options.position||[0,0,0],
+  options.scale||[1,1,1],
+  options.rotation||[0,0,0]
+ );
+ if(options.name)object.name=options.name;
+ if(options.animate){
+  registerAnimation(object,options.animate);
  }
- for(let i=0;i<9;i++)cloud(g,(i-4)*5,2+Math.sin(i)*2,-i*3,3,0xe2dcf3);
- stars(g,100,0xe6d7ff);
+ group.add(object);
+ return object;
 }
 
-/* WORLD 05 — DREAMING DESERT */
-function world05(g){
- terrain(g,0x583b57,-4,8);
- for(let i=0;i<13;i++){
-  const x=(i-6)*3.5,z=-8-Math.random()*23;
-  mountain(g,x,z,3+Math.random()*5,0x78526e,2+Math.random()*2);
- }
- ball(g,7,8,-27,5,glow(0xf2c8dc));
- for(let i=0;i<14;i++){
-  const x=(Math.random()-.5)*22,z=-Math.random()*25;
-  const rock=addMesh(g,new THREE.DodecahedronGeometry(1,0),mat(0x9b7290),x,Math.random()*6,z,1.2,.7,1.1,{float:true,spin:.002});
- }
- water(g,0,-3.45,-10,5,0xc58bb9);
- particles(g,140,0xffd3e6,32);
+/* ---------------------------------------------------------
+   07. PROCEDURAL TERRAIN GENERATOR
+--------------------------------------------------------- */
+
+function seededNoise(x,z,seed=1){
+ const n=Math.sin(x*127.1+z*311.7+seed*74.7)*43758.5453;
+ return (n-Math.floor(n))*2-1;
 }
 
-/* WORLD 06 — INFINITE LIBRARY */
-function world06(g){
- for(let side of [-1,1]){
-  for(let i=0;i<8;i++){
-   const x=side*7,z=-16+i*4;
-   block(g,x,0,z,2,11,2,mat(0x47352e));
-   for(let row=0;row<7;row++){
-    block(g,x, -4+row*1.35,z+1.1,2,.13,.25,mat(0xb18a59));
-    for(let b=0;b<5;b++)block(g,x-0.8+b*.38,-3.5+row*1.35,z+.95,.22,.8,.12,mat([0x8b463b,0x345a58,0x9d7a48,0x514b76][(b+row)%4]));
-   }
-  }
- }
- for(let i=0;i<16;i++)book(g,(Math.random()-.5)*12,Math.random()*7-1,-Math.random()*30,0xc59b5d);
- portal(g,0,2,-24,3,0xc9a8ff);
- stars(g,80,0xffe3b0);
+function smoothNoise(x,z,seed=1){
+ const ix=Math.floor(x);
+ const iz=Math.floor(z);
+ const fx=x-ix;
+ const fz=z-iz;
+ const ux=fx*fx*(3-2*fx);
+ const uz=fz*fz*(3-2*fz);
+
+ const a=seededNoise(ix,iz,seed);
+ const b=seededNoise(ix+1,iz,seed);
+ const c=seededNoise(ix,iz+1,seed);
+ const d=seededNoise(ix+1,iz+1,seed);
+
+ return THREE.MathUtils.lerp(
+  THREE.MathUtils.lerp(a,b,ux),
+  THREE.MathUtils.lerp(c,d,ux),
+  uz
+ );
 }
 
-/* WORLD 07 — CRYSTAL VALLEY */
-function world07(g){
- terrain(g,0x244d60,-4,4);
- for(let i=0;i<35;i++){
-  const x=(Math.random()-.5)*30,z=(Math.random()-.5)*32;
-  crystal(g,x,-3.2,z,2+Math.random()*5,[0x63d9ed,0x8c9eff,0x8fffd2][i%3]);
- }
- water(g,0,-3.65,-8,7,0x42bfd5);
- for(let i=0;i<7;i++)mountain(g,(i-3)*7,-24,7,0x547b91,4);
- particles(g,120,0xa4f5ff,30);
-}
+function terrainHeight(x,z,options={}){
+ const scale=options.scale||.08;
+ const amplitude=options.amplitude||3;
+ const seed=options.seed||1;
+ let total=0;
+ let frequency=scale;
+ let strength=1;
+ let normalizer=0;
 
-/* WORLD 08 — IMPOSSIBLE WORLD */
-function world08(g){
- for(let i=0;i<14;i++){
-  const x=(i%4-1.5)*5,z=-Math.floor(i/4)*7;
-  building(g,x,z,3+Math.random()*5,0x6e6688);
-  const upside=block(g,x,5+Math.random()*3,z,2,3,2,mat(0x9182a7),{float:true});
-  upside.rotation.z=Math.PI;
- }
- for(let i=0;i<12;i++)line(g,[(i-6)*2,-3,-i*2],[(i-6)*2,6,-i*2],glow(0xb9a8e6),.025);
- for(let i=0;i<8;i++)cloud(g,(i-4)*5,7,-i*4,2.5,0xaaa4c9);
-}
-
-/* WORLD 09 — GARDEN OF LIGHT */
-function world09(g){
- terrain(g,0x244a37,-4,6);
- for(let i=0;i<25;i++){
-  const x=(Math.random()-.5)*24,z=(Math.random()-.5)*30;
-  const h=1+Math.random()*3;
-  cylinder(g,x,-3.4,z,.08,.12,h,mat(0x477d4b));
-  const color=[0xff8bc7,0xffd779,0x9de9dc,0xc7a4ff][i%4];
-  ball(g,x,-2.2+h,z,.5,glow(color),{float:true});
-  for(let p=0;p<6;p++){
-   const a=p*Math.PI/3;
-   ball(g,x+Math.cos(a)*.55,-2.2+h,z+Math.sin(a)*.55,.28,mat(color));
-  }
- }
- particles(g,150,0xd5ff9c,25);
-}
-
-/* WORLD 10 — KINGDOM ABOVE CLOUDS */
-function world10(g){
- for(let i=0;i<18;i++)cloud(g,(Math.random()-.5)*35,-2+Math.random()*5,-Math.random()*35,3+Math.random()*3);
- for(let i=0;i<7;i++)mountain(g,(i-3)*7,-22,8+Math.random()*5,0x71859b,4);
- addTower(g,0,-17,9,0xb6a27c);building(g,-3,-17,7,0x8994a7);building(g,3,-17,7,0x8994a7);
- for(let i=0;i<4;i++)portal(g,(i-2)*5,1,-25,1.2,0xe6d4a5);
- stars(g,110,0xe6edff);
-}
-
-/* WORLD 11 — COSMIC OCEAN */
-function world11(g){
- const nebula=ball(g,0,1,-25,8,glow(0x553a99));
- nebula.scale.set(1.7,1,.3);
- for(let i=0;i<9;i++){
-  const r=2+i*.8;
-  ring(g,0,0,-20,r,glow([0x8b70ff,0x57c9f5,0xc879ff][i%3]),Math.random(),Math.random());
- }
- stars(g,500,0xe5e1ff,50);particles(g,150,0x9b7bff,35);
- for(let i=0;i<8;i++)ball(g,(i-4)*4,Math.sin(i)*3,-10-i*4,.5,glow(0x7a78ff),{float:true});
-}
-
-/* WORLD 12 — PLANET X */
-function world12(g){
- ball(g,0,-1,-18,10,mat(0x594477));
- for(let i=0;i<18;i++){
-  const x=(Math.random()-.5)*28,z=-Math.random()*30;
-  tree(g,x,z,3+Math.random()*5,0x45385c,[0x6e4b8c,0x417d7a,0x87629a][i%3]);
- }
- for(let i=0;i<3;i++)ball(g,8-i*7,8+i,-20-i*4,1.4+i*.5,glow([0xffb7d7,0x8ebcff,0xc5a2ff][i]));
- particles(g,120,0xd7b5ff,30);
-}
-
-/* WORLD 13 — MOON TEMPLE */
-function world13(g){
- ball(g,0,5,-27,7,glow(0xd7d9ec));
- for(let i=0;i<12;i++){
-  const a=i*Math.PI/6,x=Math.cos(a)*8,z=-20+Math.sin(a)*8;
-  block(g,x,Math.sin(a*2)*2,z,1.2,4,1.2,mat(0x9b9eae),{float:true,spin:.001});
- }
- addTower(g,0,-13,8,0xb7a98d);
- for(let i=0;i<5;i++)portal(g,(i-2)*4,1,-23,1.3,0xc8d7ff);
- stars(g,180,0xe7ebff);
-}
-
-/* WORLD 14 — EDGE OF TIME */
-function world14(g){
- for(let i=0;i<15;i++){
-  const r=1+i*.65;
-  ring(g,0,0,-20,r,glow([0xb98bff,0x6e9dff,0xffb88b][i%3]),Math.random()*3,Math.random()*3);
- }
- ball(g,0,0,-23,2,glow(0x1d1833));
- for(let i=0;i<14;i++){
-  const a=i*Math.PI/7;
-  line(g,[Math.cos(a)*2,Math.sin(a)*2,-20],[Math.cos(a)*11,Math.sin(a)*11,-27],glow(0xb49aff),.035);
- }
- stars(g,300,0xe9dcff,45);
-}
-
-/* WORLD 15 — CELESTIAL KINGDOM */
-function world15(g){
- for(let i=0;i<8;i++){
-  island(g,(i-4)*5,Math.sin(i)*2,-10-i*3,2.5,0x6e7d9d);
-  addTower(g,(i-4)*5, -10-i*3,3+Math.random()*4,0x9b8c82);
- }
- for(let i=0;i<5;i++)waterfall(g,(i-2)*7,0,-12-i*3,5,0x9bdcff);
- stars(g,250,0xffe5bc,45);
-}
-
-/* WORLD 16 — FORGOTTEN TIME */
-function world16(g){
  for(let i=0;i<5;i++){
-  const x=(i-2)*5,z=-15-Math.random()*10;
-  building(g,x,z,5+Math.random()*4,0x766b5a);
-  ring(g,x,2,z,1.5,glow(0xe3bd70),Math.PI/2);
+  total+=smoothNoise(x*frequency,z*frequency,seed+i)*strength;
+  normalizer+=strength;
+  frequency*=2;
+  strength*=.48;
  }
- for(let i=0;i<12;i++){
-  const r=1+i*.45;
-  ring(g,0,0,-20,r,mat(0x9d8256),Math.random(),Math.random());
- }
- for(let i=0;i<9;i++)block(g,(i-4)*2,6,-15-i*2,.3,3,.3,mat(0x9a8059),{float:true,spin:.003});
- stars(g,120,0xffe2b1);
+ return total/normalizer*amplitude;
 }
 
-/* WORLD 17 — MIRROR DIMENSION */
-function world17(g){
- for(let side of [-1,1]){
-  for(let i=0;i<8;i++){
-   const x=side*(3+i*1.2),z=-i*3;
-   block(g,x,0,z,.12,9,2,new THREE.MeshStandardMaterial({color:0x8299a9,metalness:.9,roughness:.08,transparent:true,opacity:.65}));
-   ring(g,x,1,z,1.3,glow(0x9ad8ff),0,Math.PI/2);
+function createTerrain(options={}){
+ const width=options.width||100;
+ const depth=options.depth||100;
+ const segments=options.segments||64;
+ const group=options.group;
+ const material=options.material||getMaterial('grass');
+ const baseY=options.baseY??-4;
+
+ const geometry=new THREE.PlaneGeometry(
+  width,depth,segments,segments
+ );
+
+ const positions=geometry.attributes.position;
+
+ for(let i=0;i<positions.count;i++){
+  const x=positions.getX(i);
+  const z=positions.getY(i);
+
+  let height=terrainHeight(x,z,{
+   scale:options.scale||.065,
+   amplitude:options.amplitude||4,
+   seed:options.seed||1
+  });
+
+  if(options.ridge){
+   height=Math.abs(height);
+  }
+
+  if(options.basin){
+   const radius=Math.sqrt(x*x+z*z);
+   height-=Math.max(0,1-radius/(width*.45))*options.basin;
+  }
+
+  positions.setZ(i,height);
+ }
+
+ geometry.computeVertexNormals();
+
+ const terrainMesh=new THREE.Mesh(geometry,material);
+ terrainMesh.rotation.x=-Math.PI/2;
+ terrainMesh.position.y=baseY;
+
+ terrainMesh.receiveShadow=false;
+ terrainMesh.name='PROCEDURAL_TERRAIN';
+
+ if(group)group.add(terrainMesh);
+
+ return terrainMesh;
+}
+
+/* ---------------------------------------------------------
+   08. MOUNTAIN GENERATION
+--------------------------------------------------------- */
+
+function createMountain(options={}){
+ const height=options.height||10;
+ const radius=options.radius||5;
+ const segments=options.segments||12;
+
+ const geometry=new THREE.ConeGeometry(
+  radius,height,segments,5
+ );
+
+ const position=geometry.attributes.position;
+
+ for(let i=0;i<position.count;i++){
+  const x=position.getX(i);
+  const y=position.getY(i);
+  const z=position.getZ(i);
+
+  const distortion=seededNoise(x*3+1,z*3+2,options.seed||1);
+  position.setX(i,x+distortion*.5);
+  position.setZ(i,z+distortion*.5);
+  if(y<0)position.setY(i,y+distortion*.25);
+ }
+
+ geometry.computeVertexNormals();
+
+ const mountainMesh=new THREE.Mesh(
+  geometry,
+  options.material||getMaterial('stone')
+ );
+
+ mountainMesh.position.set(
+  options.x||0,
+  options.y??-4+height/2,
+  options.z||0
+ );
+
+ mountainMesh.rotation.y=options.rotation||0;
+
+ return mountainMesh;
+}
+
+/* ---------------------------------------------------------
+   09. DYNAMIC WATER SYSTEM
+--------------------------------------------------------- */
+
+const WATER_VERTEX=`
+uniform float uTime;
+uniform float uAmplitude;
+uniform float uFrequency;
+uniform float uSpeed;
+varying vec2 vUv;
+varying float vWave;
+
+void main(){
+ vUv=uv;
+ vec3 p=position;
+
+ float wave1=sin(p.x*uFrequency+uTime*uSpeed);
+ float wave2=cos(p.y*uFrequency*.7-uTime*uSpeed*.8);
+ float wave3=sin((p.x+p.y)*uFrequency*.5+uTime*.6);
+
+ float wave=(wave1*.45+wave2*.35+wave3*.2)*uAmplitude;
+
+ p.z+=wave;
+ vWave=wave;
+
+ gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);
+}
+`;
+
+const WATER_FRAGMENT=`
+uniform float uTime;
+uniform vec3 uDeepColor;
+uniform vec3 uShallowColor;
+uniform float uOpacity;
+varying vec2 vUv;
+varying float vWave;
+
+void main(){
+ float pattern=sin(vUv.x*35.0+uTime*.4)*
+               cos(vUv.y*29.0-uTime*.3);
+
+ float mixValue=clamp(.45+vWave*.3+pattern*.07,0.0,1.0);
+
+ vec3 color=mix(uDeepColor,uShallowColor,mixValue);
+
+ float highlight=smoothstep(.35,.9,pattern);
+ color+=vec3(.16,.22,.27)*highlight;
+
+ gl_FragColor=vec4(color,uOpacity);
+}
+`;
+
+function createWater(options={}){
+ const geometry=new THREE.PlaneGeometry(
+  options.width||50,
+  options.depth||50,
+  options.segments||80,
+  options.segments||80
+ );
+
+ const uniforms={
+  uTime:{value:0},
+  uAmplitude:{value:options.amplitude||.14},
+  uFrequency:{value:options.frequency||1.5},
+  uSpeed:{value:options.speed||1},
+  uDeepColor:{value:new THREE.Color(options.deepColor||0x075078)},
+  uShallowColor:{value:new THREE.Color(options.shallowColor||0x64c7dc)},
+  uOpacity:{value:options.opacity||.88}
+ };
+
+ const material=new THREE.ShaderMaterial({
+  uniforms,
+  vertexShader:WATER_VERTEX,
+  fragmentShader:WATER_FRAGMENT,
+  transparent:true,
+  side:THREE.DoubleSide,
+  depthWrite:false
+ });
+
+ const waterMesh=new THREE.Mesh(geometry,material);
+ waterMesh.rotation.x=-Math.PI/2;
+ waterMesh.position.set(
+  options.x||0,
+  options.y??-3.5,
+  options.z||0
+ );
+ waterMesh.name='ANIMATED_WATER_SURFACE';
+
+ animationRegistry.push({
+  type:'water',
+  object:waterMesh,
+  update:t=>{uniforms.uTime.value=t}
+ });
+
+ return waterMesh;
+}
+
+/* ---------------------------------------------------------
+   10. ATMOSPHERIC SKY SYSTEM
+--------------------------------------------------------- */
+
+function createSky(options={}){
+ const skyGeometry=new THREE.SphereGeometry(
+  options.radius||250,48,32
+ );
+
+ const skyMaterial=new THREE.ShaderMaterial({
+  side:THREE.BackSide,
+  uniforms:{
+   topColor:{value:new THREE.Color(options.top||0x1b284b)},
+   middleColor:{value:new THREE.Color(options.middle||0x697eae)},
+   bottomColor:{value:new THREE.Color(options.bottom||0xd5b8aa)},
+   offset:{value:options.offset||20},
+   exponent:{value:options.exponent||.8},
+   time:{value:0}
+  },
+  vertexShader:`
+   varying vec3 vWorldPosition;
+   void main(){
+    vec4 worldPosition=modelMatrix*vec4(position,1.0);
+    vWorldPosition=worldPosition.xyz;
+    gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);
+   }
+  `,
+  fragmentShader:`
+   uniform vec3 topColor;
+   uniform vec3 middleColor;
+   uniform vec3 bottomColor;
+   uniform float offset;
+   uniform float exponent;
+   uniform float time;
+   varying vec3 vWorldPosition;
+
+   void main(){
+    float h=normalize(vWorldPosition).y;
+    float a=smoothstep(-.25,.35,h);
+    float b=smoothstep(.15,.85,h);
+    vec3 lower=mix(bottomColor,middleColor,a);
+    vec3 upper=mix(middleColor,topColor,b);
+    vec3 color=mix(lower,upper,b);
+    gl_FragColor=vec4(color,1.0);
+   }
+  `
+ });
+
+ const sky=new THREE.Mesh(skyGeometry,skyMaterial);
+ sky.name='ATMOSPHERIC_SKY';
+ return sky;
+}
+
+/* ---------------------------------------------------------
+   11. CLOUD VOLUME SYSTEM
+--------------------------------------------------------- */
+
+function createCloud(options={}){
+ const cloudGroup=new THREE.Group();
+
+ const count=options.count||7;
+ const size=options.size||3;
+ const cloudMaterial=options.material||getMaterial('cloud');
+
+ for(let i=0;i<count;i++){
+  const radius=size*(.55+Math.random()*.5);
+  const puff=new THREE.Mesh(
+   new THREE.SphereGeometry(radius,16,12),
+   cloudMaterial
+  );
+
+  puff.position.set(
+   (Math.random()-.5)*size*1.5,
+   (Math.random()-.5)*size*.25,
+   (Math.random()-.5)*size*.7
+  );
+
+  puff.scale.y=.38+Math.random()*.2;
+  cloudGroup.add(puff);
+ }
+
+ cloudGroup.position.set(
+  options.x||0,
+  options.y||0,
+  options.z||0
+ );
+
+ registerAnimation(cloudGroup,{
+  type:'cloud',
+  speed:options.speed||.12,
+  amplitude:options.amplitude||.2,
+  drift:options.drift||.3
+ });
+
+ return cloudGroup;
+}
+
+/* ---------------------------------------------------------
+   12. PARTICLE FIELD SYSTEM
+--------------------------------------------------------- */
+
+function createParticleField(options={}){
+ const count=Math.floor(
+  (options.count||500)*DEVICE.particles
+ );
+
+ const positions=new Float32Array(count*3);
+ const speeds=new Float32Array(count);
+ const phases=new Float32Array(count);
+
+ const spread=options.spread||35;
+ const height=options.height||18;
+ const depth=options.depth||45;
+
+ for(let i=0;i<count;i++){
+  positions[i*3]=(Math.random()-.5)*spread;
+  positions[i*3+1]=(Math.random()-.5)*height;
+  positions[i*3+2]=(Math.random()-.5)*depth;
+  speeds[i]=.2+Math.random()*.8;
+  phases[i]=Math.random()*Math.PI*2;
+ }
+
+ const geometry=new THREE.BufferGeometry();
+ geometry.setAttribute(
+  'position',
+  new THREE.BufferAttribute(positions,3)
+ );
+
+ const material=new THREE.PointsMaterial({
+  color:options.color||0xffffff,
+  size:options.size||.08,
+  transparent:true,
+  opacity:options.opacity||.7,
+  depthWrite:false,
+  blending:options.additive?THREE.AdditiveBlending:THREE.NormalBlending
+ });
+
+ const points=new THREE.Points(geometry,material);
+
+ animationRegistry.push({
+  type:'particles',
+  object:points,
+  update:t=>{
+   const array=geometry.attributes.position.array;
+
+   for(let i=0;i<count;i++){
+    array[i*3+1]+=
+     Math.sin(t*speeds[i]+phases[i])*.002;
+
+    array[i*3]+=
+     Math.cos(t*.1+phases[i])*.001;
+   }
+
+   geometry.attributes.position.needsUpdate=true;
+  }
+ });
+
+ return points;
+}
+
+/* ---------------------------------------------------------
+   13. ENVIRONMENT ANIMATION REGISTRY
+--------------------------------------------------------- */
+
+function registerAnimation(object,options={}){
+ const record={
+  type:options.type||'floating',
+  object,
+  basePosition:object.position.clone(),
+  baseRotation:object.rotation.clone(),
+  phase:Math.random()*Math.PI*2,
+  speed:options.speed||.6,
+  amplitude:options.amplitude||.25,
+  drift:options.drift||.2,
+  rotationSpeed:options.rotationSpeed||.05,
+  update:null
+ };
+
+ if(typeof options.update==='function'){
+  record.update=options.update;
+ }
+
+ animationRegistry.push(record);
+ object.userData.fantasyAnimation=true;
+ return object;
+}
+
+function animateEnvironment(time,delta){
+ for(const item of animationRegistry){
+  if(!item.object||!item.object.parent)continue;
+
+  if(item.update){
+   item.update(time,delta);
+   continue;
+  }
+
+  const o=item.object;
+
+  switch(item.type){
+   case 'cloud':
+    o.position.x+=delta*item.drift;
+    o.position.y=item.basePosition.y+
+     Math.sin(time*item.speed+item.phase)*item.amplitude;
+    break;
+
+   case 'sway':
+    o.rotation.z=item.baseRotation.z+
+     Math.sin(time*item.speed+item.phase)*item.amplitude;
+    break;
+
+   case 'spin':
+    o.rotation.y+=delta*item.rotationSpeed;
+    break;
+
+   case 'floating':
+   default:
+    o.position.y=item.basePosition.y+
+     Math.sin(time*item.speed+item.phase)*item.amplitude;
+    o.rotation.y=item.baseRotation.y+
+     Math.sin(time*.25+item.phase)*.08;
   }
  }
- const floor=addMesh(g,new THREE.PlaneGeometry(40,40),new THREE.MeshStandardMaterial({color:0x263b4d,metalness:.8,roughness:.1}),0,-3.9,-8,1,1,1,{rx:-Math.PI/2});
- for(let i=0;i<10;i++)ball(g,(i-5)*2,Math.sin(i)*3,-i*2,.35,glow(0xb6e4ff),{float:true});
 }
 
-/* WORLD 18 — WORLD TREE */
-function world18(g){
- cylinder(g,0,1,-16,1.2,2.2,13,mat(0x62442f));
- for(let i=0;i<12;i++){
-  const a=i*Math.PI/6;
-  line(g,[0,2,-16],[Math.cos(a)*5,5+Math.sin(a*2)*2,-16+Math.sin(a)*4],mat(0x76553b),.22);
-  ball(g,Math.cos(a)*5,5+Math.sin(a*2)*2,-16+Math.sin(a)*4,1.4,glow([0x5eaa78,0x8acb86,0xc0e9a4][i%3]),{float:true});
- }
- for(let i=0;i<8;i++)island(g,(i-4)*4,3+Math.sin(i)*2,-8-i*4,1.8,0x58765e);
- particles(g,160,0xa9ffb5,30);
+/* ---------------------------------------------------------
+   14. FOG & LIGHTING PRESET CONTROLLER
+--------------------------------------------------------- */
+
+function applyEnvironmentPreset(name){
+ const preset=LIGHT_PRESETS[name]||LIGHT_PRESETS.default;
+
+ ambientLight.color.setHex(preset.ambient);
+ ambientLight.groundColor.setHex(preset.ground);
+ mainSun.color.setHex(preset.sun);
+ mainSun.intensity=preset.sunPower;
+
+ scene.fog.color.setHex(preset.fog);
+ scene.background.setHex(preset.fog);
 }
 
-/* WORLD 19 — SKY OCEAN */
-function world19(g){
- for(let i=0;i<7;i++)cloud(g,(i-3)*6,Math.sin(i)*3,-i*5,4,0xa9c8df);
- for(let i=0;i<5;i++)whale(g,(i-2)*6,2+Math.sin(i)*3,-10-i*5,1.5,0x648ba9);
- for(let i=0;i<6;i++)island(g,(i-3)*6,-2,-7-i*5,2,0x6d8c9b);
- particles(g,130,0xc3eaff,35);
+function setFog(color,density){
+ scene.fog.color.set(color);
+ scene.fog.density=density;
 }
 
-/* WORLD 20 — CITY OF FORGOTTEN DREAMS */
-function world20(g){
- terrain(g,0x302c3b,-4,9);
- for(let i=0;i<18;i++){
-  const x=(i%6-2.5)*4,z=-Math.floor(i/6)*10-5;
-  building(g,x,z,3+Math.random()*6,[0x4c4657,0x5b5267,0x3d4a54][i%3]);
- }
- for(let i=0;i<8;i++)portal(g,(i-4)*3,1,-10-i*2,1.1,[0x8d8cff,0x8af0db,0xf0b8d9][i%3]);
- particles(g,120,0xb7a8d7,30);
+/* ---------------------------------------------------------
+   15. CINEMATIC CAMERA RAIL
+--------------------------------------------------------- */
+
+const cameraPath={
+ from:new THREE.Vector3(0,2,20),
+ to:new THREE.Vector3(0,2,-20),
+ lookFrom:new THREE.Vector3(0,0,-5),
+ lookTo:new THREE.Vector3(0,0,-30),
+ curve:0
+};
+
+function smoothStep(x){
+ return x*x*(3-2*x);
 }
 
-/* WORLD 21 — BUTTERFLY DIMENSION */
-function world21(g){
- terrain(g,0x513c55,-4,11);
- for(let i=0;i<26;i++){
-  butterfly(g,(Math.random()-.5)*25,Math.random()*9-1,-Math.random()*30,[0xff9acb,0xffd58b,0xb8aaff,0x9df5e3][i%4]);
- }
- for(let i=0;i<12;i++)ball(g,(Math.random()-.5)*22,-3, -Math.random()*25,.4,glow(0xffbde0),{float:true});
- particles(g,140,0xffcce9,30);
+function setCameraPath(options={}){
+ if(options.from)cameraPath.from.set(...options.from);
+ if(options.to)cameraPath.to.set(...options.to);
+ if(options.lookFrom)cameraPath.lookFrom.set(...options.lookFrom);
+ if(options.lookTo)cameraPath.lookTo.set(...options.lookTo);
+ if(options.curve!==undefined)cameraPath.curve=options.curve;
 }
 
-/* WORLD 22 — UPSIDE DOWN RIVER */
-function world22(g){
- for(let i=0;i<9;i++)mountain(g,(i-4)*5,-22,5+Math.random()*7,0x3e7180,3);
- const river=water(g,0,-1,-15,8,0x39a9b5);
- river.rotation.z=Math.PI;
- for(let i=0;i<10;i++){
-  const x=(i-5)*1.4;
-  waterfall(g,x,4,-15,7,0x6ce5eb);
- }
- for(let i=0;i<14;i++)ball(g,(Math.random()-.5)*12,Math.random()*7,-Math.random()*25,.09,glow(0xb8ffff),{float:true});
- particles(g,160,0x8df8ff,30);
+function cinematicCamera(progress,worldIndex){
+ const local=THREE.MathUtils.clamp(progress,0,1);
+ const eased=smoothStep(local);
+
+ const x=THREE.MathUtils.lerp(
+  cameraPath.from.x,
+  cameraPath.to.x,
+  eased
+ );
+
+ const y=THREE.MathUtils.lerp(
+  cameraPath.from.y,
+  cameraPath.to.y,
+  eased
+ );
+
+ const z=THREE.MathUtils.lerp(
+  cameraPath.from.z,
+  cameraPath.to.z,
+  eased
+ );
+
+ const curve=Math.sin(local*Math.PI)*cameraPath.curve;
+
+ camera.position.set(
+  x+curve,
+  y,
+  z-worldIndex*CONFIG.worldSpacing
+ );
+
+ const target=new THREE.Vector3(
+  THREE.MathUtils.lerp(cameraPath.lookFrom.x,cameraPath.lookTo.x,eased),
+  THREE.MathUtils.lerp(cameraPath.lookFrom.y,cameraPath.lookTo.y,eased),
+  THREE.MathUtils.lerp(cameraPath.lookFrom.z,cameraPath.lookTo.z,eased)
+ );
+
+ target.z-=worldIndex*CONFIG.worldSpacing;
+
+ camera.lookAt(target);
 }
 
-/* WORLD 23 — THE LAST DREAM */
-function world23(g){
- terrain(g,0x77566e,-4,12);
- for(let i=0;i<8;i++)mountain(g,(i-4)*6,-23,4+Math.random()*5,0x98758e,3.5);
- for(let i=0;i<12;i++)cloud(g,(i-6)*4,3+Math.sin(i)*2,-i*2,3,0xe9c5dc);
- water(g,0,-3.7,-12,10,0x9c7eaa);
- ball(g,0,7,-28,3,glow(0xf7d6e7));
- particles(g,130,0xf8d9ef,30);
+/* ---------------------------------------------------------
+   16. WORLD TRANSITION SYSTEM
+--------------------------------------------------------- */
+
+let transitionTimer=0;
+let transitionActive=false;
+
+function triggerTransition(){
+ const curtain=document.getElementById('transitionCurtain');
+
+ if(transitionActive)return;
+
+ transitionActive=true;
+ curtain.classList.add('active');
+
+ setTimeout(()=>{
+  curtain.classList.remove('active');
+  transitionActive=false;
+ },700);
 }
 
-/* WORLD 24 — GATEWAY OF REALITIES */
-function world24(g){
- for(let i=0;i<17;i++){
-  const x=(i%5-2)*5,y=Math.floor(i/5)*2-1,z=-i*2.1;
-  portal(g,x,y,z,1.2+Math.random()*.7,[0xb7a0ff,0x8ee6ed,0xf5c2d9,0xe8cf94][i%4]);
- }
- for(let i=0;i<12;i++)block(g,(i-6)*2,-3,-i*2,1.4,.18,1.3,mat(0x4b465f));
- stars(g,250,0xe8dfff,40);particles(g,150,0xc6b8ff,30);
-}
+/* ---------------------------------------------------------
+   17. SCROLL-BASED WORLD ACTIVATION
+--------------------------------------------------------- */
 
-/* WORLD 25 — INFINITE IMAGINATION */
-function world25(g){
- ball(g,0,2,-25,5,glow(0xffe5ae));
- for(let i=0;i<12;i++){
-  const a=i*Math.PI/6;
-  island(g,Math.cos(a)*9,Math.sin(a)*4,-22+Math.sin(a)*7,2,0x78859a);
-  addTower(g,Math.cos(a)*9,-22+Math.sin(a)*7,3+Math.random()*4,0xb39a70);
- }
- cylinder(g,0,-1,-20,1.1,1.5,8,mat(0x72503b));
- for(let i=0;i<9;i++){
-  const a=i*Math.PI*2/9;
-  line(g,[0,2,-20],[Math.cos(a)*7,6+Math.sin(a)*2,-20+Math.sin(a)*7],glow(0xe3c27e),.09);
- }
- for(let i=0;i<8;i++)portal(g,(i-4)*3,Math.sin(i)*3,-10-i*3,1.2,0xffdca0);
- for(let i=0;i<7;i++)cloud(g,(i-3)*6,-2+Math.sin(i)*2,-i*5,3,0xd5d9e5);
- stars(g,400,0xffe9c2,50);particles(g,220,0xffd99a,35);
-}
+function updateScrollState(){
+ if(!window.FANTASY_STATE.entered)return;
 
-const builders=[
- world01,world02,world03,world04,world05,
- world06,world07,world08,world09,world10,
- world11,world12,world13,world14,world15,
- world16,world17,world18,world19,world20,
- world21,world22,world23,world24,world25
-];
+ const maxScroll=Math.max(
+  1,
+  document.documentElement.scrollHeight-innerHeight
+ );
 
-function init(){
- try{
-  scene=new THREE.Scene();
-  scene.background=new THREE.Color(worlds[0][2]);
-  scene.fog=new THREE.FogExp2(worlds[0][2],.012);
-  camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,180);
-  camera.position.set(0,1,25);
-  camera.lookAt(0,0,0);
-  renderer=new THREE.WebGLRenderer({
-   canvas:$('worldCanvas'),antialias:!isMobile,alpha:false,
-   powerPreference:'high-performance'
+ const normalized=THREE.MathUtils.clamp(
+  window.scrollY/maxScroll,0,1
+ );
+
+ const worldProgress=normalized*CONFIG.worldCount;
+
+ scrollPosition=worldProgress;
+
+ const index=Math.min(
+  CONFIG.worldCount-1,
+  Math.floor(worldProgress)
+ );
+
+ const localProgress=worldProgress-index;
+
+ window.FANTASY_STATE.progress=normalized;
+ window.FANTASY_STATE.world=index;
+
+ if(index!==previousWorld){
+  previousWorld=index;
+  activeWorld=index;
+
+  const counter=document.getElementById('currentWorldNumber');
+  if(counter){
+   counter.textContent=String(index+1).padStart(2,'0');
+  }
+
+  const title=document.getElementById('captionTitle');
+  const description=document.getElementById('captionDescription');
+  const captionIndex=document.getElementById('captionIndex');
+
+  if(window.FANTASY_WORLDS&&window.FANTASY_WORLDS[index]){
+   const data=window.FANTASY_WORLDS[index];
+
+   if(title)title.textContent=data.title;
+   if(description)description.textContent=data.description;
+   if(captionIndex)captionIndex.textContent=data.chapter||'A JOURNEY BEYOND REALITY';
+  }
+
+  document.querySelectorAll('.world-nav-dot').forEach((dot,i)=>{
+   dot.classList.toggle('active',i===index);
   });
-  renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?1.35:1.8));
-  renderer.setSize(innerWidth,innerHeight);
-  renderer.outputColorSpace=THREE.SRGBColorSpace;
-  renderer.toneMapping=THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure=1.25;
-  scene.add(new THREE.HemisphereLight(0xc5d8ff,0x1c1b2b,2));
-  const sun=new THREE.DirectionalLight(0xffe2b5,2.2);
-  sun.position.set(-8,12,10);scene.add(sun);
-  const fill=new THREE.PointLight(0x8b9fff,35,80);
-  fill.position.set(0,5,-20);scene.add(fill);
-  clock=new THREE.Clock();
 
-  builders.forEach((build,i)=>{
-   const g=makeGroup(i);
-   build(g);
-   groups.push(g);
-  });
-  $('loading').classList.add('done');
-  setTimeout(()=>$('loading').remove(),1000);
-  animationReady=true;
-  if(entered)startExperience();
-  animate();
- }catch(err){
-  console.error(err);
-  $('loading').classList.add('done');
-  $('fallback').style.display='block';
+  triggerTransition();
+
+  window.dispatchEvent(new CustomEvent('fantasy:worldchange',{
+   detail:{index,progress:localProgress}
+  }));
  }
+
+ cinematicCamera(localProgress,index);
 }
 
-function updateCamera(){
- const max=worlds.length-1;
- const p=THREE.MathUtils.clamp(scrollProgress,0,max);
- const index=Math.min(max,Math.floor(p));
- const local=p-index;
- const worldZ=-index*78;
- const targetZ=worldZ+22-local*78;
- const targetY=1+Math.sin(local*Math.PI)*1.2;
- camera.position.x=THREE.MathUtils.damp(camera.position.x,targetX*.9,.9,clock.getDelta());
- camera.position.y=THREE.MathUtils.damp(camera.position.y,targetY+targetY*pointerY*.07,.8,.016);
- camera.position.z=THREE.MathUtils.damp(camera.position.z,targetZ,.9,.016);
- camera.lookAt(targetX*.4,targetY*.15,targetZ-17);
- const next=Math.min(max,index+1);
- const blend=local;
- const c1=new THREE.Color(worlds[index][2]);
- const c2=new THREE.Color(worlds[next][2]);
- const c=c1.lerp(c2,blend);
- scene.background.copy(c);
- scene.fog.color.copy(c);
- scene.fog.density=THREE.MathUtils.lerp(.010,.016,Math.sin(local*Math.PI));
- if(index!==activeIndex||!entered){
-  activeIndex=index;
-  $('sceneNumber').textContent=`WORLD ${String(index+1).padStart(2,'0')} / 25`;
-  $('sceneTitle').textContent=worlds[index][0];
-  $('sceneDescription').textContent=worlds[index][1];
-  [...progress.children].forEach((el,n)=>el.classList.toggle('active',n===index));
- }
-}
+/* ---------------------------------------------------------
+   18. NAVIGATION CREATION
+--------------------------------------------------------- */
 
-function animate(){
- requestAnimationFrame(animate);
- if(!renderer||!animationReady)return;
- const t=clock.getElapsedTime();
- const dt=Math.min(clock.getDelta(),.04);
- groups.forEach((g,i)=>{
-  const distance=Math.abs(i*78+camera.position.z);
-  g.visible=distance<145;
-  if(!g.visible)return;
-  g.traverse(o=>{
-   if(o.userData.float){
-    o.position.y=o.userData.baseY+Math.sin(t*0.7+o.userData.phase)*.18;
-   }
-   if(o.userData.spin)o.rotation.y+=o.userData.spin;
-   if(o.userData.drift)o.rotation.y+=dt*.025;
-   if(o.userData.twinkle)o.rotation.z=Math.sin(t*.12)*.03;
-   if(o.userData.water){
-    o.material.opacity=.62+Math.sin(t*1.5)*.08;
-   }
+const navigation=document.getElementById('worldNavigation');
+
+for(let i=0;i<CONFIG.worldCount;i++){
+ const dot=document.createElement('button');
+
+ dot.type='button';
+ dot.className='world-nav-dot';
+ dot.setAttribute('aria-label','Navigate to world '+(i+1));
+ dot.title='World '+String(i+1).padStart(2,'0');
+
+ dot.addEventListener('click',()=>{
+  const maxScroll=Math.max(
+   1,
+   document.documentElement.scrollHeight-innerHeight
+  );
+
+  const target=maxScroll*(i/(CONFIG.worldCount-1));
+
+  window.scrollTo({
+   top:target,
+   behavior:DEVICE.reduced?'auto':'smooth'
   });
  });
- if(entered)updateCamera();
+
+ navigation.appendChild(dot);
+}
+
+/* ---------------------------------------------------------
+   19. POINTER & TOUCH CAMERA RESPONSE
+--------------------------------------------------------- */
+
+window.addEventListener('pointermove',event=>{
+ pointerTarget.x=(event.clientX/innerWidth-.5)*2;
+ pointerTarget.y=(event.clientY/innerHeight-.5)*2;
+},{passive:true});
+
+window.addEventListener('touchmove',event=>{
+ if(!event.touches.length)return;
+
+ pointerTarget.x=(event.touches[0].clientX/innerWidth-.5)*.6;
+ pointerTarget.y=(event.touches[0].clientY/innerHeight-.5)*.6;
+},{passive:true});
+
+/* ---------------------------------------------------------
+   20. CAMERA UPDATE
+--------------------------------------------------------- */
+
+function updatePointerCamera(delta){
+ pointer.x=THREE.MathUtils.damp(
+  pointer.x,pointerTarget.x,2.2,delta
+ );
+
+ pointer.y=THREE.MathUtils.damp(
+  pointer.y,pointerTarget.y,2.2,delta
+ );
+
+ camera.rotation.z=THREE.MathUtils.damp(
+  camera.rotation.z,
+  -pointer.x*.008,
+  2,
+  delta
+ );
+}
+
+/* ---------------------------------------------------------
+   21. RESIZE HANDLER
+--------------------------------------------------------- */
+
+function resizeRenderer(){
+ const width=window.innerWidth;
+ const height=window.innerHeight;
+
+ camera.aspect=width/height;
+ camera.updateProjectionMatrix();
+
+ renderer.setPixelRatio(Math.min(
+  window.devicePixelRatio||1,
+  DEVICE.mobile?1.35:1.8
+ ));
+
+ renderer.setSize(width,height,false);
+}
+
+window.addEventListener('resize',resizeRenderer,{
+ passive:true
+});
+
+/* ---------------------------------------------------------
+   22. MAIN RENDER LOOP
+--------------------------------------------------------- */
+
+let frameTime=0;
+let frameCounter=0;
+
+function renderLoop(){
+ requestAnimationFrame(renderLoop);
+
+ const delta=Math.min(clock.getDelta(),CONFIG.maxDelta);
+ const time=clock.elapsedTime;
+
+ frameTime+=delta;
+ frameCounter++;
+
+ if(!DEVICE.reduced){
+  animateEnvironment(time,delta);
+ }
+
+ if(window.FANTASY_STATE.entered){
+  updatePointerCamera(delta);
+  updateScrollState();
+ }
+
  renderer.render(scene,camera);
 }
 
-function startExperience(){
- if(!animationReady)return;
+renderLoop();
+
+/* ---------------------------------------------------------
+   23. ENGINE API — USED BY PART 03 & PART 04
+--------------------------------------------------------- */
+
+const FantasyEngine={
+ THREE,
+ renderer,
+ scene,
+ camera,
+ clock,
+ CONFIG,
+ DEVICE,
+ MATERIALS,
+ GEOMETRIES,
+ LIGHT_PRESETS,
+ worldRegistry,
+ animationRegistry,
+
+ createWorld,
+ getWorld,
+ addToWorld,
+
+ mesh,
+ addPrimitive,
+ standardMaterial,
+ glowingMaterial,
+ createMaterial,
+ getMaterial,
+
+ createTerrain,
+ terrainHeight,
+ createMountain,
+ createWater,
+ createSky,
+ createCloud,
+ createParticleField,
+
+ registerAnimation,
+ applyEnvironmentPreset,
+ setFog,
+ setCameraPath,
+ cinematicCamera,
+ triggerTransition,
+
+ addAmbientLight:(color,intensity)=>{
+  const light=new THREE.AmbientLight(color,intensity);
+  scene.add(light);
+  return light;
+ },
+
+ addPointLight:(color,intensity,distance,position)=>{
+  const light=new THREE.PointLight(color,intensity,distance);
+  light.position.set(...position);
+  scene.add(light);
+  return light;
+ },
+
+ addDirectionalLight:(color,intensity,position)=>{
+  const light=new THREE.DirectionalLight(color,intensity);
+  light.position.set(...position);
+  scene.add(light);
+  return light;
+ },
+
+ addToEnvironment:(object)=>{
+  environmentLights.add(object);
+  return object;
+ },
+
+ setWorldBackground:(color)=>{
+  scene.background.set(color);
+  if(scene.fog)scene.fog.color.set(color);
+ },
+
+ get activeWorld(){return activeWorld},
+ get scrollPosition(){return scrollPosition},
+ get entered(){return entered}
+};
+
+window.FantasyEngine=FantasyEngine;
+window.FANTASY_STATE.engineReady=true;
+
+window.dispatchEvent(new CustomEvent('fantasy:engine-ready'));
+
+console.log(
+ '%cMAMUN CODING FANTASY — ENGINE READY',
+ 'color:#d6b779;font-size:14px;font-weight:bold'
+);
+
+/* ---------------------------------------------------------
+   24. INTRO EVENT
+--------------------------------------------------------- */
+
+window.addEventListener('fantasy:enter',()=>{
  entered=true;
- updateCamera();
-}
-window.addEventListener('fantasy-enter',()=>{
- entered=true;
- startExperience();
-});
-window.addEventListener('scroll',()=>{
- if(!entered)return;
- scrollProgress=THREE.MathUtils.clamp(scrollY/Math.max(1,innerHeight),0,24);
-},{passive:true});
-window.addEventListener('pointermove',e=>{
- targetX=(e.clientX/innerWidth-.5)*2;
- targetY=(e.clientY/innerHeight-.5)*2;
-},{passive:true});
-window.addEventListener('touchmove',e=>{
- if(e.touches.length){
-  targetX=(e.touches[0].clientX/innerWidth-.5)*.6;
-  targetY=(e.touches[0].clientY/innerHeight-.5)*.6;
+
+ const audio=document.getElementById('fantasyMusic');
+
+ if(audio&&window.FANTASY_STATE.audioEnabled){
+  audio.play().catch(()=>{});
  }
-},{passive:true});
-window.addEventListener('resize',()=>{
- if(!renderer||!camera)return;
- camera.aspect=innerWidth/innerHeight;
- camera.updateProjectionMatrix();
- renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?1.35:1.8));
- renderer.setSize(innerWidth,innerHeight);
 });
-init();
+
+/* ---------------------------------------------------------
+   25. WEBGL FAILURE HANDLING
+--------------------------------------------------------- */
+
+window.addEventListener('webglcontextlost',event=>{
+ event.preventDefault();
+ console.warn('Fantasy rendering context lost.');
+});
+
 </script>
+
+<!-- PART 3: 25 UNIQUE WORLD BUILDERS WILL BE INSERTED HERE -->
+<!-- PART 4: CINEMATIC JOURNEY AND FINAL SYSTEM WILL BE INSERTED HERE -->
 </body>
 </html>
