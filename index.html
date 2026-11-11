@@ -2075,24 +2075,337 @@ function worldFlower(root){
 }
 
 
-/* 03 — INFINITE KNOT */
+
+/* =========================================================
+   03 — INFINITE KNOT
+   MASTERCLASS DIMENSION EDITION
+   MAMUN CODING FANTASY
+========================================================= */
+
 function worldKnot(root){
+
  const knot=group(root);
+
+ // ============================================
+ // 01. MASTER ROTATION GROUP
+ // ============================================
+
+ const structure=group(knot);
+ structure.userData.kind="slowSpin";
+
+ // ============================================
+ // 02. FIVE INFINITE INTERWOVEN STRUCTURES
+ // ============================================
+
+ const colors=[
+  C.gold,
+  C.violet,
+  C.cyan,
+  C.rose,
+  C.emerald
+ ];
+
+ const curves=[];
+
  for(let k=0;k<5;k++){
+
   const pts=[];
-  for(let i=0;i<=800;i++){
-   const t=i/800*TAU*2;
-   const r=1.5+.5*Math.cos(5*t+k*.5);
-   pts.push([r*Math.cos(3*t+k*.25),
+
+  for(let i=0;i<=1000;i++){
+
+   const t=i/1000*TAU*2;
+
+   const r=
+    1.5+
+    .5*Math.cos(5*t+k*.5)+
+    .08*Math.sin(11*t+k);
+
+   pts.push([
+    r*Math.cos(3*t+k*.25),
     r*Math.sin(2*t+k*.25),
-    1.05*Math.sin(5*t+k*.8)]);
+    1.05*Math.sin(5*t+k*.8)
+   ]);
   }
-  const tube=lineTube(knot,pts,[C.gold,C.violet,C.cyan,C.rose,C.emerald][k],.035,800);
+
+  // Main metallic strand
+  const tube=lineTube(
+   structure,
+   pts,
+   colors[k],
+   .047,
+   1000
+  );
+
   tube.userData.kind="slowSpin";
+
+  // Inner energy line
+  const inner=lineTube(
+   structure,
+   pts,
+   C.white,
+   .009,
+   1000
+  );
+
+  inner.userData.kind="slowSpin";
+
+  curves.push(pts);
  }
- const core=sphere(knot,.3,C.white);core.userData.kind="pulseCore";
- addRings(knot,3,3.1,C.violet,.015);
+
+ // ============================================
+ // 03. SECONDARY INFINITY WEAVE
+ // ============================================
+
+ for(let k=0;k<3;k++){
+
+  const pts=[];
+
+  for(let i=0;i<=700;i++){
+
+   const t=i/700*TAU*2;
+
+   const r=1.9+.28*Math.sin(4*t+k);
+
+   pts.push([
+    r*Math.cos(2*t+k*.7),
+    r*Math.sin(3*t+k*.5),
+    .7*Math.cos(5*t+k)
+   ]);
+  }
+
+  const line=lineTube(
+   structure,
+   pts,
+   colors[(k+1)%5],
+   .012,
+   700
+  );
+
+  line.userData.kind="slowSpin";
+ }
+
+ // ============================================
+ // 04. CENTRAL ENERGY REACTOR
+ // ============================================
+
+ const reactor=group(structure);
+
+ const core=sphere(
+  reactor,.34,C.white,0,0,0
+ );
+
+ core.userData.kind="pulseCore";
+
+ const coreGold=sphere(
+  reactor,.23,C.gold,0,0,0
+ );
+
+ coreGold.userData.kind="slowSpin";
+
+ const coreViolet=sphere(
+  reactor,.13,C.violet,0,0,0
+ );
+
+ coreViolet.userData.kind="pulseCore";
+
+ // ============================================
+ // 05. REACTOR CRYSTALS
+ // ============================================
+
+ for(let i=0;i<8;i++){
+
+  const angle=i/8*TAU;
+
+  const crystal=sphere(
+   reactor,
+   .065,
+   colors[i%5],
+   Math.cos(angle)*.72,
+   Math.sin(angle)*.72,
+   Math.sin(angle*2)*.18
+  );
+
+  crystal.userData.kind="slowSpin";
+ }
+
+ // ============================================
+ // 06. ORBITAL ENERGY RINGS
+ // ============================================
+
+ const orbit=group(knot);
+
+ addRings(
+  orbit,
+  5,
+  2.7,
+  C.gold,
+  .012
+ );
+
+ addRings(
+  orbit,
+  4,
+  3.1,
+  C.violet,
+  .012
+ );
+
+ addRings(
+  orbit,
+  3,
+  3.45,
+  C.cyan,
+  .009
+ );
+
+ orbit.userData.kind="slowSpin";
+
+ // ============================================
+ // 07. ORBITAL ENERGY NODES
+ // ============================================
+
+ const nodes=group(orbit);
+
+ for(let i=0;i<18;i++){
+
+  const angle=i/18*TAU;
+
+  const radius=2.9+(i%3)*.18;
+
+  const node=sphere(
+   nodes,
+   .045+(i%3)*.012,
+   colors[i%5],
+   Math.cos(angle)*radius,
+   Math.sin(angle)*radius,
+   Math.sin(angle*2)*.3
+  );
+
+  node.userData.kind="slowSpin";
+ }
+
+ // ============================================
+ // 08. ENERGY PARTICLE FIELD
+ // ============================================
+
+ particleCloud(
+  knot,
+  450,
+  C.gold,
+  4.2,
+  .025
+ );
+
+ particleCloud(
+  knot,
+  220,
+  C.violet,
+  3.6,
+  .018
+ );
+
+ particleCloud(
+  knot,
+  160,
+  C.cyan,
+  3.2,
+  .016
+ );
+
+ // ============================================
+ // 09. FLOATING GOLDEN DEBRIS
+ // ============================================
+
+ addFloatingDebris(
+  knot,
+  65,
+  C.gold,
+  4.2
+ );
+
+ addFloatingDebris(
+  knot,
+  35,
+  C.violet,
+  3.5
+ );
+
+ // ============================================
+ // 10. ENERGY ORBITAL SATELLITES
+ // ============================================
+
+ const satellites=group(knot);
+
+ for(let i=0;i<12;i++){
+
+  const angle=i/12*TAU;
+
+  const radius=3.5;
+
+  const satellite=sphere(
+   satellites,
+   .055,
+   colors[i%5],
+   Math.cos(angle)*radius,
+   Math.sin(angle)*radius,
+   Math.sin(angle*3)*.5
+  );
+
+  satellite.userData.kind="pulseCore";
+ }
+
+ satellites.userData.kind="slowSpin";
+
+ // ============================================
+ // 11. OUTER DIMENSIONAL FRAME
+ // ============================================
+
+ const frame=group(knot);
+
+ addRings(
+  frame,
+  3,
+  4.0,
+  C.gold,
+  .008
+ );
+
+ frame.userData.kind="slowSpin";
+
+ // ============================================
+ // 12. FLOATING ENERGY SPHERES
+ // ============================================
+
+ for(let i=0;i<24;i++){
+
+  const angle=i/24*TAU;
+
+  const radius=2.1+Math.sin(i*2)*.3;
+
+  const orb=sphere(
+   structure,
+   .025+(i%3)*.012,
+   colors[i%5],
+   Math.cos(angle)*radius,
+   Math.sin(angle*2)*1.5,
+   Math.sin(angle)*radius
+  );
+
+  orb.userData.kind="pulseCore";
+ }
+
+ // ============================================
+ // 13. FINAL ANIMATION SETTINGS
+ // ============================================
+
+ structure.userData.kind="slowSpin";
+ orbit.userData.kind="slowSpin";
+ frame.userData.kind="slowSpin";
+
+ knot.userData.kind="slowSpin";
+
 }
+
 
 /* 04 — ORBITAL MACHINE */
 function worldOrbital(root){
@@ -3824,7 +4137,7 @@ if(kind==="asteroidBelt"){
 
   if(kind==="gravityBody"){
    const orbit=object.userData.orbit;
-   const a=orbit.angle+time*orbit.speed;
+   const a=orbit.angle+time*orbit.speed;!
    object.position.set(
     Math.cos(a)*orbit.radius,
     Math.sin(a*1.8+orbit.tilt)*orbit.radius*orbit.vertical,
