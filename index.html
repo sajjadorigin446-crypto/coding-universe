@@ -3819,28 +3819,373 @@ function worldDNA(root){
 }
 
 
-/* 11 — IMPOSSIBLE ARCHITECTURE */
+/* 11 — IMPOSSIBLE ARCHITECTURE
+   MONUMENTAL SURREAL CITY
+*/
+
 function worldArchitecture(root){
+
  const city=group(root);
- for(let i=0;i<30;i++){
-  const x=(i%6-2.5)*1.25;
-  const z=(Math.floor(i/6)-2)*1.15;
-  const h=rand(1.2,4.8);
-  const tower=mesh(city,new THREE.BoxGeometry(rand(.35,.7),h,rand(.35,.7)),
-   new THREE.MeshPhysicalMaterial({
-    color:[C.gold,C.violet,C.cyan][i%3],metalness:.75,roughness:.2,
-    emissive:[C.gold,C.violet,C.cyan][i%3],emissiveIntensity:.08
-   }),x,-2.8+h/2,z);
+
+ // =========================================
+ // 1. ARCHITECTURAL MATERIALS
+ // =========================================
+
+ const stone=new THREE.MeshStandardMaterial({
+  color:0x343638,
+  metalness:.32,
+  roughness:.68
+ });
+
+ const darkStone=new THREE.MeshStandardMaterial({
+  color:0x171b1e,
+  metalness:.42,
+  roughness:.55
+ });
+
+ const gold=new THREE.MeshPhysicalMaterial({
+  color:0xc6a45a,
+  metalness:.86,
+  roughness:.23,
+  clearcoat:1
+ });
+
+ const glass=new THREE.MeshPhysicalMaterial({
+  color:0x78939b,
+  metalness:.48,
+  roughness:.13,
+  transparent:true,
+  opacity:.65,
+  clearcoat:1
+ });
+
+ // =========================================
+ // 2. ARCHITECTURAL BLOCK
+ // =========================================
+
+ function block(parent,w,h,d,material,x,y,z){
+
+  return mesh(
+   parent,
+   new THREE.BoxGeometry(w,h,d),
+   material,
+   x,y,z
+  );
+ }
+
+ // =========================================
+ // 3. MAIN MONUMENTAL TOWERS
+ // =========================================
+
+ const towers=[
+  {x:-2.5,z:-1.5,h:4.9,w:.9,d:.9},
+  {x:0,z:-2.1,h:3.7,w:1.05,d:1.05},
+  {x:2.5,z:-1.35,h:5.2,w:.85,d:.85},
+  {x:-2.1,z:1.4,h:3.4,w:1.05,d:.95},
+  {x:.35,z:1.25,h:4.5,w:.9,d:.9},
+  {x:2.6,z:1.6,h:3.6,w:1.1,d:1.0}
+ ];
+
+ const towerGroups=[];
+
+ for(let i=0;i<towers.length;i++){
+
+  const t=towers[i];
+
+  const tower=group(city,t.x,-2.8,t.z);
+
+  // Main stone body
+  block(
+   tower,
+   t.w,t.h,t.d,
+   i%2?stone:darkStone,
+   0,t.h/2,0
+  );
+
+  // Heavy lower foundation
+  block(
+   tower,
+   t.w*1.5,.32,t.d*1.5,
+   darkStone,
+   0,.16,0
+  );
+
+  // Architectural crown
+  block(
+   tower,
+   t.w*1.3,.22,t.d*1.3,
+   gold,
+   0,t.h,0
+  );
+
+  // Upper floating cantilever
+  block(
+   tower,
+   t.w*1.65,.28,t.d*1.5,
+   stone,
+   i%2?.12:-.12,t.h*.82,0
+  );
+
+  // Vertical facade ribs
+  for(let side of [-1,1]){
+
+   block(
+    tower,
+    .065,t.h*.82,.075,
+    gold,
+    side*t.w*.37,t.h*.49,t.d*.5
+   );
+
+   block(
+    tower,
+    .065,t.h*.82,.075,
+    gold,
+    side*t.w*.37,t.h*.49,-t.d*.5
+   );
+  }
+
+  // Recessed glass facade
+  block(
+   tower,
+   t.w*.48,t.h*.62,.018,
+   glass,
+   0,t.h*.52,t.d*.505
+  );
+
+  // Horizontal architectural divisions
+  for(let j=1;j<4;j++){
+
+   const y=t.h*j/4;
+
+   block(
+    tower,
+    t.w*1.08,.045,t.d*1.08,
+    gold,
+    0,y,0
+   );
+  }
+
+  // Stepped upper structure
+  block(
+   tower,
+   t.w*.68,.5,t.d*.68,
+   darkStone,
+   0,t.h+.34,0
+  );
+
+  block(
+   tower,
+   t.w*.42,.3,t.d*.42,
+   gold,
+   0,t.h+.74,0
+  );
+
   tower.userData.kind="tower";
-  tower.userData.phase=rand(0,TAU);
+  tower.userData.phase=i*.65;
+
+  towerGroups.push(tower);
  }
- for(let i=0;i<4;i++){
-  const bridge=torus(city,1.2+i*.4,.06,C.gold);
-  bridge.position.set((i-1.5)*1.2,.5+(i%2)*.8,0);
-  bridge.rotation.set(Math.PI/2,0,i*.35);
+
+ // =========================================
+ // 4. IMPOSSIBLE INVERTED STRUCTURE
+ // =========================================
+
+ const inverted=group(city,0,2.2,-.25);
+
+ block(
+  inverted,
+  1.25,2.8,1.25,
+  darkStone,
+  0,0,0
+ );
+
+ // Upside-down crown
+ block(
+  inverted,
+  2,.28,1.8,
+  gold,
+  0,-1.25,0
+ );
+
+ block(
+  inverted,
+  .85,.8,.85,
+  stone,
+  0,-1.75,0
+ );
+
+ // Suspended architectural extensions
+ block(
+  inverted,
+  2.8,.22,.42,
+  stone,
+  1.1,-.4,0
+ );
+
+ block(
+  inverted,
+  2.4,.22,.42,
+  stone,
+  -1.0,.45,0
+ );
+
+ inverted.userData.kind="tower";
+ inverted.userData.phase=2.4;
+
+ // =========================================
+ // 5. CANTILEVER BRIDGES
+ // =========================================
+
+ const bridgeMaterial=new THREE.MeshPhysicalMaterial({
+  color:0x77736b,
+  metalness:.72,
+  roughness:.3,
+  clearcoat:1
+ });
+
+ const bridgeData=[
+  [-2.5,-1.5,0,-2.1,1.4],
+  [0,-2.1,.35,1.25,1.4],
+  [2.5,-1.35,.35,1.6,1.4],
+  [-2.1,1.4,.35,1.25,1.4],
+  [0,-2.1,2.5,-1.35,1.4]
+ ];
+
+ for(let i=0;i<bridgeData.length;i++){
+
+  const b=bridgeData[i];
+
+  const x1=b[0],z1=b[1];
+  const x2=b[3],z2=b[4];
+
+  const dx=x2-x1;
+  const dz=z2-z1;
+
+  const length=Math.sqrt(dx*dx+dz*dz);
+
+  const bridge=block(
+   city,
+   length,.2,.48,
+   bridgeMaterial,
+   (x1+x2)/2,
+   b[2],
+   (z1+z2)/2
+  );
+
+  bridge.rotation.y=-Math.atan2(dz,dx);
+
   bridge.userData.kind="bridge";
+  bridge.userData.speed=i%2?.025:-.025;
  }
+
+ // =========================================
+ // 6. ARCHITECTURAL ARCHES
+ // =========================================
+
+ const archMaterial=new THREE.MeshStandardMaterial({
+  color:0xa58b5b,
+  metalness:.78,
+  roughness:.27
+ });
+
+ const archPositions=[
+  [-1.25,-.2,0],
+  [1.3,.15,0],
+  [0,-.5,1.1]
+ ];
+
+ for(let i=0;i<archPositions.length;i++){
+
+  const p=archPositions[i];
+
+  const arch=torus(
+   city,
+   .82,
+   .065,
+   archMaterial
+  );
+
+  arch.position.set(p[0],p[1],p[2]);
+  arch.rotation.set(
+   Math.PI/2,
+   i*.35,
+   i*.45
+  );
+
+  arch.scale.set(1.15,.85,1);
+
+  arch.userData.kind="bridge";
+ }
+
+ // =========================================
+ // 7. FLOATING STONE PLATFORMS
+ // =========================================
+
+ const platforms=[
+  [-3.4,.65,0],
+  [3.5,.3,.4],
+  [-.5,-1.0,2.7],
+  [1.1,1.2,-2.9]
+ ];
+
+ for(let i=0;i<platforms.length;i++){
+
+  const p=platforms[i];
+
+  const platform=block(
+   city,
+   1.5,.18,1.15,
+   i%2?stone:darkStone,
+   p[0],p[1],p[2]
+  );
+
+  platform.rotation.y=i*.45;
+  platform.rotation.z=i%2?.08:-.08;
+
+  platform.userData.kind="tower";
+  platform.userData.phase=i*.8;
+ }
+
+ // =========================================
+ // 8. BASE ARCHITECTURAL FOUNDATION
+ // =========================================
+
+ const foundation=block(
+  city,
+  7.6,.24,5.6,
+  darkStone,
+  0,-3.0,0
+ );
+
+ // Fine golden foundation outline
+ const outline=[
+  [-3.8,-2.86,-2.8],
+  [3.8,-2.86,-2.8],
+  [3.8,-2.86,2.8],
+  [-3.8,-2.86,2.8],
+  [-3.8,-2.86,-2.8]
+ ];
+
+ const border=lineTube(
+  city,
+  outline,
+  C.gold,
+  .012,
+  120
+ );
+
+ border.material.transparent=true;
+ border.material.opacity=.7;
+
+ // =========================================
+ // 9. WORLD REFERENCES
+ // =========================================
+
+ city.userData.towers=towerGroups;
+ city.userData.kind="slowSpin";
+
 }
+
 
 
 /* 12 — THE SOLAR SYSTEM | MASTERCLASS EDITION */
