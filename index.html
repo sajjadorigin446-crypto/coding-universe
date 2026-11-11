@@ -5685,31 +5685,600 @@ function worldSacred(root){
 }
 
 
-/* 16 — PHOENIX REBIRTH */
+/* 16 — PHOENIX REBIRTH
+   REALISTIC ANATOMICAL FIREBIRD
+   LAYERED FEATHERS + MOVEMENT REFERENCES
+*/
+
 function worldPhoenix(root){
+
  const phoenix=group(root);
- const heart=sphere(phoenix,.5,materials.glow(C.orange),0,-.3,0,40);
- heart.userData.kind="phoenixHeart";
- const feathers=[];
+
+ // =========================================
+ // 1. REALISTIC FEATHER MATERIALS
+ // =========================================
+
+ const featherMaterials=[
+  new THREE.MeshPhysicalMaterial({
+   color:0x54200d,
+   metalness:.22,
+   roughness:.38,
+   clearcoat:.45
+  }),
+  new THREE.MeshPhysicalMaterial({
+   color:0x8e3210,
+   metalness:.28,
+   roughness:.32,
+   clearcoat:.6
+  }),
+  new THREE.MeshPhysicalMaterial({
+   color:0xc05b1c,
+   metalness:.3,
+   roughness:.3,
+   clearcoat:.7
+  }),
+  new THREE.MeshPhysicalMaterial({
+   color:0xe49a36,
+   metalness:.38,
+   roughness:.28,
+   clearcoat:.8
+  }),
+  new THREE.MeshPhysicalMaterial({
+   color:0xf3c16b,
+   metalness:.42,
+   roughness:.27,
+   clearcoat:.8
+  })
+ ];
+
+ const bodyMat=new THREE.MeshPhysicalMaterial({
+  color:0x51200f,
+  metalness:.2,
+  roughness:.4,
+  clearcoat:.5
+ });
+
+ const darkMat=new THREE.MeshStandardMaterial({
+  color:0x1b100c,
+  roughness:.38
+ });
+
+ const beakMat=new THREE.MeshPhysicalMaterial({
+  color:0x9a641e,
+  metalness:.65,
+  roughness:.24,
+  clearcoat:1
+ });
+
+ const fireMat=new THREE.MeshStandardMaterial({
+  color:0xff641b,
+  emissive:0xe43a00,
+  emissiveIntensity:1.1,
+  roughness:.3
+ });
+
+ const hotMat=new THREE.MeshStandardMaterial({
+  color:0xffd18a,
+  emissive:0xff7900,
+  emissiveIntensity:1.7,
+  roughness:.22
+ });
+
+ // =========================================
+ // 2. LOCAL ORGANIC TUBE
+ // =========================================
+
+ function birdTube(parent,points,radius,material){
+
+  const curve=new THREE.CatmullRomCurve3(
+   points.map(p=>new THREE.Vector3(p[0],p[1],p[2]))
+  );
+
+  const geo=new THREE.TubeGeometry(
+   curve,32,radius,7,false
+  );
+
+  return mesh(parent,geo,material);
+ }
+
+ // =========================================
+ // 3. NATURAL FEATHER GEOMETRY
+ // =========================================
+
+ const allFeathers=[];
+
+ function createFeather(parent,length,width,material,side,phase){
+
+  const feather=group(parent);
+
+  const shape=new THREE.Shape();
+
+  shape.moveTo(0,0);
+
+  shape.bezierCurveTo(
+   -width*.35,length*.18,
+   -width*.95,length*.62,
+   -width*.38,length*.91
+  );
+
+  shape.quadraticCurveTo(
+   0,length*1.08,
+   width*.38,length*.91
+  );
+
+  shape.bezierCurveTo(
+   width*.95,length*.62,
+   width*.35,length*.18,
+   0,0
+  );
+
+  const geo=new THREE.ExtrudeGeometry(shape,{
+   depth:.022,
+   bevelEnabled:true,
+   bevelSegments:2,
+   bevelSize:.008,
+   bevelThickness:.008,
+   steps:1,
+   curveSegments:6
+  });
+
+  geo.translate(0,0,-.011);
+  geo.computeVertexNormals();
+
+  const vane=mesh(
+   feather,
+   geo,
+   material
+  );
+
+  // Central rachis
+  birdTube(
+   feather,
+   [
+    [0,0,.025],
+    [0,length*.3,.031],
+    [0,length*.65,.028],
+    [0,length*.94,.012]
+   ],
+   .008,
+   featherMaterials[4]
+  );
+
+  // Fine feather barbs
+  for(let j=1;j<=5;j++){
+
+   const t=j/6;
+   const y=length*t;
+
+   const w=width*Math.sin(t*Math.PI)*.82;
+
+   for(const s of [-1,1]){
+
+    birdTube(
+     feather,
+     [
+      [0,y,.018],
+      [s*w*.48,y+length*.055,.023],
+      [s*w,y+length*.085,.012]
+     ],
+     .0035,
+     material
+    );
+   }
+  }
+
+  feather.userData.kind="phoenixFeather";
+  feather.userData.side=side;
+  feather.userData.phase=phase;
+  feather.userData.baseRotation=0;
+
+  allFeathers.push(feather);
+
+  return feather;
+ }
+
+ // =========================================
+ // 4. BODY ANATOMY
+ // =========================================
+
+ const torso=mesh(
+  phoenix,
+  new THREE.SphereGeometry(1,48,40),
+  bodyMat,
+  0,-.35,0
+ );
+
+ torso.scale.set(.48,.78,.43);
+
+ // Chest
+ const chest=mesh(
+  phoenix,
+  new THREE.SphereGeometry(1,40,32),
+  featherMaterials[1],
+  0,-.48,.19
+ );
+
+ chest.scale.set(.39,.55,.34);
+
+ // Shoulder muscles
  for(const side of [-1,1]){
-  for(let i=0;i<18;i++){
-   const f=mesh(phoenix,new THREE.ConeGeometry(.13,1.25,8),
-    materials.glow(i%2?C.orange:C.rose),
-    side*(.45+i*.13),.05+i*.1,rand(-.2,.2));
-   f.rotation.z=side*(1.15-i*.045);
-   f.userData.kind="phoenixFeather";
-   f.userData.side=side;f.userData.phase=i*.18;
-   feathers.push(f);
+
+  const shoulder=sphere(
+   phoenix,.3,bodyMat,
+   side*.39,.08,0,32
+  );
+
+  shoulder.scale.set(1.1,.85,.85);
+ }
+
+ // =========================================
+ // 5. NATURAL NECK
+ // =========================================
+
+ birdTube(
+  phoenix,
+  [
+   [0,-.05,.03],
+   [0,.25,.04],
+   [0,.55,.06],
+   [0,.82,.08],
+   [0,1.02,.1]
+  ],
+  .145,
+  bodyMat
+ );
+
+ // Overlapping neck plumage
+ for(let i=0;i<13;i++){
+
+  const y=.03+i*.075;
+
+  const f=createFeather(
+   phoenix,
+   .34,
+   .065,
+   featherMaterials[i%4],
+   0,
+   i*.2
+  );
+
+  f.position.set(
+   (i%2===0?-.055:.055),
+   y,
+   .115
+  );
+
+  f.rotation.z=(i%2===0?-.12:.12);
+ }
+
+ // =========================================
+ // 6. HEAD AND FACE
+ // =========================================
+
+ const head=sphere(
+  phoenix,.22,bodyMat,
+  0,1.12,.08,40
+ );
+
+ head.scale.set(.9,1.1,.9);
+
+ // Face feathers
+ for(let side of [-1,1]){
+
+  for(let i=0;i<4;i++){
+
+   const f=createFeather(
+    phoenix,.23,.045,
+    featherMaterials[i%3],
+    side,i*.3
+   );
+
+   f.position.set(
+    side*(.12+i*.018),
+    1.02-i*.045,
+    .19
+   );
+
+   f.rotation.z=side*.45;
   }
  }
- for(let i=0;i<75;i++){
-  const ember=sphere(phoenix,rand(.025,.075),C.orange,
-   rand(-3,3),rand(-3,3),rand(-2,2),8);
-  ember.userData.kind="ember";ember.userData.phase=rand(0,TAU);
+
+ // Eyes
+ for(const side of [-1,1]){
+
+  sphere(
+   phoenix,.047,darkMat,
+   side*.16,1.15,.245,20
+  );
+
+  sphere(
+   phoenix,.013,hotMat,
+   side*.17,1.16,.278,12
+  );
  }
- phoenix.userData.feathers=feathers;
- addRings(phoenix,3,2.7,C.orange,.018);
+
+ // Curved hooked beak
+ const upperBeak=mesh(
+  phoenix,
+  new THREE.ConeGeometry(.085,.27,8),
+  beakMat,
+  0,1.02,.29
+ );
+
+ upperBeak.rotation.x=Math.PI/2;
+ upperBeak.rotation.z=Math.PI;
+
+ const lowerBeak=mesh(
+  phoenix,
+  new THREE.ConeGeometry(.055,.15,8),
+  darkMat,
+  0,.94,.29
+ );
+
+ lowerBeak.rotation.x=-Math.PI/2;
+
+ // Crown plumage
+ for(let i=0;i<5;i++){
+
+  const f=createFeather(
+   phoenix,
+   .48-i*.035,
+   .055,
+   featherMaterials[2+i%3],
+   0,i*.4
+  );
+
+  f.position.set(
+   (i-2)*.065,
+   1.28,
+   .02
+  );
+
+  f.rotation.z=(i-2)*-.2;
+ }
+
+ // =========================================
+ // 7. WINGS — STRUCTURAL FRAME
+ // =========================================
+
+ const wings=[];
+ const wingFeathers=[];
+
+ for(const side of [-1,1]){
+
+  const wing=group(
+   phoenix,
+   side*.39,.12,-.04
+  );
+
+  // Upper wing bone
+  birdTube(
+   wing,
+   [
+    [0,0,0],
+    [side*.48,.16,0],
+    [side*1.05,.2,0],
+    [side*1.55,.12,0]
+   ],
+   .09,
+   bodyMat
+  );
+
+  // Forearm structure
+  birdTube(
+   wing,
+   [
+    [side*.9,.2,0],
+    [side*1.45,.25,0],
+    [side*2.05,.05,0],
+    [side*2.55,-.18,0]
+   ],
+   .065,
+   bodyMat
+  );
+
+  // Primary flight feathers
+  for(let i=0;i<17;i++){
+
+   const t=i/16;
+
+   const f=createFeather(
+    wing,
+    1.05+t*.55,
+    .095,
+    featherMaterials[i%5],
+    side,
+    i*.18
+   );
+
+   f.position.set(
+    side*(.65+t*1.85),
+    .08-t*.4,
+    -.05
+   );
+
+   f.rotation.z=side*(.48+t*.5);
+
+   wingFeathers.push(f);
+  }
+
+  // Secondary flight feathers
+  for(let i=0;i<15;i++){
+
+   const t=i/14;
+
+   const f=createFeather(
+    wing,
+    .82,
+    .085,
+    featherMaterials[(i+1)%5],
+    side,
+    i*.23
+   );
+
+   f.position.set(
+    side*(.25+t*1.55),
+    -.04+t*.2,
+    .13
+   );
+
+   f.rotation.z=side*(.24+t*.22);
+
+   wingFeathers.push(f);
+  }
+
+  // Upper covert feathers
+  for(let i=0;i<17;i++){
+
+   const t=i/16;
+
+   const f=createFeather(
+    wing,
+    .48,
+    .065,
+    featherMaterials[(i+2)%5],
+    side,
+    i*.29
+   );
+
+   f.position.set(
+    side*(.15+t*1.2),
+    .13+t*.12,
+    .24
+   );
+
+   f.rotation.z=side*.16;
+
+   wingFeathers.push(f);
+  }
+
+  wing.userData.side=side;
+  wing.userData.feathers=wingFeathers;
+
+  wings.push(wing);
+ }
+
+ // =========================================
+ // 8. LOWER BODY FEATHERS
+ // =========================================
+
+ for(let i=0;i<19;i++){
+
+  const angle=i/19*TAU;
+
+  const f=createFeather(
+   phoenix,
+   .48,
+   .075,
+   featherMaterials[i%5],
+   0,i*.2
+  );
+
+  f.position.set(
+   Math.cos(angle)*.3,
+   -.55+Math.sin(angle)*.35,
+   .22
+  );
+
+  f.rotation.z=-Math.cos(angle)*.45;
+ }
+
+ // =========================================
+ // 9. LONG TAIL FEATHERS
+ // =========================================
+
+ const tail=[];
+
+ for(let i=0;i<9;i++){
+
+  const f=createFeather(
+   phoenix,
+   1.4+(i%3)*.25,
+   .105,
+   featherMaterials[(i+2)%5],
+   0,i*.24
+  );
+
+  f.position.set(
+   (i-4)*.09,
+   -1.02,
+   -.16
+  );
+
+  f.rotation.z=(i-4)*-.075;
+
+  tail.push(f);
+ }
+
+ // =========================================
+ // 10. FIRE GLOW IN CHEST
+ // =========================================
+
+ const heart=sphere(
+  phoenix,.19,
+  materials.glow(C.orange),
+  0,-.42,.42,32
+ );
+
+ heart.userData.kind="phoenixHeart";
+
+ // =========================================
+ // 11. CONTROLLED FIRE EDGES
+ // =========================================
+
+ const fireTrails=[];
+
+ for(const side of [-1,1]){
+
+  const trail=birdTube(
+   phoenix,
+   [
+    [side*.5,-.45,-.15],
+    [side*.85,-.85,-.22],
+    [side*1.25,-1.2,-.18],
+    [side*1.65,-1.5,-.12]
+   ],
+   .018,
+   fireMat
+  );
+
+  fireTrails.push(trail);
+ }
+
+ // =========================================
+ // 12. FLOATING EMBERS
+ // =========================================
+
+ for(let i=0;i<38;i++){
+
+  const ember=sphere(
+   phoenix,
+   rand(.018,.045),
+   i%4===0?hotMat:fireMat,
+   rand(-2.8,2.8),
+   rand(-2.5,2.8),
+   rand(-1.5,1.5),
+   8
+  );
+
+  ember.userData.kind="ember";
+  ember.userData.phase=rand(0,TAU);
+ }
+
+ // =========================================
+ // 13. FINAL REFERENCES
+ // =========================================
+
+ phoenix.userData.feathers=allFeathers;
+ phoenix.userData.wings=wings;
+ phoenix.userData.wingFeathers=wingFeathers;
+ phoenix.userData.tail=tail;
+ phoenix.userData.heart=heart;
+ phoenix.userData.fireTrails=fireTrails;
+
 }
+
+
 
 /* 17 — BLACK HOLE */
 function worldBlackHole(root){
