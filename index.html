@@ -6279,31 +6279,597 @@ function worldPhoenix(root){
 }
 
 
+/* =========================================================
+   17 — BLACK HOLE
+   CINEMATIC ASTROPHYSICAL MASTERCLASS
+   ========================================================= */
 
-/* 17 — BLACK HOLE */
 function worldBlackHole(root){
- const black=group(root);
- sphere(black,1,new THREE.MeshBasicMaterial({color:0x000000}),0,0,0,64);
- const accretion=mesh(black,new THREE.RingGeometry(1.25,3.2,160),
+
+ const black = group(root);
+
+ // ---------------------------------------------------------
+ // 1. MATERIALS
+ // ---------------------------------------------------------
+
+ const eventMaterial = new THREE.MeshBasicMaterial({
+  color:0x000000
+ });
+
+ const photonMaterial = new THREE.MeshBasicMaterial({
+  color:0xffd8a0,
+  transparent:true,
+  opacity:.9,
+  blending:THREE.AdditiveBlending
+ });
+
+ const hotMaterial = new THREE.MeshBasicMaterial({
+  color:0xffa04a,
+  transparent:true,
+  opacity:.22,
+  side:THREE.DoubleSide,
+  blending:THREE.AdditiveBlending
+ });
+
+ const jetMaterial = new THREE.MeshBasicMaterial({
+  color:0xffa65c,
+  transparent:true,
+  opacity:.15,
+  side:THREE.DoubleSide,
+  blending:THREE.AdditiveBlending,
+  depthWrite:false
+ });
+
+ // ---------------------------------------------------------
+ // 2. EVENT HORIZON
+ // ---------------------------------------------------------
+
+ const horizon = sphere(
+  black,
+  .92,
+  eventMaterial,
+  0,0,0,
+  96
+ );
+
+ horizon.userData.kind="blackHorizon";
+
+ // Inner dark shadow boundary
+ const shadow = sphere(
+  black,
+  1.015,
   new THREE.MeshBasicMaterial({
-   color:0xff8b3d,side:THREE.DoubleSide,transparent:true,opacity:.6
-  }),0,0,0);
- accretion.rotation.x=Math.PI/2;
- accretion.userData.kind="accretion";
- for(let i=0;i<7;i++){
-  const ring=torus(black,1.15+i*.22,.018,
-   [C.orange,C.rose,C.violet][i%3]);
-  ring.rotation.set(.1+i*.14,.2+i*.2,0);
-  ring.userData.kind="blackRing";
+   color:0x030206,
+   transparent:true,
+   opacity:.45
+  }),
+  0,0,0,
+  64
+ );
+
+ // ---------------------------------------------------------
+ // 3. PHOTON RING
+ // ---------------------------------------------------------
+
+ const photonRing = torus(
+  black,
+  1.035,
+  .035,
+  photonMaterial
+ );
+
+ photonRing.rotation.x=Math.PI/2;
+ photonRing.userData.kind="blackRing";
+
+ const photonGlow = torus(
+  black,
+  1.09,
+  .085,
+  new THREE.MeshBasicMaterial({
+   color:0xff9d45,
+   transparent:true,
+   opacity:.12,
+   blending:THREE.AdditiveBlending
+  })
+ );
+
+ photonGlow.rotation.x=Math.PI/2;
+
+ // ---------------------------------------------------------
+ // 4. ACCRETION DISK GENERATOR
+ // Custom vertex-colored geometry
+ // ---------------------------------------------------------
+
+ function createAccretionDisk(inner,outer,segments,steps){
+
+  const positions=[];
+  const colors=[];
+  const indices=[];
+
+  const color = new THREE.Color();
+
+  for(let i=0;i<=steps;i++){
+
+   const t=i/steps;
+   const radius=inner+(outer-inner)*t;
+
+   for(let j=0;j<=segments;j++){
+
+    const angle=(j/segments)*TAU;
+
+    const turbulence=
+     Math.sin(angle*13+radius*8)*.018+
+     Math.sin(angle*29-radius*13)*.009+
+     Math.sin(angle*47+radius*5)*.006;
+
+    const r=radius+turbulence;
+
+    const x=Math.cos(angle)*r;
+    const z=Math.sin(angle)*r;
+
+    const y=
+     Math.sin(angle*9+radius*12)*.018+
+     Math.cos(angle*17-radius*6)*.009;
+
+    positions.push(x,y,z);
+
+    // Inner disk is extremely hot.
+    // Outer disk gradually becomes darker.
+
+    const heat=1-t;
+
+    const hue=
+     .075-(heat*.065);
+
+    const saturation=
+     .95-(t*.18);
+
+    const lightness=
+     .16+(Math.pow(heat,1.5)*.57);
+
+    color.setHSL(
+     hue,
+     saturation,
+     lightness
+    );
+
+    // Doppler-inspired asymmetric brightness
+    const doppler=
+     .72+
+     .28*Math.max(0,Math.cos(angle-.6));
+
+    color.multiplyScalar(doppler);
+
+    colors.push(
+     color.r,
+     color.g,
+     color.b
+    );
+   }
+  }
+
+  for(let i=0;i<steps;i++){
+
+   for(let j=0;j<segments;j++){
+
+    const a=i*(segments+1)+j;
+    const b=a+segments+1;
+
+    indices.push(
+     a,b,a+1,
+     b,b+1,a+1
+    );
+   }
+  }
+
+  const geometry=new THREE.BufferGeometry();
+
+  geometry.setAttribute(
+   "position",
+   new THREE.Float32BufferAttribute(positions,3)
+  );
+
+  geometry.setAttribute(
+   "color",
+   new THREE.Float32BufferAttribute(colors,3)
+  );
+
+  geometry.setIndex(indices);
+
+  geometry.computeVertexNormals();
+
+  return geometry;
  }
- for(let i=0;i<95;i++){
-  const a=rand(0,TAU),r=rand(1.5,4);
-  const star=sphere(black,rand(.015,.06),i%3?C.white:C.orange,
-   Math.cos(a)*r,rand(-.7,.7),Math.sin(a)*r,8);
-  star.userData.kind="blackOrbit";
-  star.userData.orbit={radius:r,angle:a,speed:rand(.2,.7),vertical:.18};
+
+ // Main disk
+ const diskGeometry=createAccretionDisk(
+  1.16,
+  3.55,
+  220,
+  55
+ );
+
+ const diskMaterial=new THREE.MeshBasicMaterial({
+  vertexColors:true,
+  side:THREE.DoubleSide,
+  transparent:true,
+  opacity:.96,
+  blending:THREE.AdditiveBlending,
+  depthWrite:false
+ });
+
+ const disk=mesh(
+  black,
+  diskGeometry,
+  diskMaterial,
+  0,0,0
+ );
+
+ disk.userData.kind="accretion";
+
+ // ---------------------------------------------------------
+ // 5. INNER PLASMA DISK
+ // ---------------------------------------------------------
+
+ const innerDiskGeometry=createAccretionDisk(
+  1.13,
+  1.65,
+  180,
+  24
+ );
+
+ const innerDisk=mesh(
+  black,
+  innerDiskGeometry,
+  new THREE.MeshBasicMaterial({
+   vertexColors:true,
+   side:THREE.DoubleSide,
+   transparent:true,
+   opacity:.8,
+   blending:THREE.AdditiveBlending,
+   depthWrite:false
+  }),
+  0,.025,0
+ );
+
+ innerDisk.userData.kind="accretion";
+
+ // ---------------------------------------------------------
+ // 6. OUTER DUST DISK
+ // ---------------------------------------------------------
+
+ const outerDust=mesh(
+  black,
+  new THREE.RingGeometry(2.7,4.05,180,12),
+  new THREE.MeshBasicMaterial({
+   color:0x9c482b,
+   side:THREE.DoubleSide,
+   transparent:true,
+   opacity:.075,
+   blending:THREE.AdditiveBlending,
+   depthWrite:false
+  }),
+  0,-.035,0
+ );
+
+ outerDust.rotation.x=-Math.PI/2;
+
+ // ---------------------------------------------------------
+ // 7. PLASMA FILAMENTS
+ // ---------------------------------------------------------
+
+ const plasmaColors=[
+  0xffdf9a,
+  0xff9a43,
+  0xff5428,
+  0xc94b42
+ ];
+
+ for(let i=0;i<18;i++){
+
+  const angle=(i/18)*TAU;
+  const radius=rand(1.25,3.3);
+
+  const points=[];
+
+  for(let j=0;j<=28;j++){
+
+   const t=j/28;
+
+   const a=angle+t*rand(1.1,2.1);
+   const r=radius+t*.12;
+
+   points.push(
+    new THREE.Vector3(
+     Math.cos(a)*r,
+     Math.sin(a*5)*.025,
+     Math.sin(a)*r
+    )
+   );
+  }
+
+  const curve=new THREE.CatmullRomCurve3(points);
+
+  const filament=mesh(
+   black,
+   new THREE.TubeGeometry(
+    curve,
+    48,
+    rand(.006,.018),
+    5,
+    false
+   ),
+   new THREE.MeshBasicMaterial({
+    color:plasmaColors[i%plasmaColors.length],
+    transparent:true,
+    opacity:rand(.22,.6),
+    blending:THREE.AdditiveBlending
+   }),
+   0,0,0
+  );
+
+  filament.userData.kind="blackRing";
  }
+
+ // ---------------------------------------------------------
+ // 8. GRAVITATIONAL LENSING ARCS
+ // ---------------------------------------------------------
+
+ for(let i=0;i<5;i++){
+
+  const lens=torus(
+   black,
+   1.12+i*.075,
+   .008+i*.002,
+   new THREE.MeshBasicMaterial({
+    color:i%2?0xffc77c:0xff8b48,
+    transparent:true,
+    opacity:.22-i*.025,
+    blending:THREE.AdditiveBlending
+   })
+  );
+
+  lens.rotation.set(
+   Math.PI/2+(i*.035),
+   i*.13,
+   i*.2
+  );
+
+  lens.userData.kind="blackRing";
+ }
+
+ // ---------------------------------------------------------
+ // 9. RELATIVISTIC JETS
+ // ---------------------------------------------------------
+
+ function createJet(direction){
+
+  const jetGroup=group(
+   black,
+   0,
+   direction*1.2,
+   0
+  );
+
+  const length=2.8;
+
+  const cone=mesh(
+   jetGroup,
+   new THREE.ConeGeometry(
+    .43,
+    length,
+    48,
+    12,
+    true
+   ),
+   jetMaterial,
+   0,
+   direction*length*.5,
+   0
+  );
+
+  cone.rotation.x=direction>0?0:Math.PI;
+
+  const core=mesh(
+   jetGroup,
+   new THREE.CylinderGeometry(
+    .025,
+    .12,
+    length,
+    20,
+    12,
+    true
+   ),
+   new THREE.MeshBasicMaterial({
+    color:0xffd39a,
+    transparent:true,
+    opacity:.12,
+    blending:THREE.AdditiveBlending,
+    depthWrite:false
+   }),
+   0,
+   direction*length*.5,
+   0
+  );
+
+  core.rotation.x=direction>0?0:Math.PI;
+
+  jetGroup.userData.kind="blackJet";
+
+  return jetGroup;
+ }
+
+ const upperJet=createJet(1);
+ const lowerJet=createJet(-1);
+
+ // ---------------------------------------------------------
+ // 10. ORBITING MATTER
+ // ---------------------------------------------------------
+
+ const matter=[];
+
+ for(let i=0;i<125;i++){
+
+  const angle=rand(0,TAU);
+  const radius=rand(1.25,3.8);
+
+  const size=rand(.012,.045);
+
+  const material=new THREE.MeshBasicMaterial({
+   color:
+    i%5===0?0xfff0c4:
+    i%3===0?0xff8b42:
+    0xffbd75
+  });
+
+  const particle=sphere(
+   black,
+   size,
+   material,
+   Math.cos(angle)*radius,
+   rand(-.09,.09),
+   Math.sin(angle)*radius,
+   8
+  );
+
+  particle.userData.kind="blackOrbit";
+
+  particle.userData.orbit={
+   radius:radius,
+   angle:angle,
+   speed:rand(.25,1.15),
+   vertical:rand(.025,.11),
+   phase:rand(0,TAU)
+  };
+
+  matter.push(particle);
+ }
+
+ // ---------------------------------------------------------
+ // 11. HOT INNER PARTICLES
+ // ---------------------------------------------------------
+
+ for(let i=0;i<45;i++){
+
+  const angle=rand(0,TAU);
+  const radius=rand(1.1,1.75);
+
+  const p=sphere(
+   black,
+   rand(.012,.028),
+   new THREE.MeshBasicMaterial({
+    color:0xffe0a3,
+    transparent:true,
+    opacity:.75,
+    blending:THREE.AdditiveBlending
+   }),
+   Math.cos(angle)*radius,
+   rand(-.045,.045),
+   Math.sin(angle)*radius,
+   8
+  );
+
+  p.userData.kind="blackOrbit";
+
+  p.userData.orbit={
+   radius:radius,
+   angle:angle,
+   speed:rand(.8,1.8),
+   vertical:.025,
+   phase:rand(0,TAU)
+  };
+ }
+
+ // ---------------------------------------------------------
+ // 12. BACKGROUND STAR FIELD
+ // ---------------------------------------------------------
+
+ const starPositions=[];
+ const starColors=[];
+
+ for(let i=0;i<650;i++){
+
+  const theta=rand(0,TAU);
+  const phi=Math.acos(rand(-1,1));
+  const radius=rand(8,19);
+
+  starPositions.push(
+   radius*Math.sin(phi)*Math.cos(theta),
+   radius*Math.cos(phi),
+   radius*Math.sin(phi)*Math.sin(theta)
+  );
+
+  const c=new THREE.Color(
+   i%9===0?0xffd6a0:
+   i%7===0?0x9ab9ff:
+   0xffffff
+  );
+
+  starColors.push(c.r,c.g,c.b);
+ }
+
+ const starGeometry=new THREE.BufferGeometry();
+
+ starGeometry.setAttribute(
+  "position",
+  new THREE.Float32BufferAttribute(starPositions,3)
+ );
+
+ starGeometry.setAttribute(
+  "color",
+  new THREE.Float32BufferAttribute(starColors,3)
+ );
+
+ const stars=new THREE.Points(
+  starGeometry,
+  new THREE.PointsMaterial({
+   size:.035,
+   vertexColors:true,
+   transparent:true,
+   opacity:.8,
+   sizeAttenuation:true
+  })
+ );
+
+ black.add(stars);
+
+ // ---------------------------------------------------------
+ // 13. ENVIRONMENT HALO
+ // ---------------------------------------------------------
+
+ const halo=sphere(
+  black,
+  4.3,
+  new THREE.MeshBasicMaterial({
+   color:0x7e3527,
+   transparent:true,
+   opacity:.035,
+   side:THREE.BackSide,
+   blending:THREE.AdditiveBlending,
+   depthWrite:false
+  }),
+  0,0,0,
+  48
+ );
+
+ // ---------------------------------------------------------
+ // 14. WORLD REFERENCES
+ // ---------------------------------------------------------
+
+ black.userData.horizon=horizon;
+ black.userData.disk=disk;
+ black.userData.innerDisk=innerDisk;
+ black.userData.photonRing=photonRing;
+ black.userData.matter=matter;
+ black.userData.upperJet=upperJet;
+ black.userData.lowerJet=lowerJet;
+
+ black.userData.kind="blackHole";
+
 }
+
+
+
 
 /* 18 — LIQUID WAVE */
 function worldWave(root){
