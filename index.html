@@ -623,7 +623,7 @@ const DATA=[
  ["Crystal Collapse","A cathedral of crystal fractures into stardust.","ELEMENTS",0x9c8aff],
  ["DNA Universe","The architecture of life becomes a galaxy.","SCIENCE",0x44d9c9],
  ["Impossible Architecture","A floating city ignores the laws of gravity.","ARCHITECTURE",0xb28bff],
- ["Gyroscope","A universe held in perfect rotating balance.","TECHNOLOGY",0xe4e4ee],
+["The Solar System","A realistic celestial journey through the Sun and eight orbiting planets.","COSMOS",0xf5b94c],
  ["Abyss Creature","A mysterious organism emerges from the deep.","CREATURES",0x2689ad],
  ["Chaotic Pendulum","A delicate machine explores the edge of chaos.","PHYSICS",0xf08a49],
  ["Sacred Geometry","Perfect patterns reveal a hidden universe.","GEOMETRY",0xd5b45e],
@@ -1106,26 +1106,216 @@ function worldArchitecture(root){
  }
 }
 
-/* 12 — GYROSCOPE */
-function worldGyroscope(root){
- const gyro=group(root);
- for(let i=0;i<8;i++){
-  const ring=torus(gyro,.75+i*.25,.045,
-   [C.gold,C.cyan,C.violet,C.white][i%4]);
-  ring.rotation.set(i*.65,i*.42,i*.28);
-  ring.userData.kind="gyroRing";
-  ring.userData.speed=.2+i*.07;
- }
- const center=sphere(gyro,.36,C.white);center.userData.kind="pulseCore";
- for(let i=0;i<12;i++){
-  const spike=mesh(gyro,new THREE.ConeGeometry(.09,.7,8),
-   materials.glow(C.gold),0,0,0);
-  spike.position.set(Math.cos(i/12*TAU)*2,Math.sin(i/12*TAU)*2,0);
-  spike.lookAt(0,0,0);
-  spike.userData.kind="gyroSpike";
- }
-}
+/* 12 — THE SOLAR SYSTEM */
+function worldUniverse(root){
+ const solar=group(root);
 
+ // Deep-space atmosphere
+ stars(solar,3200,100,0xe4e9ff,.035);
+ particleCloud(solar,450,0xd6b15e,30,.022);
+
+ // Sun — central star
+ const sunGroup=group(solar);
+
+ const sun=mesh(sunGroup,
+  new THREE.SphereGeometry(.88,64,64),
+  new THREE.MeshBasicMaterial({color:0xffc247})
+ );
+ sun.userData.kind="solarSun";
+
+ // Solar corona
+ for(let i=0;i<4;i++){
+  const corona=mesh(sunGroup,
+   new THREE.SphereGeometry(1.02+i*.17,48,48),
+   new THREE.MeshBasicMaterial({
+    color:i%2?0xff9b35:0xffd16b,
+    transparent:true,
+    opacity:.09-i*.012,
+    side:THREE.BackSide,
+    depthWrite:false
+   })
+  );
+  corona.userData.kind="solarCorona";
+  corona.userData.speed=(i%2?1:-1)*(.025+i*.012);
+ }
+
+ // Sun's outer glow
+ const sunGlow=mesh(sunGroup,
+  new THREE.SphereGeometry(1.75,48,48),
+  new THREE.MeshBasicMaterial({
+   color:0xff9b35,
+   transparent:true,
+   opacity:.075,
+   side:THREE.BackSide,
+   depthWrite:false
+  })
+ );
+ sunGlow.userData.kind="solarCorona";
+
+ // Powerful sunlight
+ const sunlight=new THREE.PointLight(0xffd28a,1500,100,1.25);
+ sunlight.position.set(0,0,0);
+ solar.add(sunlight);
+
+ // Planet data: name, orbit radius, planet radius, color, orbit speed
+ const planets=[
+  ["Mercury",1.75,.105,0x9b9389,.95],
+  ["Venus",2.55,.17,0xd9ad72,.72],
+  ["Earth",3.45,.19,0x2779d0,.56],
+  ["Mars",4.35,.145,0xc65d39,.43],
+  ["Jupiter",5.65,.49,0xd5ad83,.27],
+  ["Saturn",7.05,.40,0xd9c18c,.20],
+  ["Uranus",8.35,.29,0x83d5dc,.14],
+  ["Neptune",9.55,.28,0x416ce0,.11]
+ ];
+
+ const planetObjects=[];
+
+ planets.forEach((data,index)=>{
+  const [name,orbitRadius,planetRadius,color,speed]=data;
+
+  // Orbital path
+  const orbitPath=mesh(solar,
+   new THREE.TorusGeometry(orbitRadius,.008,6,220),
+   new THREE.MeshBasicMaterial({
+    color:0xc5b9a3,
+    transparent:true,
+    opacity:.25,
+    depthWrite:false
+   })
+  );
+  orbitPath.rotation.x=Math.PI/2;
+
+  // Independent orbital pivot
+  const pivot=group(solar);
+  pivot.rotation.z=(index-3.5)*.009;
+  pivot.userData.kind="solarOrbit";
+  pivot.userData.orbitSpeed=speed;
+
+  // Planet surface
+  const planetGroup=group(pivot,orbitRadius,0,0);
+
+  const planet=mesh(planetGroup,
+   new THREE.SphereGeometry(planetRadius,48,48),
+   new THREE.MeshStandardMaterial({
+    color,
+    roughness:.82,
+    metalness:.04
+   })
+  );
+
+  planet.userData.kind="solarSpin";
+  planet.userData.spinSpeed=.35+index*.045;
+
+  // Earth: atmospheric halo and cloud layer
+  if(name==="Earth"){
+   const atmosphere=mesh(planetGroup,
+    new THREE.SphereGeometry(planetRadius*1.13,40,40),
+    new THREE.MeshBasicMaterial({
+     color:0x55aaff,
+     transparent:true,
+     opacity:.13,
+     side:THREE.BackSide,
+     depthWrite:false
+    })
+   );
+
+   const clouds=mesh(planetGroup,
+    new THREE.SphereGeometry(planetRadius*1.018,40,40),
+    new THREE.MeshStandardMaterial({
+     color:0xeaf5ff,
+     transparent:true,
+     opacity:.16,
+     roughness:1
+    })
+   );
+   clouds.userData.kind="solarSpin";
+   clouds.userData.spinSpeed=.48;
+  }
+
+  // Saturn's iconic rings
+  if(name==="Saturn"){
+   const ring=mesh(planetGroup,
+    new THREE.RingGeometry(planetRadius*1.35,planetRadius*2.35,100),
+    new THREE.MeshStandardMaterial({
+     color:0xc9b18a,
+     side:THREE.DoubleSide,
+     transparent:true,
+     opacity:.82,
+     roughness:.85,
+     metalness:.12
+    })
+   );
+   ring.rotation.x=-Math.PI/2.25;
+  }
+
+  // Subtle Uranus ring
+  if(name==="Uranus"){
+   const ring=mesh(planetGroup,
+    new THREE.RingGeometry(planetRadius*1.45,planetRadius*1.9,80),
+    new THREE.MeshBasicMaterial({
+     color:0x9adce0,
+     side:THREE.DoubleSide,
+     transparent:true,
+     opacity:.35
+    })
+   );
+   ring.rotation.x=-Math.PI/2.1;
+  }
+
+  planetObjects.push({
+   name,
+   pivot,
+   planet,
+   orbitRadius
+  });
+ });
+
+ // Asteroid belt between Mars and Jupiter
+ const asteroidGroup=group(solar);
+ const asteroidCount=1500;
+ const asteroidPositions=new Float32Array(asteroidCount*3);
+ const asteroidSizes=new Float32Array(asteroidCount);
+
+ for(let i=0;i<asteroidCount;i++){
+  const angle=rand(0,TAU);
+  const radius=rand(4.85,5.25);
+  asteroidPositions[i*3]=Math.cos(angle)*radius;
+  asteroidPositions[i*3+1]=rand(-.12,.12);
+  asteroidPositions[i*3+2]=Math.sin(angle)*radius;
+  asteroidSizes[i]=rand(.012,.035);
+ }
+
+ const asteroidGeometry=new THREE.BufferGeometry();
+ asteroidGeometry.setAttribute(
+  "position",
+  new THREE.BufferAttribute(asteroidPositions,3)
+ );
+
+ const asteroidMaterial=new THREE.PointsMaterial({
+  color:0xc6ae88,
+  size:.035,
+  transparent:true,
+  opacity:.72,
+  sizeAttenuation:true,
+  depthWrite:false
+ });
+
+ const asteroidBelt=new THREE.Points(
+  asteroidGeometry,
+  asteroidMaterial
+ );
+
+ asteroidBelt.userData.kind="asteroidBelt";
+ asteroidBelt.userData.speed=.025;
+ asteroidGroup.add(asteroidBelt);
+
+ // Distant cosmic dust around the system
+ particleCloud(solar,700,0xffd58a,22,.018);
+
+ solar.userData.planets=planetObjects;
+ solar.userData.kind="solarSystem";
+}
 /* 13 — ABYSS CREATURE */
 function worldAbyss(root){
  const beast=group(root);
@@ -1429,7 +1619,7 @@ function worldFinal(root){
 const BUILDERS=[
  worldCube,worldFlower,worldKnot,worldOrbital,worldTree,
  worldLiquid,worldButterfly,worldSpiral,worldCrystal,worldDNA,
- worldArchitecture,worldGyroscope,worldAbyss,worldPendulum,
+ worldArchitecture,worldUniverse,worldAbyss,worldPendulum,
  worldSacred,worldPhoenix,worldBlackHole,worldWave,worldHeart,
  worldStorm,worldHybrid,worldMorph,worldGravity,worldPortal,
  worldFinal
@@ -1716,7 +1906,7 @@ function disposeWorld(){
 function prepareWorld(index){
  disposeWorld();
 
- activeIndex=(index+25)%25;
+ activeIndex=(index+DATA.length)%DATA.length;
  activeWorld=buildWorld(activeIndex);
  worldClock=new THREE.Clock();
 
@@ -1724,7 +1914,7 @@ function prepareWorld(index){
  targetRotationY=0;
  cameraTargetX=0;
  cameraTargetY=0;
- cameraZoom=SETTINGS.defaultCameraDistance;
+ cameraZoom=activeIndex===11?23:SETTINGS.defaultCameraDistance;
 
  activeWorld.camera.position.set(0,.2,cameraZoom);
  activeWorld.camera.lookAt(0,0,0);
@@ -1762,6 +1952,28 @@ function updateWorld(time,delta){
  root.traverse(object=>{
   const kind=object.userData.kind;
   const phase=object.userData.phase||0;
+   // SOLAR SYSTEM — REAL-TIME PLANETARY MOTION
+if(kind==="solarOrbit"){
+ object.rotation.y+=delta*(object.userData.orbitSpeed||.2);
+}
+
+if(kind==="solarSpin"){
+ object.rotation.y+=delta*(object.userData.spinSpeed||.4);
+}
+
+if(kind==="solarSun"){
+ const pulse=1+Math.sin(time*1.5)*.018;
+ object.scale.setScalar(pulse);
+}
+
+if(kind==="solarCorona"){
+ object.rotation.y+=delta*(object.userData.speed||.025);
+ object.rotation.z+=delta*.012;
+}
+
+if(kind==="asteroidBelt"){
+ object.rotation.y+=delta*(object.userData.speed||.025);
+}
 
   if(kind==="slowSpin"){
    object.rotation.x+=delta*.15;
