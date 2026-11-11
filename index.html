@@ -7918,28 +7918,375 @@ function worldStorm(root){
 }
 
 
+/* =====================================================
+   21 — HYBRID ORGANISM
+   REALISTIC BIOMECHANICAL MASTERCLASS
+   Original Engine Compatible Design
+   ===================================================== */
 
-/* 21 — HYBRID ORGANISM */
 function worldHybrid(root){
+
  const organism=group(root);
- const trunk=mesh(organism,new THREE.CapsuleGeometry(.34,1.8,8,18),
-  new THREE.MeshPhysicalMaterial({color:C.emerald,metalness:.5,roughness:.2,clearcoat:1}));
+
+ // ================================================
+ // 1. MAIN ORGANIC BODY
+ // ================================================
+
+ const trunk=mesh(
+  organism,
+  new THREE.CapsuleGeometry(.42,1.65,12,32),
+  new THREE.MeshPhysicalMaterial({
+   color:0x176b48,
+   metalness:.18,
+   roughness:.36,
+   clearcoat:1,
+   clearcoatRoughness:.2
+  })
+ );
+
  trunk.userData.kind="organicBody";
- for(let i=0;i<16;i++){
-  const a=i/16*TAU;
-  const start=[Math.cos(a)*.2,rand(-.6,.8),Math.sin(a)*.2];
-  const end=[Math.cos(a)*rand(1.1,2),rand(.4,2.5),Math.sin(a)*rand(1.1,2)];
-  const b=addBranch(organism,start,end,rand(.04,.1),i%2?C.emerald:C.gold);
-  b.userData.kind="organicBranch";
-  const bloom=sphere(organism,rand(.12,.23),[C.cyan,C.rose,C.violet][i%3],...end,16);
-  bloom.userData.kind="hybridBloom";
+
+ // Natural body proportions
+ trunk.scale.set(1.05,1.08,.9);
+ trunk.rotation.z=-.08;
+
+ // Upper organic shoulders
+ const shoulderL=sphere(
+  organism,.43,C.emerald,
+  -.43,.63,0,24
+ );
+
+ shoulderL.scale.set(1.1,.8,.9);
+
+ const shoulderR=sphere(
+  organism,.43,C.emerald,
+  .43,.63,0,24
+ );
+
+ shoulderR.scale.set(1.1,.8,.9);
+
+ // Lower organic body
+ const abdomen=sphere(
+  organism,.39,C.emerald,
+  0,-1.05,0,32
+ );
+
+ abdomen.scale.set(1,1.25,.88);
+ abdomen.userData.kind="organicBody";
+
+ // ================================================
+ // 2. BIOLOGICAL CENTRAL CORE
+ // ================================================
+
+ const core=sphere(
+  organism,.25,
+  new THREE.MeshPhysicalMaterial({
+   color:0x9affdf,
+   emissive:0x087b54,
+   emissiveIntensity:1.8,
+   metalness:.3,
+   roughness:.15,
+   clearcoat:1
+  }),
+  0,.15,.39,32
+ );
+
+ core.userData.kind="pulseCore";
+
+ const coreFrame=torus(
+  organism,.39,.035,C.gold
+ );
+
+ coreFrame.position.set(0,.15,.39);
+ coreFrame.rotation.x=.25;
+
+ // Inner biological energy nodes
+ for(let i=0;i<5;i++){
+
+  const a=i/5*TAU;
+
+  const node=sphere(
+   organism,.065,
+   C.cyan,
+   Math.cos(a)*.3,
+   .15+Math.sin(a)*.3,
+   .43,
+   16
+  );
+
+  node.userData.kind="hybridBloom";
  }
+
+ // ================================================
+ // 3. NATURAL ORGANIC BRANCH NETWORK
+ // ================================================
+
+ for(let i=0;i<16;i++){
+
+  const a=i/16*TAU;
+
+  const start=[
+   Math.cos(a)*.2,
+   rand(-.65,.75),
+   Math.sin(a)*.2
+  ];
+
+  const reach=rand(1.15,1.8);
+
+  const end=[
+   Math.cos(a)*reach,
+   rand(.45,1.95),
+   Math.sin(a)*reach*.75
+  ];
+
+  const branch=addBranch(
+   organism,
+   start,
+   end,
+   rand(.045,.085),
+   i%3===0?C.gold:C.emerald
+  );
+
+  branch.userData.kind="organicBranch";
+
+  // Branch connection nodes
+  const joint=sphere(
+   organism,.085,C.emerald,
+   ...start,16
+  );
+
+  // Biological terminal bloom
+  const bloom=sphere(
+   organism,
+   rand(.12,.2),
+   [C.cyan,C.rose,C.violet][i%3],
+   ...end,
+   20
+  );
+
+  bloom.userData.kind="hybridBloom";
+
+  // Small golden center
+  sphere(
+   organism,.045,C.gold,
+   ...end,12
+  );
+
+  // Secondary branch
+  if(i%2===0){
+
+   const mid=[
+    (start[0]+end[0])*.5,
+    (start[1]+end[1])*.5,
+    (start[2]+end[2])*.5
+   ];
+
+   const sideEnd=[
+    mid[0]+Math.cos(a+.8)*.65,
+    mid[1]+rand(.2,.7),
+    mid[2]+Math.sin(a+.8)*.65
+   ];
+
+   const secondary=addBranch(
+    organism,
+    mid,
+    sideEnd,
+    .028,
+    C.emerald
+   );
+
+   secondary.userData.kind="organicBranch";
+
+   sphere(
+    organism,.075,C.cyan,
+    ...sideEnd,16
+   );
+  }
+ }
+
+ // ================================================
+ // 4. GOLDEN BIOLOGICAL VEINS
+ // ================================================
+
+ for(let i=0;i<12;i++){
+
+  const a=i/12*TAU;
+
+  const start=[
+   Math.cos(a)*.22,
+   rand(-.7,.8),
+   Math.sin(a)*.25
+  ];
+
+  const end=[
+   Math.cos(a)*rand(.55,.9),
+   rand(-.95,1.2),
+   Math.sin(a)*rand(.5,.8)
+  ];
+
+  const vein=addBranch(
+   organism,
+   start,
+   end,
+   .018,
+   C.gold
+  );
+
+  vein.userData.kind="organicBranch";
+ }
+
+ // ================================================
+ // 5. ORGANIC RIB STRUCTURE
+ // ================================================
+
+ for(let i=0;i<5;i++){
+
+  const y=.48-i*.25;
+  const width=.38-i*.035;
+
+  const rib=torus(
+   organism,
+   width,
+   .025,
+   C.gold
+  );
+
+  rib.position.set(0,y,.04);
+  rib.scale.set(1,.68,.8);
+  rib.rotation.x=Math.PI/2;
+ }
+
+ // ================================================
+ // 6. BIOLOGICAL SPINAL NODES
+ // ================================================
+
+ for(let i=0;i<9;i++){
+
+  const y=-.95+i*.23;
+
+  const vertebra=sphere(
+   organism,
+   .13,
+   i%2?C.emerald:C.gold,
+   0,y,-.3,
+   16
+  );
+
+  vertebra.scale.set(1,.65,.75);
+ }
+
+ // ================================================
+ // 7. TRANSLUCENT ORGANIC MEMBRANES
+ // ================================================
+
+ for(let i=0;i<6;i++){
+
+  const a=i/6*TAU;
+
+  const membrane=mesh(
+   organism,
+   new THREE.SphereGeometry(
+    1,20,12,
+    0,Math.PI*2,
+    0,Math.PI
+   ),
+   new THREE.MeshPhysicalMaterial({
+    color:0x55c9a0,
+    transparent:true,
+    opacity:.25,
+    roughness:.22,
+    metalness:.08,
+    side:THREE.DoubleSide,
+    depthWrite:false
+   }),
+   Math.cos(a)*.75,
+   rand(-.2,.9),
+   Math.sin(a)*.55
+  );
+
+  membrane.scale.set(.35,.7,.12);
+  membrane.rotation.z=a;
+
+  membrane.userData.kind="hybridMembrane";
+ }
+
+ // ================================================
+ // 8. MECHANICAL SUPPORTS
+ // ================================================
+
+ for(let side of [-1,1]){
+
+  const support=addBranch(
+   organism,
+   [side*.3,.8,-.15],
+   [side*.9,-.65,-.12],
+   .055,
+   C.gold
+  );
+
+  support.userData.kind="organicBranch";
+
+  sphere(
+   organism,.09,C.gold,
+   side*.9,-.65,-.12,16
+  );
+ }
+
+ // ================================================
+ // 9. SEVEN ORBITAL ENERGY RINGS
+ // ================================================
+
  for(let i=0;i<7;i++){
-  const ring=torus(organism,1+i*.18,.018,C.cyan);
-  ring.rotation.set(i*.3,i*.4,i*.2);
+
+  const ring=torus(
+   organism,
+   1.15+i*.17,
+   .016,
+   i%2===0?C.cyan:C.gold
+  );
+
+  ring.rotation.set(
+   i*.3,
+   i*.4,
+   i*.2
+  );
+
   ring.userData.kind="hybridRing";
  }
+
+ // ================================================
+ // 10. FLOATING BIO-LUMINESCENT NODES
+ // ================================================
+
+ for(let i=0;i<32;i++){
+
+  const a=i/32*TAU;
+  const r=rand(1.4,2.5);
+
+  const particle=sphere(
+   organism,
+   rand(.018,.045),
+   i%4===0?C.gold:C.cyan,
+   Math.cos(a)*r,
+   rand(-2.2,2.5),
+   Math.sin(a)*r,
+   10
+  );
+
+  particle.userData.kind="hybridBloom";
+ }
+
+ // ================================================
+ // 11. FINAL ORGANISM REFERENCES
+ // ================================================
+
+ organism.userData.kind="hybridOrganism";
+ organism.userData.body=trunk;
+ organism.userData.core=core;
+
 }
+
+
 
 /* 22 — MORPHING DIMENSION */
 function worldMorph(root){
