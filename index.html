@@ -7500,33 +7500,424 @@ function worldHeart(root){
 }
 
 
-/* 20 — PARTICLE STORM */
+/* =========================================================
+   20 — PARTICLE STORM
+   CINEMATIC COSMIC VORTEX MASTERCLASS
+   ========================================================= */
+
 function worldStorm(root){
+
  const storm=group(root);
+
+ // -------------------------------------------------------
+ // 1. MATERIALS
+ // -------------------------------------------------------
+
+ const cyanMat=new THREE.PointsMaterial({
+  color:0x62eaff,
+  size:.035,
+  transparent:true,
+  opacity:.9,
+  blending:THREE.AdditiveBlending,
+  depthWrite:false,
+  sizeAttenuation:true
+ });
+
+ const violetMat=new THREE.PointsMaterial({
+  color:0x9870ff,
+  size:.03,
+  transparent:true,
+  opacity:.72,
+  blending:THREE.AdditiveBlending,
+  depthWrite:false
+ });
+
+ const goldMat=new THREE.PointsMaterial({
+  color:0xffd78a,
+  size:.025,
+  transparent:true,
+  opacity:.8,
+  blending:THREE.AdditiveBlending,
+  depthWrite:false
+ });
+
+ const whiteMat=new THREE.PointsMaterial({
+  color:0xffffff,
+  size:.045,
+  transparent:true,
+  opacity:.95,
+  blending:THREE.AdditiveBlending,
+  depthWrite:false
+ });
+
+ // -------------------------------------------------------
+ // 2. MAIN PARTICLE VORTEX
+ // -------------------------------------------------------
+
  const count=4800;
+
  const pos=new Float32Array(count*3);
  const velocity=new Float32Array(count);
  const angle=new Float32Array(count);
+ const radius=new Float32Array(count);
+ const height=new Float32Array(count);
+ const phase=new Float32Array(count);
+ const sizeData=new Float32Array(count);
+
  for(let i=0;i<count;i++){
-  pos[i*3]=rand(-5,5);
-  pos[i*3+1]=rand(-5,5);
-  pos[i*3+2]=rand(-4,4);
-  velocity[i]=rand(.3,1.3);
-  angle[i]=rand(0,TAU);
+
+  const a=rand(0,TAU);
+  const r=rand(.65,4.8);
+
+  const spiralHeight=rand(-3.8,3.8);
+
+  radius[i]=r;
+  angle[i]=a;
+  height[i]=spiralHeight;
+
+  velocity[i]=rand(.25,1.4);
+  phase[i]=rand(0,TAU);
+  sizeData[i]=rand(.5,1.7);
+
+  pos[i*3]=Math.cos(a)*r;
+  pos[i*3+1]=spiralHeight;
+  pos[i*3+2]=Math.sin(a)*r;
  }
+
  const geo=new THREE.BufferGeometry();
- geo.setAttribute("position",new THREE.BufferAttribute(pos,3));
- const points=new THREE.Points(geo,new THREE.PointsMaterial({
-  color:C.cyan,size:.035,transparent:true,opacity:.9,
-  blending:THREE.AdditiveBlending,depthWrite:false
- }));
+
+ geo.setAttribute(
+  "position",
+  new THREE.BufferAttribute(pos,3)
+ );
+
+ const points=new THREE.Points(
+  geo,
+  cyanMat
+ );
+
  points.userData.kind="stormParticles";
  points.userData.velocity=velocity;
  points.userData.angle=angle;
+ points.userData.radius=radius;
+ points.userData.height=height;
+ points.userData.phase=phase;
+ points.userData.sizeData=sizeData;
+
  storm.add(points);
- const core=sphere(storm,.34,materials.glow(C.white));core.userData.kind="pulseCore";
- addRings(storm,4,1.4,C.violet,.014);
+
+ // -------------------------------------------------------
+ // 3. VIOLET SECONDARY PARTICLE FIELD
+ // -------------------------------------------------------
+
+ const violetCount=1800;
+
+ const violetPos=new Float32Array(violetCount*3);
+ const violetVelocity=new Float32Array(violetCount);
+ const violetAngle=new Float32Array(violetCount);
+ const violetRadius=new Float32Array(violetCount);
+
+ for(let i=0;i<violetCount;i++){
+
+  const a=rand(0,TAU);
+  const r=rand(1.2,5.1);
+
+  violetPos[i*3]=Math.cos(a)*r;
+  violetPos[i*3+1]=rand(-4.5,4.5);
+  violetPos[i*3+2]=Math.sin(a)*r;
+
+  violetVelocity[i]=rand(.2,.8);
+  violetAngle[i]=a;
+  violetRadius[i]=r;
+ }
+
+ const violetGeo=new THREE.BufferGeometry();
+
+ violetGeo.setAttribute(
+  "position",
+  new THREE.BufferAttribute(violetPos,3)
+ );
+
+ const violetPoints=new THREE.Points(
+  violetGeo,
+  violetMat
+ );
+
+ violetPoints.userData.kind="stormViolet";
+ violetPoints.userData.velocity=violetVelocity;
+ violetPoints.userData.angle=violetAngle;
+ violetPoints.userData.radius=violetRadius;
+
+ storm.add(violetPoints);
+
+ // -------------------------------------------------------
+ // 4. GOLDEN ENERGY PARTICLES
+ // -------------------------------------------------------
+
+ const goldCount=650;
+
+ const goldPos=new Float32Array(goldCount*3);
+ const goldVelocity=new Float32Array(goldCount);
+ const goldAngle=new Float32Array(goldCount);
+ const goldRadius=new Float32Array(goldCount);
+
+ for(let i=0;i<goldCount;i++){
+
+  const a=rand(0,TAU);
+  const r=rand(.5,3.5);
+
+  goldPos[i*3]=Math.cos(a)*r;
+  goldPos[i*3+1]=rand(-3,3);
+  goldPos[i*3+2]=Math.sin(a)*r;
+
+  goldVelocity[i]=rand(.6,1.6);
+  goldAngle[i]=a;
+  goldRadius[i]=r;
+ }
+
+ const goldGeo=new THREE.BufferGeometry();
+
+ goldGeo.setAttribute(
+  "position",
+  new THREE.BufferAttribute(goldPos,3)
+ );
+
+ const goldPoints=new THREE.Points(
+  goldGeo,
+  goldMat
+ );
+
+ goldPoints.userData.kind="stormGold";
+ goldPoints.userData.velocity=goldVelocity;
+ goldPoints.userData.angle=goldAngle;
+ goldPoints.userData.radius=goldRadius;
+
+ storm.add(goldPoints);
+
+ // -------------------------------------------------------
+ // 5. CENTRAL ENERGY CORE
+ // -------------------------------------------------------
+
+ const coreGroup=group(storm);
+
+ const core=sphere(
+  coreGroup,
+  .34,
+  new THREE.MeshPhysicalMaterial({
+   color:0xffffff,
+   emissive:0x54cfff,
+   emissiveIntensity:2.2,
+   metalness:.25,
+   roughness:.12,
+   clearcoat:1
+  })
+ );
+
+ core.userData.kind="pulseCore";
+
+ const innerCore=sphere(
+  coreGroup,
+  .17,
+  new THREE.MeshBasicMaterial({
+   color:0xffffff
+  })
+ );
+
+ // Energy shell
+ const shell=sphere(
+  coreGroup,
+  .49,
+  new THREE.MeshBasicMaterial({
+   color:0x42cfff,
+   transparent:true,
+   opacity:.09,
+   side:THREE.DoubleSide,
+   depthWrite:false
+  })
+ );
+
+ coreGroup.userData.kind="heartbeat";
+
+ // -------------------------------------------------------
+ // 6. MULTI-LAYER ENERGY RINGS
+ // -------------------------------------------------------
+
+ const ringData=[
+  {r:.75,t:.018,c:C.cyan,x:0,y:0,z:0},
+  {r:1.05,t:.014,c:C.violet,x:.5,y:.2,z:.2},
+  {r:1.4,t:.018,c:C.gold,x:0,y:0,z:.7},
+  {r:1.85,t:.012,c:C.cyan,x:.8,y:.3,z:.4},
+  {r:2.25,t:.012,c:C.violet,x:.2,y:.7,z:.1}
+ ];
+
+ const rings=[];
+
+ for(let i=0;i<ringData.length;i++){
+
+  const d=ringData[i];
+
+  const ring=torus(
+   storm,
+   d.r,
+   d.t,
+   materials.glow(d.c)
+  );
+
+  ring.rotation.set(d.x,d.y,d.z);
+
+  ring.userData.kind="ringOrbit";
+  ring.userData.speed=(i%2===0?1:-1)*(.15+i*.07);
+
+  rings.push(ring);
+ }
+
+ // -------------------------------------------------------
+ // 7. SPIRAL ENERGY STREAMS
+ // -------------------------------------------------------
+
+ function createStream(radius,turns,heightOffset,color,width){
+
+  const pts=[];
+  const segments=260;
+
+  for(let i=0;i<=segments;i++){
+
+   const t=i/segments;
+   const a=t*TAU*turns;
+
+   const r=radius*(.65+t*.35);
+
+   pts.push([
+    Math.cos(a)*r,
+    Math.sin(t*TAU*2+heightOffset)*.42+
+      (t-.5)*heightOffset,
+    Math.sin(a)*r
+   ]);
+  }
+
+  const stream=lineTube(
+   storm,
+   pts,
+   color,
+   width,
+   segments
+  );
+
+  stream.userData.kind="slowSpin";
+
+  return stream;
+ }
+
+ createStream(2.5,2.5,1.5,C.cyan,.012);
+ createStream(3.1,3,-1.2,C.violet,.01);
+ createStream(1.8,3.5,1.1,C.gold,.009);
+
+ // -------------------------------------------------------
+ // 8. LIGHTNING ENERGY ARCS
+ // -------------------------------------------------------
+
+ for(let i=0;i<9;i++){
+
+  const a=i/9*TAU;
+
+  const r=rand(1.3,2.8);
+
+  const points=[];
+
+  for(let j=0;j<=12;j++){
+
+   const t=j/12;
+
+   points.push([
+    Math.cos(a+t*.28)*(r+t*.4),
+    (t-.5)*rand(1.5,2.4)+Math.sin(t*TAU)*.15,
+    Math.sin(a+t*.28)*(r+t*.4)
+   ]);
+  }
+
+  const arc=lineTube(
+   storm,
+   points,
+   i%3===0?C.gold:C.cyan,
+   .012,
+   32
+  );
+
+  arc.userData.kind="slowSpin";
+ }
+
+ // -------------------------------------------------------
+ // 9. ORBITING ENERGY NODES
+ // -------------------------------------------------------
+
+ for(let i=0;i<16;i++){
+
+  const a=i/16*TAU;
+  const r=rand(1.8,3.5);
+
+  const node=sphere(
+   storm,
+   rand(.025,.065),
+   i%3===0?materials.glow(C.gold):
+    materials.glow(C.cyan),
+   Math.cos(a)*r,
+   rand(-2.2,2.2),
+   Math.sin(a)*r,
+   12
+  );
+
+  node.userData.kind="ringOrbit";
+  node.userData.speed=rand(.3,.8);
+ }
+
+ // -------------------------------------------------------
+ // 10. DISTANT STARDUST
+ // -------------------------------------------------------
+
+ const dustCount=1200;
+ const dustPos=new Float32Array(dustCount*3);
+
+ for(let i=0;i<dustCount;i++){
+
+  dustPos[i*3]=rand(-7,7);
+  dustPos[i*3+1]=rand(-5,5);
+  dustPos[i*3+2]=rand(-6,6);
+ }
+
+ const dustGeo=new THREE.BufferGeometry();
+
+ dustGeo.setAttribute(
+  "position",
+  new THREE.BufferAttribute(dustPos,3)
+ );
+
+ const dust=new THREE.Points(
+  dustGeo,
+  new THREE.PointsMaterial({
+   color:0xc7d9ff,
+   size:.012,
+   transparent:true,
+   opacity:.48,
+   depthWrite:false
+  })
+ );
+
+ storm.add(dust);
+
+ // -------------------------------------------------------
+ // 11. ANIMATION REFERENCES
+ // -------------------------------------------------------
+
+ storm.userData.kind="stormWorld";
+ storm.userData.mainParticles=points;
+ storm.userData.violetParticles=violetPoints;
+ storm.userData.goldParticles=goldPoints;
+ storm.userData.core=coreGroup;
+ storm.userData.rings=rings;
+
 }
+
+
 
 /* 21 — HYBRID ORGANISM */
 function worldHybrid(root){
