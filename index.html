@@ -9154,27 +9154,195 @@ function worldGravity(root){
 
 
 
-/* 24 — PORTAL ENGINE */
+/* 24 — PORTAL ENGINE | MASTERCLASS FIXED */
+
 function worldPortal(root){
+
  const portal=group(root);
- for(let i=0;i<12;i++){
-  const ring=torus(portal,1.05+i*.13,.035,
-   [C.cyan,C.violet,C.gold,C.rose][i%4]);
-  ring.rotation.set(i*.14,i*.08,i*.12);
-  ring.userData.kind="portalRing";
-  ring.userData.speed=(i%2?1:-1)*(.25+i*.03);
- }
- const disc=mesh(portal,new THREE.CircleGeometry(1.02,96),
-  new THREE.MeshBasicMaterial({color:0x170c3b,transparent:true,opacity:.82,side:THREE.DoubleSide}),
-  0,0,-.2);
+
+ // 1. CENTRAL PORTAL DISC
+ const disc=mesh(
+  portal,
+  new THREE.CircleGeometry(1.02,96),
+  new THREE.MeshBasicMaterial({
+   color:0x100721,
+   transparent:true,
+   opacity:.95,
+   side:THREE.DoubleSide,
+   depthWrite:false
+  }),
+  0,0,-.2
+ );
+
  disc.userData.kind="portalDisc";
- for(let i=0;i<70;i++){
-  const a=i/70*TAU,r=rand(1.7,3.5);
-  const spark=sphere(portal,rand(.025,.08),[C.cyan,C.violet,C.gold][i%3],
-   Math.cos(a)*r,Math.sin(a)*r,rand(-1,1),8);
-  spark.userData.kind="portalSpark";spark.userData.phase=rand(0,TAU);
+
+ // 2. INNER ENERGY LAYERS
+ const inner=mesh(
+  portal,
+  new THREE.CircleGeometry(.82,96),
+  new THREE.MeshBasicMaterial({
+   color:0x48208e,
+   transparent:true,
+   opacity:.22,
+   side:THREE.DoubleSide,
+   blending:THREE.AdditiveBlending,
+   depthWrite:false
+  }),
+  0,0,-.18
+ );
+
+ const innerRing=torus(
+  portal,.72,.018,C.cyan
+ );
+
+ innerRing.position.z=-.1;
+ innerRing.userData.kind="slowSpin";
+
+ // 3. TWELVE ORIGINAL PORTAL RINGS
+ const colors=[
+  C.cyan,C.violet,C.gold,C.rose
+ ];
+
+ for(let i=0;i<12;i++){
+
+  const ring=torus(
+   portal,
+   1.05+i*.13,
+   .035,
+   colors[i%4]
+  );
+
+  ring.rotation.set(
+   i*.14,
+   i*.08,
+   i*.12
+  );
+
+  ring.userData.kind="portalRing";
+
+  ring.userData.speed=
+   (i%2?1:-1)*(.25+i*.03);
  }
+
+ // 4. METALLIC OUTER FRAME
+ const outer=torus(
+  portal,2.7,.075,
+  new THREE.MeshStandardMaterial({
+   color:0x292438,
+   metalness:.95,
+   roughness:.25
+  })
+ );
+
+ outer.userData.kind="slowSpin";
+
+ const goldEdge=torus(
+  portal,2.78,.018,C.gold
+ );
+
+ goldEdge.userData.kind="slowSpin";
+
+ // 5. MECHANICAL SUPPORTS
+ for(let i=0;i<8;i++){
+
+  const a=i/8*TAU;
+  const x=Math.cos(a)*2.55;
+  const y=Math.sin(a)*2.55;
+
+  const support=mesh(
+   portal,
+   new THREE.BoxGeometry(.16,.42,.16),
+   new THREE.MeshStandardMaterial({
+    color:0x302b3b,
+    metalness:.9,
+    roughness:.3
+   })
+  );
+
+  support.position.set(x,y,0);
+  support.rotation.z=a;
+
+  sphere(
+   portal,.065,C.gold,
+   x,y,.12,12
+  );
+ }
+
+ // 6. ORIGINAL PORTAL SPARKS
+ for(let i=0;i<70;i++){
+
+  const a=i/70*TAU;
+  const r=rand(1.7,3.5);
+
+  const spark=sphere(
+   portal,
+   rand(.025,.08),
+   [C.cyan,C.violet,C.gold][i%3],
+   Math.cos(a)*r,
+   Math.sin(a)*r,
+   rand(-1,1),
+   8
+  );
+
+  spark.userData.kind="portalSpark";
+  spark.userData.phase=rand(0,TAU);
+ }
+
+ // 7. CRYSTAL ANCHORS
+ for(let i=0;i<8;i++){
+
+  const a=i/8*TAU;
+  const r=2.95;
+
+  const crystal=mesh(
+   portal,
+   new THREE.OctahedronGeometry(.12,1),
+   new THREE.MeshPhysicalMaterial({
+    color:i%2===0?0x9c79ff:0xd4af62,
+    emissive:i%2===0?0x321078:0x65400b,
+    emissiveIntensity:.5,
+    metalness:.7,
+    roughness:.18,
+    clearcoat:1
+   })
+  );
+
+  crystal.position.set(
+   Math.cos(a)*r,
+   Math.sin(a)*r,
+   0
+  );
+
+  crystal.userData.kind="slowSpin";
+ }
+
+ // 8. OUTER ENERGY SHELL
+ const shell=mesh(
+  portal,
+  new THREE.IcosahedronGeometry(3.35,1),
+  new THREE.MeshBasicMaterial({
+   color:0x8870ff,
+   wireframe:true,
+   transparent:true,
+   opacity:.045,
+   depthWrite:false
+  })
+ );
+
+ shell.userData.kind="slowSpin";
+
+ // 9. COSMIC DEBRIS
+ addFloatingDebris(
+  portal,35,C.violet,4
+ );
+
+ addFloatingDebris(
+  portal,25,C.gold,3.5
+ );
+
 }
+
+
 
 /* 25 — THE FINAL CREATION */
 function worldFinal(root){
