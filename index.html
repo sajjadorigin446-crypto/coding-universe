@@ -4853,37 +4853,326 @@ function worldUniverse(root){
 
 }
 
-/* 13 — ABYSS CREATURE */
+
+/* 13 — ABYSS CREATURE
+   CINEMATIC DEEP SEA ORGANISM
+*/
+
 function worldAbyss(root){
+
  const beast=group(root);
- const body=sphere(beast,1,materials.glass(0x125a78),0,0,0,48);
- body.scale.set(1.4,.88,.95);
- body.userData.kind="creatureBody";
- const eyes=[];
- for(const side of [-1,1]){
-  const eye=sphere(beast,.18,C.rose,side*.65,.25,.72,24);
-  eye.userData.kind="creatureEye";eyes.push(eye);
+
+ // =========================================
+ // 1. ORGANIC MATERIALS
+ // =========================================
+
+ const skin=new THREE.MeshPhysicalMaterial({
+  color:0x173d4b,
+  metalness:.12,
+  roughness:.32,
+  transmission:.12,
+  thickness:1.2,
+  ior:1.38,
+  clearcoat:.8,
+  clearcoatRoughness:.2,
+  emissive:0x031c28,
+  emissiveIntensity:.3,
+  side:THREE.DoubleSide
+ });
+
+ const underside=new THREE.MeshStandardMaterial({
+  color:0x273c49,
+  metalness:.12,
+  roughness:.62
+ });
+
+ const biolume=new THREE.MeshStandardMaterial({
+  color:0x64c9d2,
+  emissive:0x168b9c,
+  emissiveIntensity:1.2,
+  roughness:.28
+ });
+
+ const darkEye=new THREE.MeshPhysicalMaterial({
+  color:0x050d13,
+  metalness:.35,
+  roughness:.08,
+  clearcoat:1
+ });
+
+ // =========================================
+ // 2. LOCAL TUBE GENERATOR
+ // =========================================
+
+ function abyssTube(parent,points,radius,material){
+
+  const curve=new THREE.CatmullRomCurve3(
+   points.map(p=>new THREE.Vector3(p[0],p[1],p[2]))
+  );
+
+  const geometry=new THREE.TubeGeometry(
+   curve,
+   64,
+   radius,
+   8,
+   false
+  );
+
+  return mesh(parent,geometry,material);
  }
+
+ // =========================================
+ // 3. MAIN ORGANIC BODY
+ // =========================================
+
+ const bodyGeometry=new THREE.SphereGeometry(1,64,48);
+
+ const position=bodyGeometry.attributes.position;
+
+ for(let i=0;i<position.count;i++){
+
+  const x=position.getX(i);
+  const y=position.getY(i);
+  const z=position.getZ(i);
+
+  const noise=
+   Math.sin(x*8+y*4)*.018+
+   Math.sin(z*11-y*5)*.012;
+
+  const deformation=1+noise;
+
+  position.setXYZ(
+   i,
+   x*1.4*deformation,
+   y*.9*deformation,
+   z*.95*deformation
+  );
+ }
+
+ bodyGeometry.computeVertexNormals();
+
+ const body=mesh(
+  beast,
+  bodyGeometry,
+  skin,
+  0,0,0
+ );
+
+ body.userData.kind="creatureBody";
+
+ // =========================================
+ // 4. HEAD AND MANTLE
+ // =========================================
+
+ const mantle=mesh(
+  beast,
+  new THREE.SphereGeometry(1,40,32),
+  skin,
+  0,.27,-.43
+ );
+
+ mantle.scale.set(.85,.7,.75);
+
+ // =========================================
+ // 5. EYES
+ // =========================================
+
+ const eyes=[];
+
+ for(const side of [-1,1]){
+
+  const socket=mesh(
+   beast,
+   new THREE.SphereGeometry(.205,32,24),
+   underside,
+   side*.64,.2,.67
+  );
+
+  socket.scale.set(1,.9,.5);
+
+  const eye=sphere(
+   beast,
+   .135,
+   darkEye,
+   side*.64,.22,.755,
+   32
+  );
+
+  eye.scale.set(1,1,.48);
+
+  const highlight=sphere(
+   beast,
+   .025,
+   materials.glow(C.cyan),
+   side*.64+.045,.26,.81,
+   12
+  );
+
+  eye.userData.kind="creatureEye";
+  eyes.push(eye);
+ }
+
+ // =========================================
+ // 6. NATURAL MANTLE RIDGES
+ // =========================================
+
+ const ridges=[];
+
+ for(let i=0;i<7;i++){
+
+  const x=(i-3)*.19;
+
+  const points=[
+   [x,.45,.3],
+   [x*1.1,.58,.08],
+   [x*.9,.62,-.2],
+   [x*.75,.48,-.55]
+  ];
+
+  const ridge=abyssTube(
+   beast,
+   points,
+   .018,
+   new THREE.MeshStandardMaterial({
+    color:0x527987,
+    roughness:.55
+   })
+  );
+
+  ridges.push(ridge);
+ }
+
+ // =========================================
+ // 7. EIGHT ANATOMICAL TENTACLES
+ // =========================================
+
  const tentacles=[];
- for(let i=0;i<18;i++){
-  const a=i/18*TAU;
-  const pts=[];
-  for(let j=0;j<=20;j++){
-   const t=j/20;
-   pts.push([
-    Math.cos(a)*(1+t*1.8),
-    Math.sin(a)*(0.7+t*1.5)+Math.sin(t*5+i)*.1,
-    Math.sin(a*2)*t
+
+ for(let i=0;i<8;i++){
+
+  const angle=i/8*TAU;
+
+  const length=2.2+(i%3)*.45;
+
+  const points=[];
+
+  for(let j=0;j<=48;j++){
+
+   const t=j/48;
+
+   const spread=1.05+t*length;
+
+   const wave=
+    Math.sin(t*5.5+i*.65)*.12*t+
+    Math.sin(t*9+i*.8)*.045*t;
+
+   points.push([
+    Math.cos(angle)*spread+
+     Math.cos(angle+1.1)*wave,
+
+    -.55+
+     Math.sin(angle)*spread*.58+
+     Math.sin(t*4+i)*.13*t,
+
+    Math.sin(angle)*spread+
+     Math.cos(t*5+i)*.12*t
    ]);
   }
-  const tentacle=lineTube(beast,pts,[C.cyan,C.violet,C.rose][i%3],.035,45);
+
+  const tentacle=abyssTube(
+   beast,
+   points,
+   .055,
+   skin
+  );
+
   tentacle.userData.kind="tentacle";
-  tentacle.userData.phase=i*.35;
+  tentacle.userData.phase=i*.55;
+
   tentacles.push(tentacle);
+
+  // Subtle sucker details
+  for(let j=2;j<9;j++){
+
+   const t=j/10;
+
+   const index=Math.floor(t*48);
+   const p=points[index];
+
+   const sucker=sphere(
+    beast,
+    .026*(1-t*.45),
+    underside,
+    p[0],p[1],p[2],
+    10
+   );
+
+   sucker.userData.kind="pulseCore";
+   sucker.userData.phase=i+j*.2;
+  }
  }
+
+ // =========================================
+ // 8. BIO-LUMINESCENT ORGAN
+ // =========================================
+
+ const organ=sphere(
+  beast,
+  .13,
+  biolume,
+  0,-.12,.75,
+  24
+ );
+
+ organ.scale.set(1.5,.65,.5);
+ organ.userData.kind="pulseCore";
+
+ // =========================================
+ // 9. SUBTLE BODY PATTERNS
+ // =========================================
+
+ for(let i=0;i<18;i++){
+
+  const a=i/18*TAU;
+
+  const x=Math.cos(a)*.92;
+  const y=Math.sin(a)*.52;
+
+  const spot=sphere(
+   beast,
+   .018,
+   biolume,
+   x,y,.67,
+   8
+  );
+
+  spot.userData.kind="pulseCore";
+  spot.userData.phase=i*.3;
+ }
+
+ // =========================================
+ // 10. CONTROLLED ABYSS PARTICLES
+ // =========================================
+
+ particleCloud(
+  beast,
+  45,
+  C.cyan,
+  4.5,
+  .012
+ );
+
+ // =========================================
+ // 11. REFERENCES
+ // =========================================
+
  beast.userData.tentacles=tentacles;
- particleCloud(beast,280,C.cyan,7,.03);
+ beast.userData.eyes=eyes;
+ beast.userData.body=body;
+ beast.userData.kind="slowSpin";
+
 }
+
 
 /* 14 — CHAOTIC PENDULUM */
 function worldPendulum(root){
