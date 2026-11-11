@@ -8288,25 +8288,516 @@ function worldHybrid(root){
 
 
 
-/* 22 — MORPHING DIMENSION */
+/* =========================================================
+   22 — QUANTUM DIMENSION
+   CINEMATIC MASTERCLASS EDITION
+   ========================================================= */
+
 function worldMorph(root){
- const morph=group(root);
- const forms=[
-  mesh(morph,new THREE.IcosahedronGeometry(1.65,2),materials.glow(C.violet)),
-  mesh(morph,new THREE.TorusKnotGeometry(1,.25,220,24,3,5),materials.glow(C.cyan)),
-  mesh(morph,new THREE.DodecahedronGeometry(1.65,1),materials.glow(C.orange)),
-  mesh(morph,new THREE.OctahedronGeometry(1.7,2),materials.glow(C.rose)),
-  mesh(morph,new THREE.TorusGeometry(1.1,.38,32,100),materials.glow(C.gold))
- ];
- forms.forEach((f,i)=>{
-  f.visible=i===0;f.userData.kind="morphForm";f.userData.formIndex=i;
+
+ const morph = group(root);
+
+ // =====================================================
+ // 1. MATERIAL LIBRARY
+ // =====================================================
+
+ const crystalMat = new THREE.MeshPhysicalMaterial({
+  color:0x9275ff,
+  emissive:0x32106d,
+  emissiveIntensity:.65,
+  metalness:.28,
+  roughness:.09,
+  transmission:.32,
+  thickness:1.4,
+  clearcoat:1,
+  clearcoatRoughness:.05
  });
+
+ const goldMat = new THREE.MeshPhysicalMaterial({
+  color:0xd4af62,
+  metalness:1,
+  roughness:.17,
+  clearcoat:1
+ });
+
+ const cyanMat = new THREE.MeshPhysicalMaterial({
+  color:0x43d9eb,
+  emissive:0x07576c,
+  emissiveIntensity:.55,
+  metalness:.65,
+  roughness:.13,
+  clearcoat:1
+ });
+
+ const darkMetal = new THREE.MeshStandardMaterial({
+  color:0x171526,
+  metalness:.95,
+  roughness:.24
+ });
+
+ const roseMat = new THREE.MeshPhysicalMaterial({
+  color:0xe58ac8,
+  metalness:.35,
+  roughness:.12,
+  transmission:.2,
+  thickness:1,
+  clearcoat:1
+ });
+
+ // =====================================================
+ // 2. CENTRAL QUANTUM REACTOR
+ // =====================================================
+
+ const reactor = group(morph);
+
+ const core = sphere(
+  reactor,
+  .47,
+  new THREE.MeshPhysicalMaterial({
+   color:0x9e7aff,
+   emissive:0x7135ff,
+   emissiveIntensity:2.1,
+   metalness:.3,
+   roughness:.08,
+   clearcoat:1
+  }),
+  0,0,0,
+  48
+ );
+
+ core.userData.kind="pulseCore";
+
+ const nucleus = sphere(
+  reactor,
+  .2,
+  materials.glow(C.white),
+  0,0,0,
+  32
+ );
+
+ nucleus.userData.kind="pulseCore";
+
+ const innerCrystal = mesh(
+  reactor,
+  new THREE.IcosahedronGeometry(.78,2),
+  new THREE.MeshPhysicalMaterial({
+   color:0x9e7aff,
+   emissive:0x4b1ca5,
+   emissiveIntensity:.6,
+   metalness:.45,
+   roughness:.1,
+   transmission:.22,
+   thickness:1.2,
+   wireframe:false,
+   clearcoat:1
+  })
+ );
+
+ innerCrystal.userData.kind="slowSpin";
+
+ const crystalWire = mesh(
+  reactor,
+  new THREE.IcosahedronGeometry(.86,2),
+  new THREE.MeshBasicMaterial({
+   color:0xc3a8ff,
+   wireframe:true,
+   transparent:true,
+   opacity:.22,
+   depthWrite:false
+  })
+ );
+
+ crystalWire.userData.kind="slowSpin";
+
+ // =====================================================
+ // 3. REACTOR ARMOR
+ // =====================================================
+
+ for(let i=0;i<3;i++){
+
+  const armor = torus(
+   reactor,
+   .95+i*.19,
+   .035,
+   i===0?C.gold:i===1?C.violet:C.cyan
+  );
+
+  armor.rotation.set(
+   .45+i*.6,
+   .25+i*.7,
+   .2+i*.4
+  );
+
+  armor.userData.kind="slowSpin";
+ }
+
+ // =====================================================
+ // 4. FIVE DIMENSIONAL FORMS
+ // =====================================================
+
+ const forms=[];
+
+ function createForm(geometry,material,index){
+
+  const object=mesh(
+   morph,
+   geometry,
+   material
+  );
+
+  object.visible=index===0;
+  object.userData.kind="morphForm";
+  object.userData.formIndex=index;
+
+  forms.push(object);
+
+  return object;
+ }
+
+ // 01 — Amethyst Crystal
+
+ createForm(
+  new THREE.IcosahedronGeometry(1.48,3),
+  crystalMat,
+  0
+ );
+
+ // 02 — Liquid Energy Knot
+
+ createForm(
+  new THREE.TorusKnotGeometry(
+   1,.22,240,32,3,5
+  ),
+  new THREE.MeshPhysicalMaterial({
+   color:0x39d7e8,
+   emissive:0x075b78,
+   emissiveIntensity:.8,
+   metalness:.85,
+   roughness:.11,
+   clearcoat:1
+  }),
+  1
+ );
+
+ // 03 — Golden Dimensional Core
+
+ createForm(
+  new THREE.DodecahedronGeometry(1.48,2),
+  goldMat,
+  2
+ );
+
+ // 04 — Rose Translucent Crystal
+
+ createForm(
+  new THREE.OctahedronGeometry(1.55,3),
+  roseMat,
+  3
+ );
+
+ // 05 — Metallic Quantum Ring
+
+ createForm(
+  new THREE.TorusGeometry(1.05,.34,48,160),
+  new THREE.MeshPhysicalMaterial({
+   color:0xc4a15b,
+   metalness:1,
+   roughness:.1,
+   clearcoat:1
+  }),
+  4
+ );
+
  morph.userData.forms=forms;
- const shell=mesh(morph,new THREE.IcosahedronGeometry(2.5,1),
-  new THREE.MeshBasicMaterial({color:C.white,wireframe:true,transparent:true,opacity:.13}));
+
+ // =====================================================
+ // 5. DARK METALLIC DIMENSIONAL SHELL
+ // =====================================================
+
+ const shell=mesh(
+  morph,
+  new THREE.IcosahedronGeometry(2.45,2),
+  new THREE.MeshBasicMaterial({
+   color:0x9b82ff,
+   wireframe:true,
+   transparent:true,
+   opacity:.13,
+   depthWrite:false
+  })
+ );
+
  shell.userData.kind="slowSpin";
- addFloatingDebris(morph,60,C.cyan,4);
+
+ const shell2=mesh(
+  morph,
+  new THREE.OctahedronGeometry(2.12,1),
+  new THREE.MeshBasicMaterial({
+   color:0x53dff0,
+   wireframe:true,
+   transparent:true,
+   opacity:.1,
+   depthWrite:false
+  })
+ );
+
+ shell2.userData.kind="slowSpin";
+
+ // =====================================================
+ // 6. PRECISION ORBITAL ARCHITECTURE
+ // =====================================================
+
+ const orbital=group(morph);
+
+ for(let i=0;i<7;i++){
+
+  const radius=1.85+i*.15;
+
+  const ring=torus(
+   orbital,
+   radius,
+   i%3===0?.026:.012,
+   i%3===0?C.gold:
+   i%3===1?C.cyan:C.violet
+  );
+
+  ring.rotation.set(
+   .35+i*.28,
+   .3+i*.41,
+   .15+i*.24
+  );
+
+  ring.userData.kind="slowSpin";
+ }
+
+ // Dark metallic orbit supports
+
+ for(let i=0;i<4;i++){
+
+  const support=torus(
+   morph,
+   2.72+i*.1,
+   .045,
+   darkMetal
+  );
+
+  support.rotation.set(
+   i*.55,
+   i*.8,
+   i*.3
+  );
+
+  support.userData.kind="slowSpin";
+ }
+
+ // =====================================================
+ // 7. ENERGY ARCS
+ // =====================================================
+
+ function makeArc(radius,start,end,color){
+
+  const points=[];
+
+  const steps=90;
+
+  for(let i=0;i<=steps;i++){
+
+   const t=i/steps;
+   const a=start+(end-start)*t;
+
+   points.push(
+    new THREE.Vector3(
+     Math.cos(a)*radius,
+     Math.sin(a)*radius,
+     Math.sin(a*2)*.12
+    )
+   );
+  }
+
+  const curve=new THREE.CatmullRomCurve3(points);
+
+  const arc=mesh(
+   morph,
+   new THREE.TubeGeometry(
+    curve,
+    steps,
+    .018,
+    6,
+    false
+   ),
+   new THREE.MeshBasicMaterial({
+    color:color,
+    transparent:true,
+    opacity:.8
+   })
+  );
+
+  arc.userData.kind="slowSpin";
+
+  return arc;
+ }
+
+ makeArc(2.05,0,Math.PI*1.55,C.cyan);
+ makeArc(2.25,Math.PI*.2,Math.PI*1.7,C.gold);
+ makeArc(2.45,Math.PI,Math.PI*2.65,C.violet);
+
+ // =====================================================
+ // 8. FLOATING CRYSTAL SHARDS
+ // =====================================================
+
+ const shardPositions=[
+  [-1.9,1.15,0],
+  [1.9,1.15,0],
+  [-1.9,-1.15,0],
+  [1.9,-1.15,0],
+  [0,2.05,0],
+  [0,-2.05,0],
+  [0,0,2.05],
+  [0,0,-2.05],
+  [2.55,.6,.5],
+  [-2.55,-.6,-.5]
+ ];
+
+ for(let i=0;i<shardPositions.length;i++){
+
+  const p=shardPositions[i];
+
+  const shard=mesh(
+   morph,
+   new THREE.OctahedronGeometry(
+    .16+(i%3)*.045,
+    1
+   ),
+   i%2===0?crystalMat:goldMat
+  );
+
+  shard.position.set(p[0],p[1],p[2]);
+
+  shard.rotation.set(
+   i*.4,
+   i*.7,
+   i*.3
+  );
+
+  shard.userData.kind="slowSpin";
+ }
+
+ // =====================================================
+ // 9. ENERGY NODES
+ // =====================================================
+
+ for(let i=0;i<20;i++){
+
+  const a=i/20*TAU;
+  const r=2.75;
+
+  const node=sphere(
+   morph,
+   .035+(i%3)*.012,
+   i%3===0?C.gold:
+   i%3===1?C.cyan:C.violet,
+   Math.cos(a)*r,
+   Math.sin(i*1.7)*1.6,
+   Math.sin(a)*r,
+   16
+  );
+
+  node.userData.kind="slowSpin";
+ }
+
+ // =====================================================
+ // 10. COSMIC DUST
+ // =====================================================
+
+ const count=700;
+
+ const positions=new Float32Array(count*3);
+
+ for(let i=0;i<count;i++){
+
+  const angle=rand(0,TAU);
+  const radius=rand(2.5,4);
+
+  positions[i*3]=Math.cos(angle)*radius;
+  positions[i*3+1]=rand(-3.5,3.5);
+  positions[i*3+2]=Math.sin(angle)*radius;
+ }
+
+ const dustGeometry=new THREE.BufferGeometry();
+
+ dustGeometry.setAttribute(
+  "position",
+  new THREE.BufferAttribute(positions,3)
+ );
+
+ const dust=new THREE.Points(
+  dustGeometry,
+  new THREE.PointsMaterial({
+   color:0xb9a5ff,
+   size:.025,
+   transparent:true,
+   opacity:.7,
+   blending:THREE.AdditiveBlending,
+   depthWrite:false
+  })
+ );
+
+ morph.add(dust);
+
+ // =====================================================
+ // 11. OUTER GOLDEN DIMENSIONAL FRAME
+ // =====================================================
+
+ const frame=torus(
+  morph,
+  3.05,
+  .018,
+  C.gold
+ );
+
+ frame.rotation.x=Math.PI/2.4;
+ frame.userData.kind="slowSpin";
+
+ const frame2=torus(
+  morph,
+  3.3,
+  .012,
+  C.cyan
+ );
+
+ frame2.rotation.y=Math.PI/3;
+ frame2.userData.kind="slowSpin";
+
+ // =====================================================
+ // 12. COSMIC ENVIRONMENT
+ // =====================================================
+
+ addFloatingDebris(
+  morph,
+  45,
+  C.violet,
+  4
+ );
+
+ addFloatingDebris(
+  morph,
+  30,
+  C.gold,
+  3.5
+ );
+
+ // =====================================================
+ // 13. REFERENCES
+ // =====================================================
+
+ morph.userData.kind="morphDimension";
+ morph.userData.forms=forms;
+ morph.userData.core=core;
+ morph.userData.shell=shell;
+ morph.userData.orbital=orbital;
+
 }
+
+
 
 /* 23 — GRAVITY PLAYGROUND */
 function worldGravity(root){
