@@ -5174,23 +5174,259 @@ function worldAbyss(root){
 }
 
 
-/* 14 — CHAOTIC PENDULUM */
+
+/* 14 — CHAOTIC PENDULUM
+   PREMIUM MECHANICAL INSTALLATION
+*/
+
 function worldPendulum(root){
+
  const pendulum=group(root,0,1.8,0);
- mesh(pendulum,new THREE.BoxGeometry(4,.18,.5),materials.gold(),0,2.3,0);
+
+ // =========================================
+ // 1. MATERIALS
+ // =========================================
+
+ const frameMat=new THREE.MeshStandardMaterial({
+  color:0x292d32,
+  metalness:.88,
+  roughness:.24
+ });
+
+ const goldMat=new THREE.MeshStandardMaterial({
+  color:0xc6a45a,
+  metalness:.9,
+  roughness:.2
+ });
+
+ const steelMat=new THREE.MeshStandardMaterial({
+  color:0xb8c0c5,
+  metalness:.92,
+  roughness:.19
+ });
+
+ const darkMat=new THREE.MeshStandardMaterial({
+  color:0x101419,
+  metalness:.8,
+  roughness:.3
+ });
+
+ const bobMats=[
+  goldMat,
+  new THREE.MeshStandardMaterial({
+   color:0x397e88,
+   metalness:.85,
+   roughness:.2,
+   emissive:0x06252b,
+   emissiveIntensity:.25
+  }),
+  new THREE.MeshStandardMaterial({
+   color:0x9a526d,
+   metalness:.8,
+   roughness:.23,
+   emissive:0x260914,
+   emissiveIntensity:.18
+  })
+ ];
+
+ // =========================================
+ // 2. MAIN SUPPORT FRAME
+ // =========================================
+
+ mesh(
+  pendulum,
+  new THREE.BoxGeometry(4.25,.2,.62),
+  frameMat,
+  0,2.3,0
+ );
+
+ // Gold upper trim
+ mesh(
+  pendulum,
+  new THREE.BoxGeometry(4.28,.035,.65),
+  goldMat,
+  0,2.415,0
+ );
+
+ // Structural side supports
+ for(const side of [-1,1]){
+
+  mesh(
+   pendulum,
+   new THREE.CylinderGeometry(.055,.075,2.1,16),
+   frameMat,
+   side*2.02,1.25,0
+  );
+
+  mesh(
+   pendulum,
+   new THREE.BoxGeometry(.48,.12,.8),
+   goldMat,
+   side*2.02,.18,0
+  );
+ }
+
+ // =========================================
+ // 3. NINE PRECISION PENDULUMS
+ // =========================================
+
  const arms=[];
+
  for(let i=0;i<9;i++){
-  const pivot=group(pendulum,(i-4)*.42,2.15,0);
-  mesh(pivot,new THREE.CylinderGeometry(.025,.035,2.6,10),
-   materials.matte(C.white),0,-1.3,0);
-  const bob=sphere(pivot,.19,[C.gold,C.cyan,C.rose][i%3],0,-2.65,0);
+
+  const x=(i-4)*.42;
+
+  const pivot=group(
+   pendulum,
+   x,2.15,0
+  );
+
+  // Suspension joint
+  const joint=sphere(
+   pivot,
+   .095,
+   goldMat,
+   0,0,0,
+   20
+  );
+
+  joint.scale.set(1,.8,.8);
+
+  // Bearing cap
+  sphere(
+   pivot,
+   .12,
+   darkMat,
+   0,0,-.035,
+   16
+  );
+
+  // Suspension rod
+  mesh(
+   pivot,
+   new THREE.CylinderGeometry(
+    .018,.026,2.6,12
+   ),
+   steelMat,
+   0,-1.3,0
+  );
+
+  // Decorative upper collar
+  mesh(
+   pivot,
+   new THREE.CylinderGeometry(
+    .055,.055,.09,16
+   ),
+   goldMat,
+   0,-.18,0
+  );
+
+  // Lower collar
+  mesh(
+   pivot,
+   new THREE.CylinderGeometry(
+    .045,.045,.08,16
+   ),
+   goldMat,
+   0,-2.48,0
+  );
+
+  // Weighted metallic bob
+  const bob=sphere(
+   pivot,
+   .19,
+   bobMats[i%3],
+   0,-2.65,0,
+   32
+  );
+
+  bob.scale.set(1,1.08,1);
+
+  // Precision center detail
+  sphere(
+   pivot,
+   .045,
+   goldMat,
+   0,-2.65,.17,
+   16
+  );
+
   bob.userData.kind="pendulumBob";
+
   pivot.userData.kind="pendulumPivot";
   pivot.userData.index=i;
+
   arms.push(pivot);
  }
+
+ // =========================================
+ // 4. SIDE BEARING DETAILS
+ // =========================================
+
+ for(const side of [-1,1]){
+
+  const bearing=sphere(
+   pendulum,
+   .16,
+   goldMat,
+   side*2.02,2.15,0,
+   24
+  );
+
+  bearing.scale.set(1,.75,.75);
+
+  sphere(
+   pendulum,
+   .075,
+   darkMat,
+   side*2.02,2.15,.1,
+   16
+  );
+ }
+
+ // =========================================
+ // 5. BASE PLATFORM
+ // =========================================
+
+ mesh(
+  pendulum,
+  new THREE.BoxGeometry(4.8,.16,1.2),
+  darkMat,
+  0,-.02,0
+ );
+
+ mesh(
+  pendulum,
+  new THREE.BoxGeometry(4.65,.025,1.05),
+  goldMat,
+  0,.075,0
+ );
+
+ // =========================================
+ // 6. SUBTLE MECHANICAL DETAILS
+ // =========================================
+
+ for(let i=0;i<9;i++){
+
+  const x=(i-4)*.42;
+
+  mesh(
+   pendulum,
+   new THREE.BoxGeometry(.08,.035,.72),
+   goldMat,
+   x,2.53,0
+  );
+ }
+
+ // =========================================
+ // 7. ANIMATION REFERENCES
+ // =========================================
+
  pendulum.userData.arms=arms;
+ 
+
 }
+
 
 /* 15 — SACRED GEOMETRY */
 function worldSacred(root){
