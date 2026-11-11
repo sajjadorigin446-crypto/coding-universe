@@ -1106,187 +1106,631 @@ function worldArchitecture(root){
  }
 }
 
-/* 12 — THE SOLAR SYSTEM */
+
+/* 12 — THE SOLAR SYSTEM | MASTERCLASS EDITION */
 function worldUniverse(root){
+
  const solar=group(root);
 
- // Deep-space atmosphere
- stars(solar,3200,100,0xe4e9ff,.035);
- particleCloud(solar,450,0xd6b15e,30,.022);
+ // ==========================================
+ // 1. PROCEDURAL TEXTURE GENERATOR
+ // ==========================================
 
- // Sun — central star
- const sunGroup=group(solar);
+ function createPlanetTexture(type,baseColor){
 
- const sun=mesh(sunGroup,
-  new THREE.SphereGeometry(.88,64,64),
-  new THREE.MeshBasicMaterial({color:0xffc247})
- );
- sun.userData.kind="solarSun";
+  const canvas=document.createElement("canvas");
+  canvas.width=1024;
+  canvas.height=512;
 
- // Solar corona
- for(let i=0;i<4;i++){
-  const corona=mesh(sunGroup,
-   new THREE.SphereGeometry(1.02+i*.17,48,48),
-   new THREE.MeshBasicMaterial({
-    color:i%2?0xff9b35:0xffd16b,
-    transparent:true,
-    opacity:.09-i*.012,
-    side:THREE.BackSide,
-    depthWrite:false
-   })
-  );
-  corona.userData.kind="solarCorona";
-  corona.userData.speed=(i%2?1:-1)*(.025+i*.012);
+  const ctx=canvas.getContext("2d");
+
+  ctx.fillStyle="#"+baseColor.toString(16).padStart(6,"0");
+  ctx.fillRect(0,0,1024,512);
+
+  // Atmospheric and surface variations
+  if(type==="sun"){
+
+   const gradient=ctx.createRadialGradient(512,256,30,512,256,550);
+   gradient.addColorStop(0,"#fff9b0");
+   gradient.addColorStop(.25,"#ffdf65");
+   gradient.addColorStop(.65,"#ff9c20");
+   gradient.addColorStop(1,"#d94708");
+
+   ctx.fillStyle=gradient;
+   ctx.fillRect(0,0,1024,512);
+
+   for(let i=0;i<3500;i++){
+    const x=Math.random()*1024;
+    const y=Math.random()*512;
+    const r=Math.random()*5+1;
+
+    ctx.beginPath();
+    ctx.fillStyle=Math.random()>.5
+     ?"rgba(255,245,160,.22)"
+     :"rgba(160,45,0,.18)";
+    ctx.arc(x,y,r,0,TAU);
+    ctx.fill();
+   }
+  }
+
+  if(type==="earth"){
+
+   // Ocean
+   ctx.fillStyle="#1458a0";
+   ctx.fillRect(0,0,1024,512);
+
+   // Continents
+   const continents=[
+    [210,160,115,75],
+    [285,340,65,120],
+    [480,145,95,65],
+    [535,290,65,115],
+    [700,155,150,85],
+    [800,340,100,75],
+    [920,210,55,80]
+   ];
+
+   continents.forEach(([x,y,rx,ry])=>{
+    ctx.beginPath();
+
+    for(let a=0;a<=TAU+.1;a+=.12){
+     const irregular=1+Math.sin(a*7)*.12+Math.cos(a*11)*.08;
+     const px=x+Math.cos(a)*rx*irregular;
+     const py=y+Math.sin(a)*ry*irregular;
+
+     if(a===0)ctx.moveTo(px,py);
+     else ctx.lineTo(px,py);
+    }
+
+    ctx.closePath();
+    ctx.fillStyle="#4d9b55";
+    ctx.fill();
+
+    ctx.strokeStyle="#a1b77a";
+    ctx.lineWidth=5;
+    ctx.stroke();
+   });
+
+   // Polar ice
+   ctx.fillStyle="rgba(235,250,255,.85)";
+   ctx.fillRect(0,0,1024,24);
+   ctx.fillRect(0,488,1024,24);
+  }
+
+  if(type==="jupiter" || type==="saturn"){
+
+   const colors=type==="jupiter"
+    ?["#a56e45","#e6c59b","#d6a77b","#87563c","#f1d7af"]
+    :["#b69b72","#e5d4ae","#9f805e","#d7c39b"];
+
+   for(let y=0;y<512;y+=13){
+    ctx.fillStyle=colors[Math.floor(Math.random()*colors.length)];
+    ctx.globalAlpha=.35+Math.random()*.45;
+    ctx.fillRect(0,y,1024,Math.random()*18+7);
+   }
+
+   ctx.globalAlpha=1;
+
+   if(type==="jupiter"){
+    ctx.beginPath();
+    ctx.ellipse(690,280,70,35,-.2,0,TAU);
+    ctx.fillStyle="#a94f35";
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.ellipse(690,280,55,22,-.2,0,TAU);
+    ctx.fillStyle="#d58b62";
+    ctx.fill();
+   }
+  }
+
+  if(type==="mars"){
+   for(let i=0;i<450;i++){
+    ctx.beginPath();
+    ctx.fillStyle=i%2?"rgba(80,25,12,.2)":"rgba(255,180,120,.25)";
+    ctx.arc(Math.random()*1024,Math.random()*512,Math.random()*18+3,0,TAU);
+    ctx.fill();
+   }
+  }
+
+  if(type==="venus" || type==="neptune" || type==="uranus"){
+
+   for(let i=0;i<180;i++){
+    ctx.beginPath();
+    ctx.strokeStyle="rgba(255,255,255,.12)";
+    ctx.lineWidth=Math.random()*12+2;
+
+    const y=Math.random()*512;
+    ctx.moveTo(0,y);
+    ctx.bezierCurveTo(
+     250,y-30,
+     700,y+30,
+     1024,y
+    );
+    ctx.stroke();
+   }
+  }
+
+  if(type==="mercury"){
+   for(let i=0;i<300;i++){
+    const x=Math.random()*1024;
+    const y=Math.random()*512;
+    const r=Math.random()*14+2;
+
+    ctx.beginPath();
+    ctx.fillStyle="rgba(35,30,25,.25)";
+    ctx.arc(x,y,r,0,TAU);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.strokeStyle="rgba(220,215,205,.2)";
+    ctx.arc(x-2,y-2,r*.8,0,TAU);
+    ctx.stroke();
+   }
+  }
+
+  // Surface grain
+  for(let i=0;i<5000;i++){
+   ctx.fillStyle=Math.random()>.5
+    ?"rgba(255,255,255,.035)"
+    :"rgba(0,0,0,.045)";
+
+   ctx.fillRect(
+    Math.random()*1024,
+    Math.random()*512,
+    2,
+    2
+   );
+  }
+
+  const texture=new THREE.CanvasTexture(canvas);
+  texture.colorSpace=THREE.SRGBColorSpace;
+  texture.anisotropy=4;
+
+  return texture;
  }
 
- // Sun's outer glow
- const sunGlow=mesh(sunGroup,
-  new THREE.SphereGeometry(1.75,48,48),
+ // ==========================================
+ // 2. DEEP SPACE ENVIRONMENT
+ // ==========================================
+
+ stars(solar,4200,120,0xe4e9ff,.045);
+ particleCloud(solar,650,0xd6b15e,35,.018);
+
+ // Distant cosmic atmosphere
+ const nebula=mesh(
+  solar,
+  new THREE.SphereGeometry(95,32,32),
   new THREE.MeshBasicMaterial({
-   color:0xff9b35,
+   color:0x161329,
+   side:THREE.BackSide,
    transparent:true,
-   opacity:.075,
+   opacity:.11,
+   depthWrite:false
+  })
+ );
+
+ // ==========================================
+ // 3. THE SUN
+ // ==========================================
+
+ const sunGroup=group(solar);
+
+ const sunTexture=createPlanetTexture("sun",0xffa52d);
+
+ const sun=mesh(
+  sunGroup,
+  new THREE.SphereGeometry(.88,96,96),
+  new THREE.MeshBasicMaterial({
+   map:sunTexture,
+   color:0xffffff
+  })
+ );
+
+ sun.userData.kind="solarSun";
+
+ // Sun inner glow
+ const sunInnerGlow=mesh(
+  sunGroup,
+  new THREE.SphereGeometry(1.02,64,64),
+  new THREE.MeshBasicMaterial({
+   color:0xffb52e,
+   transparent:true,
+   opacity:.20,
    side:THREE.BackSide,
    depthWrite:false
   })
  );
+
+ sunInnerGlow.userData.kind="solarCorona";
+ sunInnerGlow.userData.speed=.07;
+
+ // Solar corona layers
+ for(let i=0;i<5;i++){
+
+  const corona=mesh(
+   sunGroup,
+   new THREE.SphereGeometry(1.12+i*.15,64,64),
+   new THREE.MeshBasicMaterial({
+    color:i%2?0xff8b26:0xffd16b,
+    transparent:true,
+    opacity:.10-i*.014,
+    side:THREE.BackSide,
+    depthWrite:false
+   })
+  );
+
+  corona.userData.kind="solarCorona";
+  corona.userData.speed=(i%2?1:-1)*(.025+i*.012);
+ }
+
+ // Solar outer glow
+ const sunGlow=mesh(
+  sunGroup,
+  new THREE.SphereGeometry(1.95,64,64),
+  new THREE.MeshBasicMaterial({
+   color:0xff9b35,
+   transparent:true,
+   opacity:.065,
+   side:THREE.BackSide,
+   depthWrite:false
+  })
+ );
+
  sunGlow.userData.kind="solarCorona";
 
- // Powerful sunlight
+ // Sunlight
  const sunlight=new THREE.PointLight(0xffd28a,1500,100,1.25);
  sunlight.position.set(0,0,0);
  solar.add(sunlight);
 
- // Planet data: name, orbit radius, planet radius, color, orbit speed
+ // Additional warm ambient illumination
+ const ambient=new THREE.AmbientLight(0x526080,.35);
+ solar.add(ambient);
+
+ // ==========================================
+ // 4. PLANET INFORMATION
+ // ==========================================
+
  const planets=[
-  ["Mercury",1.75,.105,0x9b9389,.95],
-  ["Venus",2.55,.17,0xd9ad72,.72],
-  ["Earth",3.45,.19,0x2779d0,.56],
-  ["Mars",4.35,.145,0xc65d39,.43],
-  ["Jupiter",5.65,.49,0xd5ad83,.27],
-  ["Saturn",7.05,.40,0xd9c18c,.20],
-  ["Uranus",8.35,.29,0x83d5dc,.14],
-  ["Neptune",9.55,.28,0x416ce0,.11]
+
+  {
+   name:"Mercury",
+   radius:1.75,
+   size:.105,
+   color:0x9b9389,
+   texture:"mercury",
+   speed:.95,
+   rotation:1.1,
+   tilt:.03
+  },
+
+  {
+   name:"Venus",
+   radius:2.55,
+   size:.17,
+   color:0xd9ad72,
+   texture:"venus",
+   speed:.72,
+   rotation:-.25,
+   tilt:3.1
+  },
+
+  {
+   name:"Earth",
+   radius:3.45,
+   size:.19,
+   color:0xffffff,
+   texture:"earth",
+   speed:.56,
+   rotation:1.8,
+   tilt:.41
+  },
+
+  {
+   name:"Mars",
+   radius:4.35,
+   size:.145,
+   color:0xc65d39,
+   texture:"mars",
+   speed:.43,
+   rotation:1.4,
+   tilt:.44
+  },
+
+  {
+   name:"Jupiter",
+   radius:5.65,
+   size:.49,
+   color:0xffffff,
+   texture:"jupiter",
+   speed:.27,
+   rotation:2.0,
+   tilt:.05
+  },
+
+  {
+   name:"Saturn",
+   radius:7.05,
+   size:.40,
+   color:0xffffff,
+   texture:"saturn",
+   speed:.20,
+   rotation:1.8,
+   tilt:.47
+  },
+
+  {
+   name:"Uranus",
+   radius:8.35,
+   size:.29,
+   color:0xffffff,
+   texture:"uranus",
+   speed:.14,
+   rotation:-1.4,
+   tilt:1.70
+  },
+
+  {
+   name:"Neptune",
+   radius:9.55,
+   size:.28,
+   color:0xffffff,
+   texture:"neptune",
+   speed:.11,
+   rotation:1.5,
+   tilt:.50
+  }
+
  ];
 
  const planetObjects=[];
 
- planets.forEach((data,index)=>{
-  const [name,orbitRadius,planetRadius,color,speed]=data;
+ // ==========================================
+ // 5. CREATE ALL EIGHT PLANETS
+ // ==========================================
 
-  // Orbital path
-  const orbitPath=mesh(solar,
-   new THREE.TorusGeometry(orbitRadius,.008,6,220),
+ planets.forEach((data,index)=>{
+
+  const {
+   name,
+   radius,
+   size,
+   color,
+   texture,
+   speed,
+   rotation,
+   tilt
+  }=data;
+
+  // Orbital path in XZ plane
+  const orbitPath=mesh(
+   solar,
+   new THREE.TorusGeometry(radius,.006,6,280),
    new THREE.MeshBasicMaterial({
     color:0xc5b9a3,
     transparent:true,
-    opacity:.25,
+    opacity:.20,
     depthWrite:false
    })
   );
+
   orbitPath.rotation.x=Math.PI/2;
 
-  // Independent orbital pivot
+  // Orbital pivot
   const pivot=group(solar);
-  pivot.rotation.z=(index-3.5)*.009;
+
+  pivot.rotation.y=Math.random()*TAU;
+
   pivot.userData.kind="solarOrbit";
   pivot.userData.orbitSpeed=speed;
 
-  // Planet surface
-  const planetGroup=group(pivot,orbitRadius,0,0);
+  // Planet group
+  const planetGroup=group(pivot,radius,0,0);
 
-  const planet=mesh(planetGroup,
-   new THREE.SphereGeometry(planetRadius,48,48),
-   new THREE.MeshStandardMaterial({
-    color,
-    roughness:.82,
-    metalness:.04
-   })
+  planetGroup.rotation.z=tilt;
+
+  // Planet surface texture
+  const surfaceTexture=createPlanetTexture(texture,color);
+
+  const planetMaterial=new THREE.MeshStandardMaterial({
+   map:surfaceTexture,
+   color:color,
+   roughness:name==="Earth"?.76:.88,
+   metalness:.015
+  });
+
+  const planet=mesh(
+   planetGroup,
+   new THREE.SphereGeometry(size,72,72),
+   planetMaterial
   );
 
   planet.userData.kind="solarSpin";
-  planet.userData.spinSpeed=.35+index*.045;
+  planet.userData.spinSpeed=rotation;
 
-  // Earth: atmospheric halo and cloud layer
+  // Individual atmosphere
+  const atmosphereColors={
+   Mercury:0x9e9b96,
+   Venus:0xe8bd83,
+   Earth:0x4a9dff,
+   Mars:0xd97854,
+   Jupiter:0xd6a77b,
+   Saturn:0xe0c99a,
+   Uranus:0x9be5e8,
+   Neptune:0x497cff
+  };
+
+  const atmosphere=mesh(
+   planetGroup,
+   new THREE.SphereGeometry(size*1.10,48,48),
+   new THREE.MeshBasicMaterial({
+    color:atmosphereColors[name],
+    transparent:true,
+    opacity:name==="Earth"?.18:.075,
+    side:THREE.BackSide,
+    depthWrite:false
+   })
+  );
+
+  // Earth cloud layer
   if(name==="Earth"){
-   const atmosphere=mesh(planetGroup,
-    new THREE.SphereGeometry(planetRadius*1.13,40,40),
-    new THREE.MeshBasicMaterial({
-     color:0x55aaff,
+
+   const cloudTexture=createPlanetTexture("venus",0xe8f5ff);
+
+   const clouds=mesh(
+    planetGroup,
+    new THREE.SphereGeometry(size*1.025,64,64),
+    new THREE.MeshStandardMaterial({
+     map:cloudTexture,
+     color:0xffffff,
      transparent:true,
-     opacity:.13,
-     side:THREE.BackSide,
+     opacity:.22,
+     roughness:1,
      depthWrite:false
     })
    );
 
-   const clouds=mesh(planetGroup,
-    new THREE.SphereGeometry(planetRadius*1.018,40,40),
-    new THREE.MeshStandardMaterial({
-     color:0xeaf5ff,
-     transparent:true,
-     opacity:.16,
-     roughness:1
-    })
-   );
    clouds.userData.kind="solarSpin";
-   clouds.userData.spinSpeed=.48;
-  }
+   clouds.userData.spinSpeed=.65;
 
-  // Saturn's iconic rings
-  if(name==="Saturn"){
-   const ring=mesh(planetGroup,
-    new THREE.RingGeometry(planetRadius*1.35,planetRadius*2.35,100),
-    new THREE.MeshStandardMaterial({
-     color:0xc9b18a,
-     side:THREE.DoubleSide,
-     transparent:true,
-     opacity:.82,
-     roughness:.85,
-     metalness:.12
-    })
-   );
-   ring.rotation.x=-Math.PI/2.25;
-  }
-
-  // Subtle Uranus ring
-  if(name==="Uranus"){
-   const ring=mesh(planetGroup,
-    new THREE.RingGeometry(planetRadius*1.45,planetRadius*1.9,80),
+   // Earth atmospheric outer halo
+   const earthHalo=mesh(
+    planetGroup,
+    new THREE.SphereGeometry(size*1.25,48,48),
     new THREE.MeshBasicMaterial({
-     color:0x9adce0,
-     side:THREE.DoubleSide,
+     color:0x399bff,
      transparent:true,
-     opacity:.35
+     opacity:.10,
+     side:THREE.BackSide,
+     depthWrite:false
     })
    );
-   ring.rotation.x=-Math.PI/2.1;
+  }
+
+  // Jupiter Great Red Spot detail is included in its texture.
+
+  // ========================================
+  // SATURN RING SYSTEM
+  // ========================================
+
+  if(name==="Saturn"){
+
+   const ringGeometry=new THREE.RingGeometry(
+    size*1.25,
+    size*2.45,
+    160
+   );
+
+   const ringTextureCanvas=document.createElement("canvas");
+   ringTextureCanvas.width=512;
+   ringTextureCanvas.height=32;
+
+   const ringCtx=ringTextureCanvas.getContext("2d");
+
+   for(let x=0;x<512;x++){
+
+    const band=Math.sin(x*.18)*.5+.5;
+
+    ringCtx.fillStyle=`rgba(
+     ${185+band*55},
+     ${158+band*45},
+     ${112+band*45},
+     ${.45+band*.5}
+    )`;
+
+    ringCtx.fillRect(x,0,1,32);
+   }
+
+   const ringTexture=new THREE.CanvasTexture(ringTextureCanvas);
+
+   const ringMaterial=new THREE.MeshStandardMaterial({
+    map:ringTexture,
+    color:0xd7c19b,
+    side:THREE.DoubleSide,
+    transparent:true,
+    opacity:.90,
+    roughness:.95,
+    metalness:.02,
+    depthWrite:false
+   });
+
+   const ring=mesh(
+    planetGroup,
+    ringGeometry,
+    ringMaterial
+   );
+
+   ring.rotation.x=-Math.PI/2.25;
+
+   // Inner dark ring
+   const innerRing=mesh(
+    planetGroup,
+    new THREE.RingGeometry(size*1.12,size*1.30,120),
+    new THREE.MeshBasicMaterial({
+     color:0x75614b,
+     side:THREE.DoubleSide,
+     transparent:true,
+     opacity:.65,
+     depthWrite:false
+    })
+   );
+
+   innerRing.rotation.x=-Math.PI/2.25;
+  }
+
+  // Uranus faint ring
+  if(name==="Uranus"){
+
+   const uranusRing=mesh(
+    planetGroup,
+    new THREE.RingGeometry(size*1.35,size*1.85,120),
+    new THREE.MeshBasicMaterial({
+     color:0xa4e5e8,
+     side:THREE.DoubleSide,
+     transparent:true,
+     opacity:.28,
+     depthWrite:false
+    })
+   );
+
+   uranusRing.rotation.x=-Math.PI/2.1;
   }
 
   planetObjects.push({
    name,
    pivot,
    planet,
-   orbitRadius
+   planetGroup,
+   orbitRadius:radius,
+   size,
+   speed
   });
+
  });
 
- // Asteroid belt between Mars and Jupiter
- const asteroidGroup=group(solar);
- const asteroidCount=1500;
+ // ==========================================
+ // 6. ASTEROID BELT
+ // ==========================================
+
+ const asteroidCount=1800;
  const asteroidPositions=new Float32Array(asteroidCount*3);
  const asteroidSizes=new Float32Array(asteroidCount);
 
  for(let i=0;i<asteroidCount;i++){
+
   const angle=rand(0,TAU);
   const radius=rand(4.85,5.25);
+
   asteroidPositions[i*3]=Math.cos(angle)*radius;
-  asteroidPositions[i*3+1]=rand(-.12,.12);
+  asteroidPositions[i*3+1]=rand(-.10,.10);
   asteroidPositions[i*3+2]=Math.sin(angle)*radius;
+
   asteroidSizes[i]=rand(.012,.035);
  }
 
  const asteroidGeometry=new THREE.BufferGeometry();
+
  asteroidGeometry.setAttribute(
   "position",
   new THREE.BufferAttribute(asteroidPositions,3)
@@ -1294,9 +1738,9 @@ function worldUniverse(root){
 
  const asteroidMaterial=new THREE.PointsMaterial({
   color:0xc6ae88,
-  size:.035,
+  size:.028,
   transparent:true,
-  opacity:.72,
+  opacity:.78,
   sizeAttenuation:true,
   depthWrite:false
  });
@@ -1308,14 +1752,26 @@ function worldUniverse(root){
 
  asteroidBelt.userData.kind="asteroidBelt";
  asteroidBelt.userData.speed=.025;
- asteroidGroup.add(asteroidBelt);
 
- // Distant cosmic dust around the system
- particleCloud(solar,700,0xffd58a,22,.018);
+ solar.add(asteroidBelt);
+
+ // ==========================================
+ // 7. COSMIC DUST
+ // ==========================================
+
+ particleCloud(solar,900,0xffd58a,24,.015);
+ particleCloud(solar,300,0x9bbaff,32,.012);
+
+ // ==========================================
+ // 8. SYSTEM METADATA
+ // ==========================================
 
  solar.userData.planets=planetObjects;
+ solar.userData.sun=sun;
  solar.userData.kind="solarSystem";
+
 }
+
 /* 13 — ABYSS CREATURE */
 function worldAbyss(root){
  const beast=group(root);
