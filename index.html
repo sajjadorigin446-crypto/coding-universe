@@ -2426,85 +2426,915 @@ function worldOrbital(root){
  addRings(machine,2,3.6,C.gold,.01);
 }
 
-/* 05 — FRACTAL TREE */
+/* 05 — FRACTAL TREE | MASTERCLASS EDITION */
 function worldTree(root){
+
  const tree=group(root,0,-2.6,0);
  const leaves=[];
- function grow(start,length,angle,depth,spread){
+ const branches=[];
+ const leafColors=[C.emerald,C.cyan,C.gold];
+
+ // =====================================
+ // 1. FRACTAL BRANCH GENERATOR
+ // =====================================
+
+ function grow(start,length,angle,depth,spread,side){
+
   if(depth===0){
-   const leaf=sphere(tree,.12,[C.emerald,C.cyan,C.gold][Math.floor(rand(0,3))],
-    start[0],start[1],start[2],12);
-   leaf.userData.kind="leafGlow";leaves.push(leaf);return;
+
+   const leaf=sphere(
+    tree,
+    rand(.075,.13),
+    leafColors[Math.floor(rand(0,3))],
+    start[0],start[1],start[2],
+    14
+   );
+
+   leaf.userData.kind="leafGlow";
+   leaves.push(leaf);
+
+   return;
   }
+
   const end=[
    start[0]+Math.sin(angle)*length,
    start[1]+Math.cos(angle)*length,
-   start[2]+rand(-.16,.16)
+   start[2]+rand(-.12,.12)
   ];
-  const branch=addBranch(tree,start,end,.025+depth*.018,
-   depth>3?C.gold:C.emerald);
+
+  const thickness=.012+depth*.017;
+
+  const branch=addBranch(
+   tree,
+   start,
+   end,
+   thickness,
+   depth>4?C.gold:C.emerald
+  );
+
   branch.userData.kind="branchPulse";
-  grow(end,length*.76,angle-spread,depth-1,spread*.9);
-  grow(end,length*.76,angle+spread,depth-1,spread*.9);
-  if(depth>3)grow(end,length*.68,angle+spread*.12,depth-1,spread*.9);
- }
- grow([0,0,0],1.35,0,7,.55);
- tree.userData.leaves=leaves;
- particleCloud(tree,250,C.emerald,6,.025);
-}
+  branches.push(branch);
 
-/* 06 — LIQUID DIMENSION */
-function worldLiquid(root){
- const liquid=group(root,0,-1.7,0);
- const geo=new THREE.PlaneGeometry(10,10,100,100);
- const water=mesh(liquid,geo,new THREE.MeshPhysicalMaterial({
-  color:0x0869a4,metalness:.75,roughness:.12,clearcoat:1,
-  emissive:0x052f5c,emissiveIntensity:.65,side:THREE.DoubleSide
- }));
- water.rotation.x=-Math.PI/2;
- water.userData.kind="liquidSurface";
- for(let i=0;i<16;i++){
-  const r=torus(liquid,.2+i*.24,.012,i%2?C.cyan:C.violet);
-  r.rotation.x=Math.PI/2;r.position.y=.1+i*.012;
-  r.userData.kind="waterRing";
- }
- for(let i=0;i<35;i++){
-  const bubble=sphere(liquid,rand(.04,.12),C.cyan,rand(-4,4),rand(-1,2),rand(-4,4),12);
-  bubble.userData.kind="bubble";bubble.userData.phase=rand(0,TAU);
- }
-}
+  // Main branching structure
+  grow(
+   end,
+   length*.76,
+   angle-spread,
+   depth-1,
+   spread*.91,
+   -1
+  );
 
-/* 07 — MECHANICAL BUTTERFLY */
-function worldButterfly(root){
- const butterfly=group(root);
- const body=mesh(butterfly,new THREE.CapsuleGeometry(.12,.95,6,14),
-  materials.gold());
- body.rotation.x=Math.PI/2;
- const wings=[];
- for(const side of [-1,1]){
-  for(let i=0;i<2;i++){
-   const wing=mesh(butterfly,new THREE.SphereGeometry(.78,36,24),
-    new THREE.MeshPhysicalMaterial({
-     color:i?C.violet:C.cyan,metalness:.35,roughness:.12,
-     clearcoat:1,emissive:i?C.violet:C.cyan,emissiveIntensity:.28,
-     side:THREE.DoubleSide
-    }));
-   wing.position.set(side*.68,i?.48:-.42,0);
-   wing.scale.set(1.2,.8,.13);
-   wing.rotation.z=side*(i?-.5:.55);
-   wing.userData.kind="butterflyWing";
-   wing.userData.side=side;
-   wing.userData.offset=i*.7;
-   wings.push(wing);
+  grow(
+   end,
+   length*.76,
+   angle+spread,
+   depth-1,
+   spread*.91,
+   1
+  );
+
+  // Central secondary branch
+  if(depth>3){
+
+   grow(
+    end,
+    length*.69,
+    angle+spread*.12,
+    depth-1,
+    spread*.88,
+    0
+   );
   }
  }
- for(let i=0;i<2;i++){
-  const pts=[[0,.45,0],[Math.sin(i)*.35,1.1,.1],[Math.sin(i)*.65,1.55,.2]];
-  lineTube(butterfly,pts,C.gold,.022);
+
+ // =====================================
+ // 2. MAIN TREE STRUCTURE
+ // =====================================
+
+ grow([0,0,0],1.35,0,7,.55,0);
+
+ // =====================================
+ // 3. GOLDEN ROOT SYSTEM
+ // =====================================
+
+ for(let i=0;i<9;i++){
+
+  const a=i/9*TAU;
+
+  const end=[
+   Math.cos(a)*rand(.55,.95),
+   -rand(.12,.38),
+   Math.sin(a)*rand(.55,.95)
+  ];
+
+  const rootBranch=addBranch(
+   tree,
+   [0,0,0],
+   end,
+   rand(.025,.045),
+   C.gold
+  );
+
+  rootBranch.userData.kind="branchPulse";
  }
- butterfly.userData.wings=wings;
- particleCloud(butterfly,150,C.cyan,5,.025);
+
+ // =====================================
+ // 4. LUMINOUS CANOPY ACCENTS
+ // =====================================
+
+ for(let i=0;i<18;i++){
+
+  const a=i/18*TAU;
+  const radius=rand(1.3,2.3);
+  const y=rand(3.1,5.1);
+
+  const glow=sphere(
+   tree,
+   rand(.025,.055),
+   materials.glow(i%3===0?C.gold:C.emerald),
+   Math.cos(a)*radius,
+   y,
+   Math.sin(a)*radius,
+   12
+  );
+
+  glow.userData.kind="pulseCore";
+ }
+
+ // =====================================
+ // 5. FLOATING FOREST LIGHT
+ // =====================================
+
+ particleCloud(
+  tree,
+  180,
+  C.gold,
+  4.8,
+  .018
+ );
+
+ particleCloud(
+  tree,
+  100,
+  C.emerald,
+  3.8,
+  .022
+ );
+
+ // =====================================
+ // 6. TREE CORE
+ // =====================================
+
+ const core=sphere(
+  tree,
+  .19,
+  materials.glow(C.gold),
+  0,
+  1.15,
+  0,
+  32
+ );
+
+ core.userData.kind="pulseCore";
+
+ // =====================================
+ // 7. SAVE TREE ELEMENTS
+ // =====================================
+
+ tree.userData.leaves=leaves;
+ tree.userData.branches=branches;
+ tree.userData.kind="slowSpin";
 }
+
+
+/* 06 — LIQUID | CINEMATIC OCEAN MASTERCLASS */
+
+function worldLiquid(root){
+
+ const liquid=group(root,0,-1.7,0);
+
+ // =========================================
+ // 1. REALISTIC OCEAN MATERIAL
+ // =========================================
+
+ const oceanGeo=new THREE.PlaneGeometry(10,10,160,160);
+
+ const oceanMat=new THREE.MeshPhysicalMaterial({
+  color:0x063d62,
+  metalness:.28,
+  roughness:.16,
+  clearcoat:1,
+  clearcoatRoughness:.08,
+  reflectivity:.85,
+  emissive:0x021b32,
+  emissiveIntensity:.38,
+  side:THREE.DoubleSide
+ });
+
+ const ocean=mesh(liquid,oceanGeo,oceanMat);
+
+ ocean.rotation.x=-Math.PI/2;
+ ocean.userData.kind="liquidSurface";
+
+ // Store original vertices for wave animation
+ const positions=oceanGeo.attributes.position;
+ const original=[];
+
+ for(let i=0;i<positions.count;i++){
+  original.push([
+   positions.getX(i),
+   positions.getY(i),
+   positions.getZ(i)
+  ]);
+ }
+
+ ocean.userData.originalPositions=original;
+ ocean.userData.waveTime=0;
+
+ // =========================================
+ // 2. DEEP OCEAN FLOOR
+ // =========================================
+
+ const deepGeo=new THREE.PlaneGeometry(10,10);
+
+ const deep=mesh(
+  liquid,
+  deepGeo,
+  new THREE.MeshStandardMaterial({
+   color:0x010d1a,
+   roughness:.9,
+   metalness:.1,
+   side:THREE.DoubleSide
+  })
+ );
+
+ deep.rotation.x=-Math.PI/2;
+ deep.position.y=-.32;
+
+ // =========================================
+ // 3. SECONDARY WATER LAYER
+ // =========================================
+
+ const reflection=mesh(
+  liquid,
+  new THREE.PlaneGeometry(9.8,9.8,90,90),
+  new THREE.MeshPhysicalMaterial({
+   color:0x08739a,
+   metalness:.38,
+   roughness:.2,
+   clearcoat:1,
+   transparent:true,
+   opacity:.2,
+   side:THREE.DoubleSide,
+   depthWrite:false
+  })
+ );
+
+ reflection.rotation.x=-Math.PI/2;
+ reflection.position.y=.025;
+ reflection.userData.kind="liquidSurface";
+
+ // =========================================
+ // 4. OCEAN RIPPLE SYSTEM
+ // =========================================
+
+ const ripples=[];
+
+ for(let i=0;i<12;i++){
+
+  const radius=.35+i*.32;
+
+  const ripple=torus(
+   liquid,
+   radius,
+   .008,
+   i%3===0?C.cyan:C.violet
+  );
+
+  ripple.rotation.x=Math.PI/2;
+  ripple.position.y=.055+i*.002;
+
+  ripple.material.transparent=true;
+  ripple.material.opacity=.18;
+
+  ripple.userData.kind="waterRing";
+  ripple.userData.phase=i*.48;
+  ripple.userData.baseScale=1;
+
+  ripples.push(ripple);
+ }
+
+ // =========================================
+ // 5. NATURAL FOAM DETAILS
+ // =========================================
+
+ for(let i=0;i<90;i++){
+
+  const x=rand(-4.8,4.8);
+  const z=rand(-4.8,4.8);
+
+  const foam=sphere(
+   liquid,
+   rand(.012,.035),
+   i%3===0?C.white:C.cyan,
+   x,.045,z,
+   8
+  );
+
+  foam.scale.set(
+   rand(1.2,3),
+   .12,
+   rand(.7,1.8)
+  );
+
+  foam.userData.kind="slowSpin";
+ }
+
+ // =========================================
+ // 6. UNDERWATER LIGHT SHAFTS
+ // =========================================
+
+ for(let i=0;i<8;i++){
+
+  const beam=mesh(
+   liquid,
+   new THREE.CylinderGeometry(
+    .015,.22,3.5,16,1,true
+   ),
+   new THREE.MeshBasicMaterial({
+    color:i%2?0x12b8d5:0x397de8,
+    transparent:true,
+    opacity:.055,
+    side:THREE.DoubleSide,
+    depthWrite:false
+   })
+  );
+
+  beam.position.set(
+   rand(-3.8,3.8),
+   1.4,
+   rand(-3.8,3.8)
+  );
+
+  beam.rotation.z=rand(-.12,.12);
+  beam.userData.kind="slowSpin";
+ }
+
+ // =========================================
+ // 7. UNDERWATER BUBBLES
+ // =========================================
+
+ const bubbles=[];
+
+ for(let i=0;i<42;i++){
+
+  const size=rand(.035,.105);
+
+  const bubble=sphere(
+   liquid,
+   size,
+   C.cyan,
+   rand(-4.5,4.5),
+   rand(-.2,2.2),
+   rand(-4.5,4.5),
+   12
+  );
+
+  bubble.userData.kind="bubble";
+  bubble.userData.phase=rand(0,TAU);
+  bubble.userData.speed=rand(.35,.9);
+
+  bubbles.push(bubble);
+ }
+
+ // =========================================
+ // 8. OCEAN LIGHT PARTICLES
+ // =========================================
+
+ particleCloud(liquid,130,C.cyan,4.5,.016);
+ particleCloud(liquid,65,C.violet,3.5,.014);
+
+ // =========================================
+ // 9. CENTRAL UNDERWATER GLOW
+ // =========================================
+
+ const core=sphere(
+  liquid,
+  .2,
+  materials.glow(C.cyan),
+  0,-.05,0,
+  24
+ );
+
+ core.userData.kind="pulseCore";
+
+ // =========================================
+ // 10. WORLD REFERENCES
+ // =========================================
+
+ liquid.userData.ocean=ocean;
+ liquid.userData.reflection=reflection;
+ liquid.userData.ripples=ripples;
+ liquid.userData.bubbles=bubbles;
+ liquid.userData.foam=true;
+}
+
+
+
+/* 07 — MECHANICAL BUTTERFLY
+   REALISTIC MASTERCLASS EDITION
+   SYMMETRICAL FOUR-WING DESIGN
+*/
+
+function worldButterfly(root){
+
+ const butterfly=group(root);
+ const wings=[];
+
+ // =========================================
+ // 1. PREMIUM MATERIAL SYSTEM
+ // =========================================
+
+ const gold=new THREE.MeshPhysicalMaterial({
+  color:0xc6a45a,
+  metalness:.88,
+  roughness:.22,
+  clearcoat:1
+ });
+
+ const titanium=new THREE.MeshStandardMaterial({
+  color:0x343b43,
+  metalness:.92,
+  roughness:.25
+ });
+
+ const dark=new THREE.MeshStandardMaterial({
+  color:0x101923,
+  metalness:.85,
+  roughness:.3
+ });
+
+ const cyanWing=new THREE.MeshPhysicalMaterial({
+  color:0x18b7cb,
+  metalness:.22,
+  roughness:.18,
+  transmission:.12,
+  transparent:true,
+  opacity:.8,
+  clearcoat:1,
+  side:THREE.DoubleSide,
+  emissive:0x034b65,
+  emissiveIntensity:.3,
+  depthWrite:false
+ });
+
+ const violetWing=new THREE.MeshPhysicalMaterial({
+  color:0x7952ae,
+  metalness:.3,
+  roughness:.18,
+  transparent:true,
+  opacity:.8,
+  clearcoat:1,
+  side:THREE.DoubleSide,
+  emissive:0x29123e,
+  emissiveIntensity:.35,
+  depthWrite:false
+ });
+
+ const cyanGlow=materials.glow(C.cyan);
+ const goldGlow=materials.glow(C.gold);
+
+ // =========================================
+ // 2. HEAD
+ // =========================================
+
+ const head=sphere(
+  butterfly,.19,dark,
+  0,.48,0,32
+ );
+
+ head.scale.set(1,.95,.9);
+
+ const face=sphere(
+  butterfly,.105,gold,
+  0,.43,.13,24
+ );
+
+ // Compound eyes
+ for(const side of [-1,1]){
+
+  const eye=sphere(
+   butterfly,.085,
+   new THREE.MeshPhysicalMaterial({
+    color:0x071c2c,
+    metalness:.45,
+    roughness:.08,
+    clearcoat:1,
+    emissive:0x07516a,
+    emissiveIntensity:.5
+   }),
+   side*.145,.52,.12,24
+  );
+
+  eye.scale.set(.85,1,.65);
+
+  sphere(
+   butterfly,.018,goldGlow,
+   side*.17,.55,.18,10
+  );
+ }
+
+ // =========================================
+ // 3. THORAX
+ // =========================================
+
+ const thorax=mesh(
+  butterfly,
+  new THREE.CapsuleGeometry(.14,.68,8,24),
+  gold
+ );
+
+ thorax.rotation.x=Math.PI/2;
+ thorax.position.y=.02;
+
+ const thoraxArmor=sphere(
+  butterfly,.2,titanium,
+  0,.08,0,32
+ );
+
+ thoraxArmor.scale.set(.9,1.8,.9);
+
+ // =========================================
+ // 4. ENERGY CORE
+ // =========================================
+
+ const reactor=sphere(
+  butterfly,.105,
+  cyanGlow,
+  0,.1,.19,32
+ );
+
+ reactor.userData.kind="pulseCore";
+
+ const reactorRing=torus(
+  butterfly,.16,.018,gold
+ );
+
+ reactorRing.position.set(0,.1,.17);
+
+ // =========================================
+ // 5. SEGMENTED ABDOMEN
+ // =========================================
+
+ for(let i=0;i<7;i++){
+
+  const y=-.28-i*.135;
+  const radius=.13-i*.012;
+
+  const segment=sphere(
+   butterfly,
+   radius,
+   i%2?dark:gold,
+   0,y,0,20
+  );
+
+  segment.scale.set(.8,1.25,.8);
+
+  const band=torus(
+   butterfly,
+   radius*.88,
+   .012,
+   titanium
+  );
+
+  band.position.y=y-.055;
+  band.rotation.x=Math.PI/2;
+ }
+
+ sphere(
+  butterfly,.055,gold,
+  0,-1.17,0,16
+ );
+
+ // =========================================
+ // 6. SYMMETRICAL FOUR-WING SYSTEM
+ // =========================================
+
+ function createWingShape(rear){
+
+  const shape=new THREE.Shape();
+
+  if(!rear){
+
+   shape.moveTo(0,0);
+
+   shape.bezierCurveTo(
+    .35,.38,
+    .9,.9,
+    1.45,.92
+   );
+
+   shape.bezierCurveTo(
+    1.9,.9,
+    2.02,.48,
+    1.72,.12
+   );
+
+   shape.bezierCurveTo(
+    1.3,-.15,
+    .62,-.12,
+    0,0
+   );
+
+  }else{
+
+   shape.moveTo(0,0);
+
+   shape.bezierCurveTo(
+    .4,.08,
+    1.05,.25,
+    1.35,-.12
+   );
+
+   shape.bezierCurveTo(
+    1.52,-.52,
+    1.18,-.98,
+    .88,-1.02
+   );
+
+   shape.bezierCurveTo(
+    .45,-.92,
+    .2,-.48,
+    0,0
+   );
+  }
+
+  return new THREE.ShapeGeometry(shape,36);
+ }
+
+ // Two wings per side
+ for(const side of [-1,1]){
+
+  for(let i=0;i<2;i++){
+
+   const rear=i===1;
+
+   // Independent pivot for each wing
+   const pivot=group(
+    butterfly,
+    side*.13,
+    rear?-.12:.16,
+    0
+   );
+
+   const geometry=createWingShape(rear);
+
+   // Mirror the left wing
+   if(side===-1){
+    geometry.scale(-1,1,1);
+   }
+
+   const material=rear?violetWing:cyanWing;
+
+   const membrane=mesh(
+    pivot,
+    geometry,
+    material
+   );
+
+   membrane.position.z=.035;
+
+   // =====================================
+   // 7. NATURAL WING VEINS
+   // =====================================
+
+   const paths=rear?[
+    [[0,0,.07],[.4,-.1,.07],[.85,-.35,.07],[1.2,-.65,.07]],
+    [[0,0,.07],[.4,-.28,.07],[.82,-.68,.07],[1.02,-.9,.07]],
+    [[0,0,.07],[.28,.02,.07],[.7,.08,.07],[1.15,-.12,.07]]
+   ]:[
+    [[0,0,.07],[.45,.2,.07],[.9,.5,.07],[1.45,.85,.07]],
+    [[0,0,.07],[.45,.08,.07],[1,.18,.07],[1.72,.12,.07]],
+    [[.45,.2,.07],[.72,.55,.07],[1.12,.78,.07]],
+    [[.45,.08,.07],[.65,-.05,.07],[1.15,-.02,.07]]
+   ];
+
+   for(const path of paths){
+
+    const mirroredPath=path.map(p=>[
+     side*p[0],
+     p[1],
+     p[2]
+    ]);
+
+    lineTube(
+     pivot,
+     mirroredPath,
+     gold,
+     .012,
+     18
+    );
+   }
+
+   // =====================================
+   // 8. METALLIC WING BORDER
+   // =====================================
+
+   const border=rear?[
+    [0,0,.08],
+    [.45,.08,.08],
+    [1.15,-.12,.08],
+    [1.35,-.5,.08],
+    [.88,-1.02,.08],
+    [.4,-.48,.08],
+    [0,0,.08]
+   ]:[
+    [0,0,.08],
+    [.45,.2,.08],
+    [1.45,.92,.08],
+    [1.72,.12,.08],
+    [1.3,-.15,.08],
+    [0,0,.08]
+   ];
+
+   lineTube(
+    pivot,
+    border.map(p=>[
+     side*p[0],p[1],p[2]
+    ]),
+    gold,
+    .018,
+    24
+   );
+
+   // =====================================
+   // 9. WING DETAIL NODES
+   // =====================================
+
+   const nodes=rear?[
+    [.85,-.35],
+    [1.02,-.9],
+    [1.2,-.65]
+   ]:[
+    [.9,.5],
+    [1.45,.85],
+    [1.72,.12]
+   ];
+
+   for(const p of nodes){
+
+    sphere(
+     pivot,
+     .035,
+     goldGlow,
+     side*p[0],
+     p[1],
+     .09,
+     12
+    );
+   }
+
+   // Wing tip glow
+   const tip=sphere(
+    pivot,.045,
+    rear?materials.glow(C.violet):cyanGlow,
+    side*(rear?1.02:1.72),
+    rear?-.9:.12,
+    .1,
+    16
+   );
+
+   tip.userData.kind="pulseCore";
+
+   // =====================================
+   // 10. ENGINE ANIMATION REFERENCES
+   // =====================================
+
+   pivot.userData.kind="butterflyWing";
+   pivot.userData.side=side;
+   pivot.userData.offset=i*.7;
+   pivot.userData.wingIndex=i;
+
+   wings.push(pivot);
+
+   // =====================================
+   // 11. WING ROOT JOINTS
+   // =====================================
+
+   const joint=sphere(
+    butterfly,.105,gold,
+    side*.19,
+    rear?-.12:.16,
+    .04,
+    24
+   );
+
+   const jointCore=sphere(
+    butterfly,.045,
+    cyanGlow,
+    side*.19,
+    rear?-.12:.16,
+    .12,
+    16
+   );
+
+   jointCore.userData.kind="pulseCore";
+
+   const jointRing=torus(
+    butterfly,.12,.018,titanium
+   );
+
+   jointRing.position.set(
+    side*.19,
+    rear?-.12:.16,
+    .04
+   );
+
+   jointRing.rotation.y=Math.PI/2;
+  }
+ }
+
+ // =========================================
+ // 12. MECHANICAL ANTENNAE
+ // =========================================
+
+ for(const side of [-1,1]){
+
+  lineTube(
+   butterfly,
+   [
+    [side*.07,.59,.02],
+    [side*.16,.9,.05],
+    [side*.34,1.16,.1],
+    [side*.46,1.25,.12]
+   ],
+   gold,
+   .018,
+   20
+  );
+
+  const antennaTip=sphere(
+   butterfly,.055,
+   goldGlow,
+   side*.46,1.25,.12,
+   16
+  );
+
+  antennaTip.userData.kind="pulseCore";
+ }
+
+ // =========================================
+ // 13. MICRO MECHANICAL DETAILS
+ // =========================================
+
+ for(const side of [-1,1]){
+
+  for(let i=0;i<4;i++){
+
+   sphere(
+    butterfly,.022,gold,
+    side*(.23+i*.035),
+    .25-i*.14,
+    .11,
+    10
+   );
+  }
+ }
+
+ // =========================================
+ // 14. ENERGY PARTICLES
+ // =========================================
+
+ particleCloud(
+  butterfly,
+  90,
+  C.cyan,
+  3.2,
+  .018
+ );
+
+ particleCloud(
+  butterfly,
+  45,
+  C.gold,
+  2.8,
+  .014
+ );
+
+ // =========================================
+ // 15. FINAL WORLD REFERENCES
+ // =========================================
+
+ butterfly.userData.wings=wings;
+ butterfly.userData.kind="slowSpin";
+ butterfly.userData.body=thorax;
+ butterfly.userData.reactor=reactor;
+
+}
+
+
+
 
 /* 08 — GOLDEN SPIRAL */
 function worldSpiral(root){
