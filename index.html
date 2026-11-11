@@ -822,7 +822,7 @@ function createBase(index){
 }
 
 /* ---------- SCENE BUILDER UTILITIES ---------- */
-  function addFacetedShell(root,color=C.gold){
+function addFacetedShell(root,color=C.gold){
  const shell=mesh(root,new THREE.IcosahedronGeometry(1.8,1),
   new THREE.MeshPhysicalMaterial({
    color,metalness:.82,roughness:.13,wireframe:true,
@@ -1432,9 +1432,9 @@ const BUILDERS=[
  worldArchitecture,worldGyroscope,worldAbyss,worldPendulum,
  worldSacred,worldPhoenix,worldBlackHole,worldWave,worldHeart,
  worldStorm,worldHybrid,worldMorph,worldGravity,worldPortal,
- worworldFinal
- ];
-  /* ==============================================
+ worldFinal
+];
+/* ==============================================
    CINEMATIC ENGINE — CAMERA, LIGHT, ANIMATION
 ============================================== */
 
@@ -2047,7 +2047,7 @@ function updateWorld(time,delta){
 
  animateCamera(time,delta);
 }
-  /* ---------- MAIN EXPERIENCE LOOP ---------- */
+/* ---------- MAIN EXPERIENCE LOOP ---------- */
 function startWorldLoop(){
  if(document.hidden||!activeWorld)return;
 
@@ -2384,4 +2384,3 @@ console.info("MAMUN CODING FANTASY — 25 WORLDS READY.");
 </script>
 </body>
 </html>
-  
