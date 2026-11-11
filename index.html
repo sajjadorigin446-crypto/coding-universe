@@ -8798,26 +8798,361 @@ function worldMorph(root){
 }
 
 
+/* =========================================================
+   23 — GRAVITY PLAYGROUND
+   CINEMATIC MASTERCLASS EDITION
+   ========================================================= */
 
-/* 23 — GRAVITY PLAYGROUND */
 function worldGravity(root){
+
  const gravity=group(root);
- const sun=sphere(gravity,.4,materials.glow(C.gold));sun.userData.kind="pulseCore";
+
+ // =====================================================
+ // 1. CENTRAL GRAVITY STAR
+ // =====================================================
+
+ const starGroup=group(gravity);
+
+ const sun=sphere(
+  starGroup,
+  .48,
+  new THREE.MeshPhysicalMaterial({
+   color:0xffd47a,
+   emissive:0xff9e24,
+   emissiveIntensity:2.2,
+   roughness:.28,
+   metalness:.05,
+   clearcoat:1
+  }),
+  0,0,0,
+  48
+ );
+
+ sun.userData.kind="pulseCore";
+
+ // Inner stellar nucleus
+ const nucleus=sphere(
+  starGroup,
+  .25,
+  materials.glow(C.white),
+  0,0,0,
+  32
+ );
+
+ nucleus.userData.kind="pulseCore";
+
+ // Stellar outer shell
+ const solarShell=mesh(
+  starGroup,
+  new THREE.SphereGeometry(.59,32,32),
+  new THREE.MeshBasicMaterial({
+   color:0xffba4c,
+   wireframe:true,
+   transparent:true,
+   opacity:.16,
+   depthWrite:false
+  })
+ );
+
+ solarShell.userData.kind="slowSpin";
+
+ // =====================================================
+ // 2. PLANET MATERIALS
+ // =====================================================
+
+ const planetMaterials=[
+
+  new THREE.MeshPhysicalMaterial({
+   color:0x34b9d5,
+   metalness:.18,
+   roughness:.58,
+   clearcoat:.2
+  }),
+
+  new THREE.MeshPhysicalMaterial({
+   color:0x8a69d8,
+   metalness:.25,
+   roughness:.48,
+   clearcoat:.35
+  }),
+
+  new THREE.MeshPhysicalMaterial({
+   color:0xc66c82,
+   metalness:.15,
+   roughness:.65
+  }),
+
+  new THREE.MeshPhysicalMaterial({
+   color:0x4caa80,
+   metalness:.12,
+   roughness:.7
+  }),
+
+  new THREE.MeshPhysicalMaterial({
+   color:0xd5a45a,
+   metalness:.38,
+   roughness:.38,
+   clearcoat:.4
+  }),
+
+  new THREE.MeshPhysicalMaterial({
+   color:0x6484bd,
+   metalness:.2,
+   roughness:.52
+  })
+ ];
+
+ // =====================================================
+ // 3. PLANETARY SYSTEM
+ // =====================================================
+
+ const planets=[];
+
  for(let i=0;i<38;i++){
-  const body=sphere(gravity,rand(.04,.12),
-   [C.cyan,C.violet,C.rose,C.emerald][i%4],0,0,0,12);
+
+  const radius=rand(.065,.145);
+
+  const material=planetMaterials[i%planetMaterials.length];
+
+  const body=sphere(
+   gravity,
+   radius,
+   material,
+   0,0,0,
+   24
+  );
+
   body.userData.kind="gravityBody";
-  body.userData.orbit={
-   radius:rand(1,4),angle:rand(0,TAU),speed:rand(.15,.8)*(i%2?1:-1),
-   vertical:rand(.2,.8),tilt:rand(0,TAU)
+
+  const orbitData={
+   radius:rand(1.15,4.1),
+   angle:rand(0,TAU),
+   speed:rand(.12,.48)*(i%2?1:-1),
+   vertical:rand(.15,.75),
+   tilt:rand(0,TAU)
   };
+
+  body.userData.orbit=orbitData;
+
+  body.userData.originalScale=radius;
+
+  planets.push(body);
+
+  // Small moon around selected planets
+  if(i%5===0){
+
+   const moon=sphere(
+    gravity,
+    radius*.35,
+    new THREE.MeshStandardMaterial({
+     color:0xb8b3c8,
+     roughness:.85
+    }),
+    0,0,0,
+    12
+   );
+
+   moon.userData.kind="gravityMoon";
+   moon.userData.parentPlanet=body;
+   moon.userData.moonAngle=rand(0,TAU);
+   moon.userData.moonDistance=radius*2.5;
+  }
+
+  // Planetary ring for selected planets
+  if(i%9===0){
+
+   const planetRing=torus(
+    body,
+    radius*1.7,
+    radius*.12,
+    C.gold
+   );
+
+   planetRing.rotation.x=Math.PI/2.3;
+  }
  }
+
+ // =====================================================
+ // 4. ORBITAL PLANES
+ // =====================================================
+
+ const orbitColors=[
+  C.gold,
+  C.violet,
+  C.cyan,
+  C.rose,
+  C.emerald,
+  C.gold
+ ];
+
  for(let i=0;i<6;i++){
-  const orbit=torus(gravity,.9+i*.55,.012,[C.gold,C.violet,C.cyan][i%3]);
-  orbit.rotation.set(i*.25,i*.3,i*.15);
+
+  const radius=1.15+i*.57;
+
+  const orbit=torus(
+   gravity,
+   radius,
+   .009,
+   orbitColors[i]
+  );
+
+  orbit.rotation.set(
+   .2+i*.25,
+   .15+i*.31,
+   .1+i*.18
+  );
+
   orbit.userData.kind="gravityRing";
  }
+
+ // =====================================================
+ // 5. ASTEROID BELT
+ // =====================================================
+
+ const asteroidGroup=group(gravity);
+
+ const asteroidMaterial=new THREE.MeshStandardMaterial({
+  color:0x77717b,
+  metalness:.38,
+  roughness:.82
+ });
+
+ for(let i=0;i<180;i++){
+
+  const angle=rand(0,TAU);
+  const radius=rand(2.35,2.8);
+
+  const asteroid=mesh(
+   asteroidGroup,
+   new THREE.IcosahedronGeometry(
+    rand(.018,.045),
+    0
+   ),
+   asteroidMaterial
+  );
+
+  asteroid.position.set(
+   Math.cos(angle)*radius,
+   rand(-.12,.12),
+   Math.sin(angle)*radius
+  );
+
+  asteroid.rotation.set(
+   rand(0,TAU),
+   rand(0,TAU),
+   rand(0,TAU)
+  );
+ }
+
+ // =====================================================
+ // 6. GRAVITY ENERGY FIELD
+ // =====================================================
+
+ const field=mesh(
+  gravity,
+  new THREE.SphereGeometry(4.35,32,24),
+  new THREE.MeshBasicMaterial({
+   color:0x7865e8,
+   wireframe:true,
+   transparent:true,
+   opacity:.035,
+   depthWrite:false
+  })
+ );
+
+ field.userData.kind="slowSpin";
+
+ // =====================================================
+ // 7. GRAVITY PARTICLES
+ // =====================================================
+
+ const count=600;
+
+ const positions=new Float32Array(count*3);
+
+ for(let i=0;i<count;i++){
+
+  const a=rand(0,TAU);
+  const r=rand(2.8,4.5);
+
+  positions[i*3]=Math.cos(a)*r;
+  positions[i*3+1]=rand(-2.8,2.8);
+  positions[i*3+2]=Math.sin(a)*r;
+ }
+
+ const particleGeometry=new THREE.BufferGeometry();
+
+ particleGeometry.setAttribute(
+  "position",
+  new THREE.BufferAttribute(positions,3)
+ );
+
+ const dust=new THREE.Points(
+  particleGeometry,
+  new THREE.PointsMaterial({
+   color:0xc6b5ff,
+   size:.022,
+   transparent:true,
+   opacity:.65,
+   blending:THREE.AdditiveBlending,
+   depthWrite:false
+  })
+ );
+
+ gravity.add(dust);
+
+ // =====================================================
+ // 8. OUTER GRAVITY RINGS
+ // =====================================================
+
+ for(let i=0;i<3;i++){
+
+  const ring=torus(
+   gravity,
+   4.15+i*.12,
+   .012,
+   i===0?C.gold:
+   i===1?C.violet:C.cyan
+  );
+
+  ring.rotation.set(
+   .4+i*.3,
+   .3+i*.45,
+   .2+i*.25
+  );
+
+  ring.userData.kind="slowSpin";
+ }
+
+ // =====================================================
+ // 9. COSMIC DEBRIS
+ // =====================================================
+
+ addFloatingDebris(
+  gravity,
+  40,
+  C.gold,
+  4
+ );
+
+ addFloatingDebris(
+  gravity,
+  40,
+  C.violet,
+  4
+ );
+
+ // =====================================================
+ // 10. WORLD REFERENCES
+ // =====================================================
+
+ gravity.userData.planets=planets;
+ gravity.userData.sun=sun;
+ gravity.userData.asteroids=asteroidGroup;
+
 }
+
+
 
 /* 24 — PORTAL ENGINE */
 function worldPortal(root){
