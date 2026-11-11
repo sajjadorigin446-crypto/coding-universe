@@ -1400,25 +1400,680 @@ function worldCube(root){
 
 }
 
-/* 02 — MASTERCLASS FLOWER */
+/* =========================================================
+   02 — MASTERCLASS FLOWER
+   ULTRA REALISTIC | PERFECT POSITION | CINEMATIC TRANSITION
+   MAMUN CODING FANTASY
+========================================================= */
+
 function worldFlower(root){
- const flower=group(root,0,-.2,0);
- addBranch(flower,[0,-2.8,0],[0,-.1,0],.12,C.emerald);
- const petals=[];
- for(let i=0;i<20;i++)petals.push(addPetal(flower,i/20*TAU,
-  [C.rose,C.violet,C.gold,C.cyan][i%4],i));
- const center=sphere(flower,.43,C.gold,0,.15,40);
- center.userData.kind="pulseCore";
- for(let i=0;i<9;i++){
-  const leaf=mesh(flower,new THREE.SphereGeometry(.45,20,12),
-   materials.matte(C.emerald),Math.sin(i*2)*.55,-.9-i*.18,0);
-  leaf.scale.set(1.9,.32,.35);leaf.rotation.z=i*.6;
+
+ const flower=group(root,0,0,0);
+
+ // =====================================================
+ // 01. MASTER MATERIALS
+ // =====================================================
+
+ const petalMaterials=[
+  new THREE.MeshPhysicalMaterial({
+   color:0xc72c70,
+   roughness:.32,
+   metalness:.02,
+   clearcoat:1,
+   clearcoatRoughness:.2,
+   side:THREE.DoubleSide
+  }),
+
+  new THREE.MeshPhysicalMaterial({
+   color:0x913d9d,
+   roughness:.3,
+   metalness:.04,
+   clearcoat:1,
+   side:THREE.DoubleSide
+  }),
+
+  new THREE.MeshPhysicalMaterial({
+   color:0xd4af37,
+   roughness:.23,
+   metalness:.45,
+   clearcoat:1,
+   side:THREE.DoubleSide
+  }),
+
+  new THREE.MeshPhysicalMaterial({
+   color:0xe99bbb,
+   roughness:.28,
+   metalness:.02,
+   clearcoat:1,
+   side:THREE.DoubleSide
+  })
+ ];
+
+ const leafMaterial=new THREE.MeshPhysicalMaterial({
+  color:0x185332,
+  roughness:.4,
+  metalness:.05,
+  clearcoat:.8,
+  side:THREE.DoubleSide
+ });
+
+ const goldMaterial=new THREE.MeshPhysicalMaterial({
+  color:0xd4af37,
+  metalness:1,
+  roughness:.18,
+  emissive:0x71440b,
+  emissiveIntensity:.45
+ });
+
+ // =====================================================
+ // 02. ORGANIC STEM
+ // =====================================================
+
+ const stemGroup=group(flower);
+
+ const stemCurve=new THREE.CatmullRomCurve3([
+  new THREE.Vector3(0,-2.85,0),
+  new THREE.Vector3(-.06,-2.3,.02),
+  new THREE.Vector3(.08,-1.7,0),
+  new THREE.Vector3(-.035,-1.05,0),
+  new THREE.Vector3(0,-.45,0),
+  new THREE.Vector3(0,-.12,0)
+ ]);
+
+ const stem=mesh(
+  stemGroup,
+  new THREE.TubeGeometry(
+   stemCurve,80,.085,16,false
+  ),
+  new THREE.MeshPhysicalMaterial({
+   color:0x23663b,
+   roughness:.36,
+   metalness:.08
+  })
+ );
+
+ // =====================================================
+ // 03. REALISTIC PETAL GEOMETRY
+ // =====================================================
+
+ function createPetal(length,width,material){
+
+  const shape=new THREE.Shape();
+
+  shape.moveTo(0,0);
+
+  shape.bezierCurveTo(
+   -width*.75,length*.2,
+   -width*.95,length*.7,
+   0,length
+  );
+
+  shape.bezierCurveTo(
+   width*.95,length*.7,
+   width*.75,length*.2,
+   0,0
+  );
+
+  const geometry=new THREE.ShapeGeometry(shape,32);
+
+  const pos=geometry.attributes.position;
+
+  for(let i=0;i<pos.count;i++){
+
+   const x=pos.getX(i);
+   const y=pos.getY(i);
+
+   const bend=Math.sin(y/length*Math.PI)*.14;
+
+   pos.setZ(
+    i,
+    bend-x*x*.42
+   );
+  }
+
+  geometry.computeVertexNormals();
+
+  return new THREE.Mesh(geometry,material);
  }
- flower.userData.petals=petals;
- flower.userData.kind="flower";
+
+ // =====================================================
+ // 04. FOUR LAYERS OF PETALS
+ // =====================================================
+
+ const petals=[];
+
+ const layers=[
+  {
+   count:14,
+   length:1.45,
+   width:.48,
+   radius:.13,
+   tilt:-.34,
+   angle:0
+  },
+  {
+   count:12,
+   length:1.17,
+   width:.44,
+   radius:.09,
+   tilt:-.17,
+   angle:.18
+  },
+  {
+   count:9,
+   length:.86,
+   width:.37,
+   radius:.055,
+   tilt:.03,
+   angle:.35
+  },
+  {
+   count:7,
+   length:.59,
+   width:.30,
+   radius:.025,
+   tilt:.22,
+   angle:.12
+  }
+ ];
+
+ layers.forEach((layer,layerIndex)=>{
+
+  for(let i=0;i<layer.count;i++){
+
+   const angle=
+    i/layer.count*TAU+layer.angle;
+
+   const pivot=group(flower);
+
+   pivot.position.set(
+    Math.cos(angle)*layer.radius,
+    .08+layerIndex*.025,
+    Math.sin(angle)*layer.radius
+   );
+
+   const petal=createPetal(
+    layer.length,
+    layer.width,
+    petalMaterials[(i+layerIndex)%4]
+   );
+
+   pivot.add(petal);
+
+   petal.rotation.x=-Math.PI/2;
+
+   pivot.rotation.y=-angle;
+   pivot.rotation.x=layer.tilt;
+
+   petals.push({
+    pivot,
+    petal,
+    angle,
+    layerIndex,
+    originalX:layer.tilt,
+    phase:i*.19
+   });
+  }
+ });
+
+ // =====================================================
+ // 05. GOLDEN FLOWER CENTER
+ // =====================================================
+
+ const centerGroup=group(flower);
+
+ centerGroup.position.set(0,.12,0);
+
+ const center=mesh(
+  centerGroup,
+  new THREE.SphereGeometry(.36,48,40),
+  new THREE.MeshPhysicalMaterial({
+   color:0xffc653,
+   emissive:0xe28a12,
+   emissiveIntensity:1.5,
+   metalness:.65,
+   roughness:.18,
+   clearcoat:1
+  })
+ );
+
+ center.scale.set(1,.7,1);
+
+ const nucleus=mesh(
+  centerGroup,
+  new THREE.SphereGeometry(.17,32,32),
+  new THREE.MeshBasicMaterial({
+   color:0xfff1b7
+  })
+ );
+
+ // =====================================================
+ // 06. GOLDEN STAMENS
+ // =====================================================
+
+ const stamens=[];
+
+ for(let i=0;i<42;i++){
+
+  const angle=i*2.399;
+  const radius=.08+Math.random()*.24;
+
+  const height=.14+Math.random()*.19;
+
+  const stamen=group(centerGroup);
+
+  const stalk=mesh(
+   stamen,
+   new THREE.CylinderGeometry(
+    .009,.016,height,8
+   ),
+   goldMaterial
+  );
+
+  stalk.position.y=height*.5;
+
+  const tip=mesh(
+   stamen,
+   new THREE.SphereGeometry(.038,14,12),
+   new THREE.MeshBasicMaterial({
+    color:0xffe4a0
+   })
+  );
+
+  tip.position.y=height;
+
+  stamen.position.set(
+   Math.cos(angle)*radius,
+   .08,
+   Math.sin(angle)*radius
+  );
+
+  stamens.push(stamen);
+ }
+
+ // =====================================================
+ // 07. REALISTIC LEAVES
+ // =====================================================
+
+ const leaves=[];
+
+ function createLeaf(length,width){
+
+  const shape=new THREE.Shape();
+
+  shape.moveTo(0,0);
+
+  shape.bezierCurveTo(
+   -width,length*.25,
+   -width,length*.75,
+   0,length
+  );
+
+  shape.bezierCurveTo(
+   width,length*.75,
+   width,length*.25,
+   0,0
+  );
+
+  const geometry=new THREE.ShapeGeometry(shape,32);
+
+  const pos=geometry.attributes.position;
+
+  for(let i=0;i<pos.count;i++){
+
+   const x=pos.getX(i);
+   const y=pos.getY(i);
+
+   pos.setZ(
+    i,
+    Math.sin(y/length*Math.PI)*.08-x*x*.3
+   );
+  }
+
+  geometry.computeVertexNormals();
+
+  return geometry;
+ }
+
+ const leafPositions=[
+  {y:-.95,angle:0,rotation:-.65},
+  {y:-1.15,angle:Math.PI,rotation:.65},
+  {y:-1.4,angle:.65,rotation:-.5},
+  {y:-1.65,angle:Math.PI+.65,rotation:.5},
+  {y:-1.9,angle:1.1,rotation:-.6},
+  {y:-2.15,angle:Math.PI+1.1,rotation:.6},
+  {y:-2.4,angle:.3,rotation:-.5},
+  {y:-2.6,angle:Math.PI+.3,rotation:.5}
+ ];
+
+ leafPositions.forEach((data,i)=>{
+
+  const leafGroup=group(flower);
+
+  leafGroup.position.set(
+   Math.cos(data.angle)*.055,
+   data.y,
+   Math.sin(data.angle)*.055
+  );
+
+  const leaf=new THREE.Mesh(
+   createLeaf(.85,.27),
+   leafMaterial
+  );
+
+  leaf.rotation.x=-Math.PI/2;
+  leaf.rotation.y=-data.angle;
+
+  leafGroup.add(leaf);
+
+  leafGroup.rotation.z=data.rotation;
+
+  leaves.push({
+   group:leafGroup,
+   base:data.rotation,
+   phase:i*.8
+  });
+
+  // Central leaf vein
+  const vein=mesh(
+   leafGroup,
+   new THREE.CylinderGeometry(.006,.009,.67,6),
+   goldMaterial
+  );
+
+  vein.position.y=.34;
+ });
+
+ // =====================================================
+ // 08. FLOWER ORBITAL RINGS
+ // =====================================================
+
+ const orbitGroup=group(flower);
+
+ const orbit1=mesh(
+  orbitGroup,
+  new THREE.TorusGeometry(2.15,.012,8,128),
+  new THREE.MeshBasicMaterial({
+   color:0xd4af37,
+   transparent:true,
+   opacity:.65
+  })
+ );
+
+ orbit1.rotation.x=.85;
+
+ const orbit2=mesh(
+  orbitGroup,
+  new THREE.TorusGeometry(2.4,.009,8,128),
+  new THREE.MeshBasicMaterial({
+   color:0xffa5ce,
+   transparent:true,
+   opacity:.55
+  })
+ );
+
+ orbit2.rotation.y=1.15;
+
+ const orbit3=mesh(
+  orbitGroup,
+  new THREE.TorusGeometry(2.65,.008,8,128),
+  new THREE.MeshBasicMaterial({
+   color:0xffdf9b,
+   transparent:true,
+   opacity:.4
+  })
+ );
+
+ orbit3.rotation.set(.45,.3,1.1);
+
+ // =====================================================
+ // 09. GOLDEN POLLEN PARTICLES
+ // =====================================================
+
+ const pollenCount=220;
+
+ const pollenGeometry=new THREE.BufferGeometry();
+
+ const pollenPositions=new Float32Array(
+  pollenCount*3
+ );
+
+ const pollenData=[];
+
+ for(let i=0;i<pollenCount;i++){
+
+  const angle=Math.random()*TAU;
+  const radius=.6+Math.random()*2.1;
+
+  const height=-.8+Math.random()*2.8;
+
+  pollenData.push({
+   angle,
+   radius,
+   height,
+   speed:.15+Math.random()*.4,
+   phase:Math.random()*TAU
+  });
+
+  pollenPositions[i*3]=Math.cos(angle)*radius;
+  pollenPositions[i*3+1]=height;
+  pollenPositions[i*3+2]=Math.sin(angle)*radius;
+ }
+
+ pollenGeometry.setAttribute(
+  "position",
+  new THREE.BufferAttribute(pollenPositions,3)
+ );
+
+ const pollen=new THREE.Points(
+  pollenGeometry,
+  new THREE.PointsMaterial({
+   color:0xffd978,
+   size:.027,
+   transparent:true,
+   opacity:.85,
+   blending:THREE.AdditiveBlending,
+   depthWrite:false
+  })
+ );
+
+ flower.add(pollen);
+
+ // Original floating particles
  addRings(flower,3,2.3,C.rose,.014);
- particleCloud(flower,350,C.rose,5,.035);
+
+ particleCloud(
+  flower,
+  250,
+  C.gold,
+  4.5,
+  .025
+ );
+
+ // =====================================================
+ // 10. CINEMATIC LIGHTING
+ // =====================================================
+
+ const goldLight=new THREE.PointLight(
+  0xffc65c,2.8,8
+ );
+
+ goldLight.position.set(0,1,1);
+
+ flower.add(goldLight);
+
+ const roseLight=new THREE.PointLight(
+  0xff5eaa,2.1,7
+ );
+
+ roseLight.position.set(-2,1,1);
+
+ flower.add(roseLight);
+
+ const fillLight=new THREE.PointLight(
+  0xffe7bd,1.2,6
+ );
+
+ fillLight.position.set(1,0,2);
+
+ flower.add(fillLight);
+
+ // =====================================================
+ // 11. CINEMATIC ENTRANCE TRANSITION
+ // =====================================================
+
+ const clock=new THREE.Clock();
+
+ const entrance={
+  progress:0,
+  duration:2.8
+ };
+
+ flower.position.set(0,-.85,0);
+ flower.scale.setScalar(.72);
+
+ // =====================================================
+ // 12. MASTERCLASS ANIMATION ENGINE
+ // =====================================================
+
+ flower.userData.kind="flower";
+ flower.userData.petals=petals;
+
+ flower.userData.update=function(){
+
+  const t=clock.getElapsedTime();
+
+  // -----------------------------------------------
+  // ENTRANCE
+  // -----------------------------------------------
+
+  entrance.progress=Math.min(
+   1,
+   entrance.progress+1/60/entrance.duration
+  );
+
+  const e=entrance.progress;
+
+  const ease=1-Math.pow(1-e,3);
+
+  flower.position.y=
+   -.85+ease*.85+Math.sin(t*.65)*.035;
+
+  const baseScale=.72+ease*.28;
+
+  const breathing=1+Math.sin(t*.8)*.012;
+
+  flower.scale.setScalar(
+   baseScale*breathing
+  );
+
+  // -----------------------------------------------
+  // NATURAL BLOOMING
+  // -----------------------------------------------
+
+  const bloom=.5-.5*Math.cos(t*.38);
+
+  petals.forEach(p=>{
+
+   const amount=.72+bloom*.28;
+
+   const wave=Math.sin(
+    t*.55+p.phase
+   )*.018;
+
+   p.pivot.rotation.x=
+    p.originalX-amount*.11+wave;
+
+   p.pivot.rotation.z=
+    Math.sin(t*.4+p.phase)*.015;
+  });
+
+  // -----------------------------------------------
+  // CENTER PULSE
+  // -----------------------------------------------
+
+  const pulse=1+Math.sin(t*2)*.035;
+
+  centerGroup.scale.setScalar(pulse);
+
+  nucleus.scale.setScalar(
+   1+Math.sin(t*2.4)*.12
+  );
+
+  // -----------------------------------------------
+  // STAMENS
+  // -----------------------------------------------
+
+  stamens.forEach((s,i)=>{
+
+   s.rotation.z=
+    Math.sin(t*1.2+i*.4)*.025;
+  });
+
+  // -----------------------------------------------
+  // LEAVES
+  // -----------------------------------------------
+
+  leaves.forEach(leaf=>{
+
+   leaf.group.rotation.z=
+    leaf.base+
+    Math.sin(t*.55+leaf.phase)*.025;
+  });
+
+  // -----------------------------------------------
+  // GOLDEN POLLEN
+  // -----------------------------------------------
+
+  const positions=pollenGeometry.attributes.position;
+
+  for(let i=0;i<pollenCount;i++){
+
+   const p=pollenData[i];
+
+   const angle=p.angle+t*p.speed*.12;
+
+   positions.setXYZ(
+    i,
+    Math.cos(angle)*p.radius,
+    p.height+Math.sin(t*.7+p.phase)*.12,
+    Math.sin(angle)*p.radius
+   );
+  }
+
+  positions.needsUpdate=true;
+
+  // -----------------------------------------------
+  // ORBITAL ROTATION
+  // -----------------------------------------------
+
+  orbitGroup.rotation.y=t*.08;
+
+  orbit1.rotation.z=t*.12;
+
+  orbit2.rotation.x=
+   1.15+Math.sin(t*.3)*.08;
+
+  orbit3.rotation.z=
+   1.1+t*.06;
+
+  // -----------------------------------------------
+  // CINEMATIC LIGHT PULSE
+  // -----------------------------------------------
+
+  goldLight.intensity=
+   2.8+Math.sin(t*1.5)*.45;
+
+  roseLight.intensity=
+   2.1+Math.sin(t*1.2)*.3;
+
+  fillLight.intensity=
+   1.1+Math.sin(t*.9)*.2;
+
+ };
+
 }
+
 
 /* 03 — INFINITE KNOT */
 function worldKnot(root){
