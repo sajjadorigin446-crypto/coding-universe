@@ -5428,26 +5428,262 @@ function worldPendulum(root){
 }
 
 
-/* 15 — SACRED GEOMETRY */
+
+/* 15 — SACRED GEOMETRY
+   MASTERCLASS SACRED MATHEMATICAL SCULPTURE
+*/
+
 function worldSacred(root){
+
  const sacred=group(root);
- for(let i=0;i<9;i++){
-  const r=.65+i*.28;
-  const ring=torus(sacred,r,.012,[C.gold,C.cyan,C.violet][i%3]);
-  ring.rotation.set(i*.12,i*.18,i*.31);
+
+ // =========================================
+ // 1. MATERIALS
+ // =========================================
+
+ const gold=new THREE.MeshPhysicalMaterial({
+  color:0xd4af62,
+  metalness:.88,
+  roughness:.22,
+  clearcoat:1,
+  clearcoatRoughness:.15
+ });
+
+ const silver=new THREE.MeshPhysicalMaterial({
+  color:0x9caeb4,
+  metalness:.9,
+  roughness:.25
+ });
+
+ const violet=new THREE.MeshStandardMaterial({
+  color:0x59417c,
+  metalness:.8,
+  roughness:.28,
+  emissive:0x160b2b,
+  emissiveIntensity:.3
+ });
+
+ const cyan=new THREE.MeshStandardMaterial({
+  color:0x438e98,
+  metalness:.8,
+  roughness:.23,
+  emissive:0x092b32,
+  emissiveIntensity:.25
+ });
+
+ // =========================================
+ // 2. FLOWER OF LIFE
+ // =========================================
+
+ const flowerGroup=group(sacred);
+
+ const flowerRadius=.92;
+
+ // Central circle
+ const central=torus(
+  flowerGroup,
+  flowerRadius,
+  .018,
+  gold
+ );
+
+ // Six surrounding circles
+ for(let i=0;i<6;i++){
+
+  const a=i/6*TAU;
+
+  const circle=torus(
+   flowerGroup,
+   flowerRadius,
+   .014,
+   silver
+  );
+
+  circle.position.set(
+   Math.cos(a)*flowerRadius,
+   Math.sin(a)*flowerRadius,
+   0
+  );
+ }
+
+ // Outer six circles
+ for(let i=0;i<6;i++){
+
+  const a=i/6*TAU+Math.PI/6;
+
+  const circle=torus(
+   flowerGroup,
+   flowerRadius,
+   .012,
+   gold
+  );
+
+  circle.position.set(
+   Math.cos(a)*flowerRadius*1.72,
+   Math.sin(a)*flowerRadius*1.72,
+   -.025
+  );
+ }
+
+ // =========================================
+ // 3. OUTER SACRED CIRCULAR FRAME
+ // =========================================
+
+ for(let i=0;i<4;i++){
+
+  const radius=1.9+i*.23;
+
+  const ring=torus(
+   sacred,
+   radius,
+   i===0?.025:.012,
+   i%2===0?gold:silver
+  );
+
+  ring.rotation.x=Math.PI/2;
+
   ring.userData.kind="sacredRing";
+  ring.userData.phase=i*.25;
  }
+
+ // =========================================
+ // 4. METATRON-STYLE GEOMETRIC CONNECTIONS
+ // =========================================
+
+ const nodes=[];
+
+ for(let i=0;i<13;i++){
+
+  let x=0;
+  let y=0;
+
+  if(i>0){
+
+   const a=(i-1)/12*TAU;
+
+   x=Math.cos(a)*1.05;
+   y=Math.sin(a)*1.05;
+  }
+
+  nodes.push([x,y,0]);
+ }
+
+ // Connect the geometric nodes
+ for(let i=0;i<nodes.length;i++){
+
+  for(let j=i+1;j<nodes.length;j++){
+
+   const a=nodes[i];
+   const b=nodes[j];
+
+   const distance=Math.hypot(
+    a[0]-b[0],
+    a[1]-b[1]
+   );
+
+   if(distance>2.01) continue;
+
+   const line=lineTube(
+    sacred,
+    [a,b],
+    0x9d8250,
+    .007,
+    8
+   );
+  }
+ }
+
+ // =========================================
+ // 5. CENTRAL ICOSAHEDRAL STRUCTURE
+ // =========================================
+
+ const core=mesh(
+  sacred,
+  new THREE.IcosahedronGeometry(.57,1),
+  new THREE.MeshPhysicalMaterial({
+   color:0xc6a45a,
+   metalness:.82,
+   roughness:.19,
+   wireframe:true,
+   emissive:0x5b3c10,
+   emissiveIntensity:.3
+  })
+ );
+
+ core.userData.kind="slowSpin";
+
+ // Inner solid geometry
+ const inner=sphere(
+  sacred,
+  .19,
+  gold,
+  0,0,0,
+  24
+ );
+
+ inner.userData.kind="pulseCore";
+
+ // =========================================
+ // 6. THREE DIMENSIONAL ORBITAL RINGS
+ // =========================================
+
+ const orientations=[
+  [Math.PI/2,0,0],
+  [0,Math.PI/2,0],
+  [.65,.65,.65]
+ ];
+
+ for(let i=0;i<orientations.length;i++){
+
+  const ring=torus(
+   sacred,
+   2.35,
+   .012,
+   [gold,cyan,violet][i]
+  );
+
+  ring.rotation.set(
+   orientations[i][0],
+   orientations[i][1],
+   orientations[i][2]
+  );
+
+  ring.userData.kind="sacredOrbit";
+  ring.userData.phase=i*.8;
+ }
+
+ // =========================================
+ // 7. PRECISION OUTER NODES
+ // =========================================
+
  for(let i=0;i<12;i++){
+
   const a=i/12*TAU;
-  const flower=torus(sacred,1.25,.018,C.gold);
-  flower.position.set(Math.cos(a)*.72,Math.sin(a)*.72,0);
-  flower.userData.kind="sacredOrbit";
+
+  const x=Math.cos(a)*2.35;
+  const y=Math.sin(a)*2.35;
+
+  const node=sphere(
+   sacred,
+   .045,
+   i%2===0?gold:cyan,
+   x,y,0,
+   16
+  );
+
+  node.userData.kind="pulseCore";
+  node.userData.phase=i*.3;
  }
- const center=mesh(sacred,new THREE.IcosahedronGeometry(.8,2),
-  new THREE.MeshBasicMaterial({color:C.gold,wireframe:true}));
- center.userData.kind="slowSpin";
- addRings(sacred,3,2.9,C.violet,.012);
+
+ // =========================================
+ // 8. FINAL REFERENCES
+ // =========================================
+
+ sacred.userData.kind="slowSpin";
+ sacred.userData.core=core;
+
 }
+
 
 /* 16 — PHOENIX REBIRTH */
 function worldPhoenix(root){
