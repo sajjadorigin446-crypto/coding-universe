@@ -6888,28 +6888,617 @@ function worldWave(root){
  }
 }
 
-/* 19 — CLOCKWORK HEART */
+
+/* =========================================================
+   19 — CLOCKWORK HEART
+   ANATOMICAL MECHANICAL MASTERCLASS
+   ========================================================= */
+
 function worldHeart(root){
+
  const heart=group(root);
- const shape=new THREE.Shape();
- shape.moveTo(0,-.9);
- shape.bezierCurveTo(-2.1,.5,-1.8,2,0,1.2);
- shape.bezierCurveTo(1.8,2,2.1,.5,0,-.9);
- const geo=new THREE.ExtrudeGeometry(shape,{
-  depth:.42,bevelEnabled:true,bevelSegments:5,steps:2,
-  bevelSize:.12,bevelThickness:.12
+
+ // -------------------------------------------------------
+ // 1. MATERIAL SYSTEM
+ // -------------------------------------------------------
+
+ const myocardium=new THREE.MeshPhysicalMaterial({
+  color:0x791b32,
+  metalness:.16,
+  roughness:.32,
+  clearcoat:1,
+  clearcoatRoughness:.2
  });
- const heartMesh=mesh(heart,geo,
-  new THREE.MeshPhysicalMaterial({color:0x9d1645,metalness:.7,roughness:.18,clearcoat:1}));
- heartMesh.scale.set(.7,.7,.7);
- heartMesh.userData.kind="heartbeat";
- for(let i=0;i<13;i++){
-  const gear=torus(heart,.25+(i%3)*.16,.035,C.gold);
-  gear.position.set(rand(-1.5,1.5),rand(-1.5,1.5),.55);
-  gear.userData.kind="heartGear";gear.userData.speed=rand(.3,1)*(i%2?1:-1);
+
+ const atriumMat=new THREE.MeshPhysicalMaterial({
+  color:0x9d3045,
+  metalness:.2,
+  roughness:.29,
+  clearcoat:1
+ });
+
+ const vesselMat=new THREE.MeshPhysicalMaterial({
+  color:0x9e2739,
+  metalness:.12,
+  roughness:.27,
+  clearcoat:1
+ });
+
+ const veinMat=new THREE.MeshPhysicalMaterial({
+  color:0x284c79,
+  metalness:.15,
+  roughness:.3,
+  clearcoat:1
+ });
+
+ const goldMat=new THREE.MeshStandardMaterial({
+  color:0xc69a48,
+  metalness:.94,
+  roughness:.22
+ });
+
+ const brightGold=new THREE.MeshStandardMaterial({
+  color:0xf2cc79,
+  metalness:1,
+  roughness:.17
+ });
+
+ const steelMat=new THREE.MeshStandardMaterial({
+  color:0x7d8990,
+  metalness:.96,
+  roughness:.24
+ });
+
+ const darkMetal=new THREE.MeshStandardMaterial({
+  color:0x252b30,
+  metalness:.9,
+  roughness:.3
+ });
+
+ // -------------------------------------------------------
+ // 2. LOCAL GEOMETRY HELPERS
+ // -------------------------------------------------------
+
+ function organicSphere(parent,rx,ry,rz,material,x,y,z){
+
+  const object=mesh(
+   parent,
+   new THREE.SphereGeometry(1,48,36),
+   material,
+   x,y,z
+  );
+
+  object.scale.set(rx,ry,rz);
+
+  return object;
  }
- addRings(heart,3,2.6,C.rose,.018);
+
+ function curvedTube(parent,points,radius,material,segments=64){
+
+  const curve=new THREE.CatmullRomCurve3(
+   points.map(p=>new THREE.Vector3(p[0],p[1],p[2]))
+  );
+
+  return mesh(
+   parent,
+   new THREE.TubeGeometry(
+    curve,
+    segments,
+    radius,
+    12,
+    false
+   ),
+   material,
+   0,0,0
+  );
+ }
+
+ function metalJoint(parent,x,y,z,r=.07){
+
+  const joint=sphere(
+   parent,
+   r,
+   brightGold,
+   x,y,z,
+   16
+  );
+
+  joint.userData.kind="heartGear";
+
+  return joint;
+ }
+
+ // -------------------------------------------------------
+ // 3. MAIN HEART BODY
+ // -------------------------------------------------------
+
+ const body=group(heart,0,0,0);
+
+ // Left ventricle
+ const leftVentricle=organicSphere(
+  body,.69,.96,.48,
+  myocardium,
+  -.37,-.48,0
+ );
+
+ leftVentricle.rotation.z=-.22;
+ leftVentricle.userData.kind="heartbeat";
+
+ // Right ventricle
+ const rightVentricle=organicSphere(
+  body,.67,.84,.46,
+  myocardium,
+  .39,-.42,.015
+ );
+
+ rightVentricle.rotation.z=.19;
+ rightVentricle.userData.kind="heartbeat";
+
+ // Apex of the heart
+ const apex=organicSphere(
+  body,.36,.65,.37,
+  myocardium,
+  .02,-1.12,.04
+ );
+
+ apex.rotation.z=-.18;
+ apex.userData.kind="heartbeat";
+
+ // -------------------------------------------------------
+ // 4. ATRIA
+ // -------------------------------------------------------
+
+ const leftAtrium=organicSphere(
+  body,.46,.4,.37,
+  atriumMat,
+  -.48,.66,.03
+ );
+
+ leftAtrium.rotation.z=.2;
+
+ const rightAtrium=organicSphere(
+  body,.43,.39,.36,
+  atriumMat,
+  .42,.64,.04
+ );
+
+ rightAtrium.rotation.z=-.18;
+
+ // Atrial appendages
+ const appendageL=organicSphere(
+  body,.22,.33,.24,
+  atriumMat,
+  -.87,.7,.12
+ );
+
+ appendageL.rotation.z=.6;
+
+ const appendageR=organicSphere(
+  body,.22,.32,.24,
+  atriumMat,
+  .82,.69,.12
+ );
+
+ appendageR.rotation.z=-.6;
+
+ // -------------------------------------------------------
+ // 5. AORTA — MAIN ARTERIAL ARCH
+ // -------------------------------------------------------
+
+ const aorta=curvedTube(
+  heart,
+  [
+   [-.05,.75,.02],
+   [-.1,1.05,.02],
+   [-.15,1.48,.02],
+   [.05,1.78,.02],
+   [.48,1.88,.02],
+   [.77,1.63,.02],
+   [.72,1.32,.02]
+  ],
+  .19,
+  vesselMat,
+  90
+ );
+
+ aorta.userData.kind="heartbeat";
+
+ // Aorta branches
+ curvedTube(
+  heart,
+  [
+   [.12,1.65,.02],
+   [.08,2.02,.02],
+   [.02,2.22,.02]
+  ],
+  .075,
+  vesselMat
+ );
+
+ curvedTube(
+  heart,
+  [
+   [.35,1.78,.02],
+   [.4,2.1,.02],
+   [.45,2.26,.02]
+  ],
+  .07,
+  vesselMat
+ );
+
+ curvedTube(
+  heart,
+  [
+   [.58,1.72,.02],
+   [.75,2.02,.02],
+   [.85,2.17,.02]
+  ],
+  .065,
+  vesselMat
+ );
+
+ // -------------------------------------------------------
+ // 6. VENA CAVA
+ // -------------------------------------------------------
+
+ const venaCava=curvedTube(
+  heart,
+  [
+   [.65,1.9,-.08],
+   [.55,1.45,-.08],
+   [.57,1.05,-.08],
+   [.48,.8,-.08]
+  ],
+  .15,
+  veinMat,
+  60
+ );
+
+ curvedTube(
+  heart,
+  [
+   [.58,.45,-.08],
+   [.68,.1,-.08],
+   [.72,-.25,-.08]
+  ],
+  .13,
+  veinMat
+ );
+
+ // -------------------------------------------------------
+ // 7. PULMONARY ARTERY
+ // -------------------------------------------------------
+
+ curvedTube(
+  heart,
+  [
+   [-.2,.65,.18],
+   [-.45,1.05,.18],
+   [-.75,1.25,.18],
+   [-1.12,1.16,.18],
+   [-1.35,.95,.18]
+  ],
+  .14,
+  new THREE.MeshPhysicalMaterial({
+   color:0x526d9c,
+   metalness:.18,
+   roughness:.28,
+   clearcoat:1
+  }),
+  80
+ );
+
+ curvedTube(
+  heart,
+  [
+   [-.9,1.2,.18],
+   [-1.05,1.48,.18],
+   [-1.3,1.62,.18]
+  ],
+  .09,
+  veinMat
+ );
+
+ // -------------------------------------------------------
+ // 8. CORONARY ARTERIES
+ // -------------------------------------------------------
+
+ const coronary=[
+  [
+   [-.05,.45,.46],
+   [-.35,.3,.49],
+   [-.62,.02,.45],
+   [-.77,-.38,.39],
+   [-.72,-.72,.3]
+  ],
+  [
+   [-.05,.45,.46],
+   [.2,.25,.49],
+   [.48,.02,.45],
+   [.62,-.3,.38],
+   [.48,-.72,.3]
+  ],
+  [
+   [.2,.24,.49],
+   [.32,-.02,.49],
+   [.23,-.32,.44],
+   [.1,-.62,.38]
+  ],
+  [
+   [-.35,.3,.49],
+   [-.18,.02,.51],
+   [-.1,-.25,.47],
+   [-.12,-.58,.4]
+  ]
+ ];
+
+ for(let i=0;i<coronary.length;i++){
+
+  const vessel=curvedTube(
+   body,
+   coronary[i],
+   i===0||i===1?.035:.023,
+   brightGold,
+   50
+  );
+
+  vessel.userData.kind="heartVessel";
+ }
+
+ // Smaller coronary branches
+ for(let i=0;i<12;i++){
+
+  const side=i%2===0?1:-1;
+  const x=rand(.15,.62)*side;
+  const y=rand(-.75,.2);
+
+  curvedTube(
+   body,
+   [
+    [x*.65,y+.25,.48],
+    [x,y+.12,.49],
+    [x*1.12,y-.1,.44]
+   ],
+   .012,
+   goldMat,
+   20
+  );
+ }
+
+ // -------------------------------------------------------
+ // 9. MECHANICAL INTERNAL CORE
+ // -------------------------------------------------------
+
+ const core=sphere(
+  heart,
+  .23,
+  new THREE.MeshPhysicalMaterial({
+   color:0xffb84f,
+   metalness:.9,
+   roughness:.15,
+   emissive:0x7d3510,
+   emissiveIntensity:.55,
+   clearcoat:1
+  }),
+  0,-.05,.54,
+  40
+ );
+
+ core.userData.kind="pulseCore";
+
+ // Core protective housing
+ const coreHousing=torus(
+  heart,
+  .32,
+  .045,
+  goldMat
+ );
+
+ coreHousing.position.set(0,-.05,.54);
+
+ // -------------------------------------------------------
+ // 10. INTERLOCKING MECHANICAL GEARS
+ // -------------------------------------------------------
+
+ const gears=[];
+
+ function createGear(x,y,z,radius,teeth,speed){
+
+  const gear=group(heart,x,y,z);
+
+  const gearBody=torus(
+   gear,
+   radius,
+   .045,
+   goldMat
+  );
+
+  // Gear teeth
+  for(let i=0;i<teeth;i++){
+
+   const a=i/teeth*TAU;
+
+   const tooth=mesh(
+    gear,
+    new THREE.BoxGeometry(
+     radius*.27,
+     .105,
+     .09
+    ),
+    brightGold,
+    Math.cos(a)*radius,
+    Math.sin(a)*radius,
+    0
+   );
+
+   tooth.rotation.z=a;
+  }
+
+  // Center bearing
+  sphere(
+   gear,
+   radius*.2,
+   steelMat,
+   0,0,.025,
+   20
+  );
+
+  // Four mechanical spokes
+  for(let i=0;i<4;i++){
+
+   const spoke=mesh(
+    gear,
+    new THREE.BoxGeometry(
+     radius*.72,
+     .035,
+     .06
+    ),
+    steelMat,
+    0,0,.035
+   );
+
+   spoke.rotation.z=i*Math.PI/4;
+  }
+
+  gear.userData.kind="heartGear";
+  gear.userData.speed=speed;
+
+  gears.push(gear);
+
+  return gear;
+ }
+
+ createGear(-.92,.25,.67,.24,12,.7);
+ createGear(.92,.25,.67,.24,12,-.7);
+ createGear(-.82,-.85,.56,.2,10,-.9);
+ createGear(.82,-.85,.56,.2,10,.9);
+ createGear(0,-.45,.72,.16,9,-1.1);
+
+ // -------------------------------------------------------
+ // 11. MECHANICAL FRAME
+ // -------------------------------------------------------
+
+ const framePositions=[
+  [-1.28,.8,.34],
+  [1.28,.8,.34],
+  [-1.05,-.8,.36],
+  [1.05,-.8,.36],
+  [0,-1.55,.25]
+ ];
+
+ for(let i=0;i<framePositions.length;i++){
+
+  const p=framePositions[i];
+
+  metalJoint(
+   heart,
+   p[0],p[1],p[2],
+   .085
+  );
+ }
+
+ curvedTube(
+  heart,
+  [
+   [-1.25,.8,.35],
+   [-1.45,.25,.35],
+   [-1.35,-.45,.35],
+   [-1.05,-.9,.35]
+  ],
+  .045,
+  goldMat
+ );
+
+ curvedTube(
+  heart,
+  [
+   [1.25,.8,.35],
+   [1.45,.25,.35],
+   [1.35,-.45,.35],
+   [1.05,-.9,.35]
+  ],
+  .045,
+  goldMat
+ );
+
+ // Lower mechanical support
+ curvedTube(
+  heart,
+  [
+   [-1.05,-.9,.35],
+   [-.55,-1.5,.35],
+   [0,-1.7,.35],
+   [.55,-1.5,.35],
+   [1.05,-.9,.35]
+  ],
+  .05,
+  brightGold
+ );
+
+ // -------------------------------------------------------
+ // 12. ARMOR PLATES
+ // -------------------------------------------------------
+
+ for(let i=0;i<7;i++){
+
+  const y=-.8+i*.25;
+
+  const plate=mesh(
+   heart,
+   new THREE.BoxGeometry(
+    .48+Math.sin(i*.5)*.12,
+    .045,
+    .055
+   ),
+   darkMetal,
+   0,y,.57
+  );
+
+  plate.rotation.z=Math.sin(i*.6)*.2;
+
+  // Golden rivets
+  metalJoint(
+   heart,
+   -.23,y,.62,
+   .025
+  );
+
+  metalJoint(
+   heart,
+   .23,y,.62,
+   .025
+  );
+ }
+
+ // -------------------------------------------------------
+ // 13. OUTER ORBITAL RINGS
+ // -------------------------------------------------------
+
+ addRings(
+  heart,
+  3,
+  2.45,
+  C.gold,
+  .018
+ );
+
+ // -------------------------------------------------------
+ // 14. HEARTBEAT ANIMATION REFERENCES
+ // -------------------------------------------------------
+
+ body.userData.kind="heartbeat";
+
+ heart.userData.heartBody=body;
+ heart.userData.leftVentricle=leftVentricle;
+ heart.userData.rightVentricle=rightVentricle;
+ heart.userData.apex=apex;
+ heart.userData.gears=gears;
+ heart.userData.core=core;
+ heart.userData.aorta=aorta;
+ heart.userData.kind="heartbeat";
+
 }
+
 
 /* 20 — PARTICLE STORM */
 function worldStorm(root){
