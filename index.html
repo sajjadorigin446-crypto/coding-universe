@@ -3334,25 +3334,226 @@ function worldButterfly(root){
 }
 
 
+/* 08 — GOLDEN SPIRAL
+   PHOTOREALISTIC MATHEMATICAL SCULPTURE
+*/
 
-
-/* 08 — GOLDEN SPIRAL */
 function worldSpiral(root){
+
  const spiral=group(root);
- for(let i=0;i<7;i++){
-  const tube=lineTube(spiral,makeSpiralPoints(5,2.3,1.2,i*.8),
-   [C.gold,C.cyan,C.violet][i%3],.025,450);
-  tube.userData.kind="spiralMotion";
-  tube.userData.speed=i%2?.12:-.12;
+
+ const PHI=1.61803398875;
+
+ // =========================================
+ // 1. PRIMARY GOLDEN SPIRAL
+ // =========================================
+
+ const mainPoints=makeSpiralPoints(
+  5,
+  2.3,
+  1.2,
+  0
+ );
+
+ const mainSpiral=lineTube(
+  spiral,
+  mainPoints,
+  C.gold,
+  .038,
+  600
+ );
+
+ mainSpiral.userData.kind="spiralMotion";
+ mainSpiral.userData.speed=.055;
+ mainSpiral.userData.phase=0;
+
+ // =========================================
+ // 2. SUBTLE SECONDARY SPIRAL
+ // =========================================
+
+ const secondaryPoints=makeSpiralPoints(
+  4.85,
+  2.3,
+  1.2,
+  .045
+ );
+
+ const secondary=lineTube(
+  spiral,
+  secondaryPoints,
+  C.gold,
+  .009,
+  500
+ );
+
+ secondary.userData.kind="spiralMotion";
+ secondary.userData.speed=-.025;
+ secondary.userData.phase=.4;
+
+ // =========================================
+ // 3. FIBONACCI STRUCTURE
+ // =========================================
+
+ const fibonacciNodes=[];
+
+ for(let i=0;i<13;i++){
+
+  const angle=i*2.3999632297;
+
+  const radius=.15*Math.sqrt(i+1)*PHI;
+
+  const x=Math.cos(angle)*radius;
+  const y=Math.sin(angle)*radius*.72;
+  const z=Math.sin(angle*.5)*radius*.6;
+
+  const node=sphere(
+   spiral,
+   .012+(i/13)*.012,
+   C.gold,
+   x,y,z,
+   10
+  );
+
+  node.userData.kind="spiralPoint";
+  node.userData.phase=i;
+
+  fibonacciNodes.push(node);
  }
- for(let i=0;i<21;i++){
-  const a=i/21*TAU*3;
-  const r=.5+i*.1;
-  const point=sphere(spiral,.045,C.gold,Math.cos(a)*r,Math.sin(a)*r*.6,Math.sin(a)*r);
-  point.userData.kind="spiralPoint";point.userData.phase=i;
+
+ // =========================================
+ // 4. CENTRAL GOLDEN CORE
+ // =========================================
+
+ const center=group(spiral);
+
+ const core=sphere(
+  center,
+  .115,
+  materials.gold(),
+  0,0,0,
+  32
+ );
+
+ core.userData.kind="pulseCore";
+
+ // Fine central structure
+ const innerPoints=[];
+
+ for(let i=0;i<=120;i++){
+
+  const t=i/120*TAU*2.5;
+  const r=.035+t*.009;
+
+  innerPoints.push([
+   Math.cos(t)*r,
+   Math.sin(t)*r,
+   Math.sin(t*.5)*.025
+  ]);
  }
- addRings(spiral,3,3.4,C.gold,.012);
+
+ const innerSpiral=lineTube(
+  center,
+  innerPoints,
+  C.gold,
+  .008,
+  180
+ );
+
+ innerSpiral.userData.kind="slowSpin";
+
+ // =========================================
+ // 5. GOLDEN RATIO PROPORTION FRAME
+ // =========================================
+
+ const w=3.1;
+ const h=w/PHI;
+
+ const framePoints=[
+  [-w/2,-h/2,0],
+  [ w/2,-h/2,0],
+  [ w/2, h/2,0],
+  [-w/2, h/2,0],
+  [-w/2,-h/2,0]
+ ];
+
+ const frame=lineTube(
+  spiral,
+  framePoints,
+  C.gold,
+  .008,
+  120
+ );
+
+ frame.position.z=-.15;
+ frame.material.transparent=true;
+ frame.material.opacity=.32;
+
+ // =========================================
+ // 6. FIBONACCI GOLDEN ARC
+ // =========================================
+
+ const arcPoints=[];
+
+ for(let i=0;i<=180;i++){
+
+  const t=i/180*TAU*1.5;
+
+  const radius=.2*Math.exp(.19*t);
+
+  arcPoints.push([
+   Math.cos(t)*radius,
+   Math.sin(t)*radius,
+   Math.sin(t*.5)*.08
+  ]);
+ }
+
+ const fibonacciArc=lineTube(
+  spiral,
+  arcPoints,
+  C.gold,
+  .012,
+  240
+ );
+
+ fibonacciArc.userData.kind="slowSpin";
+
+ // =========================================
+ // 7. CONTROLLED CINEMATIC LIGHT POINTS
+ // =========================================
+
+ const accentPositions=[
+  [2.5,.8,.4],
+  [-2.2,-.9,-.3],
+  [.7,2.1,.5],
+  [-.8,-2.0,.2]
+ ];
+
+ for(let i=0;i<accentPositions.length;i++){
+
+  const p=accentPositions[i];
+
+  const accent=sphere(
+   spiral,
+   .018,
+   materials.glow(C.gold),
+   p[0],p[1],p[2],
+   10
+  );
+
+  accent.userData.kind="pulseCore";
+ }
+
+ // =========================================
+ // 8. WORLD MOTION REFERENCES
+ // =========================================
+
+ spiral.userData.nodes=fibonacciNodes;
+ spiral.userData.mainSpiral=mainSpiral;
+ spiral.userData.kind="slowSpin";
+
 }
+
+
 
 /* 09 — CRYSTAL COLLAPSE */
 function worldCrystal(root){
