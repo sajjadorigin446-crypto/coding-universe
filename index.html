@@ -3573,30 +3573,251 @@ function worldCrystal(root){
  const core=sphere(crystal,.38,C.white);core.userData.kind="pulseCore";
 }
 
-/* 10 — DNA UNIVERSE */
+
+/* 10 — DNA UNIVERSE
+   REALISTIC MOLECULAR DOUBLE HELIX
+*/
+
 function worldDNA(root){
+
  const dna=group(root);
+
+ const HEIGHT=7;
+ const TURNS=4;
+ const RADIUS=1.05;
+ const SEGMENTS=560;
+ const TAU=Math.PI*2;
+
+ // =========================================
+ // 1. MOLECULAR MATERIALS
+ // =========================================
+
+ const backboneMaterials=[
+  new THREE.MeshPhysicalMaterial({
+   color:0x9cbdc8,
+   metalness:.35,
+   roughness:.2,
+   clearcoat:1,
+   clearcoatRoughness:.08,
+   emissive:0x102b38,
+   emissiveIntensity:.12
+  }),
+
+  new THREE.MeshPhysicalMaterial({
+   color:0xc6a45a,
+   metalness:.72,
+   roughness:.22,
+   clearcoat:1,
+   emissive:0x30200a,
+   emissiveIntensity:.08
+  })
+ ];
+
+ const baseMaterials=[
+  new THREE.MeshPhysicalMaterial({
+   color:0x43a9b5,
+   metalness:.28,
+   roughness:.2,
+   clearcoat:1,
+   emissive:0x073b48,
+   emissiveIntensity:.12
+  }),
+
+  new THREE.MeshPhysicalMaterial({
+   color:0xb47b91,
+   metalness:.24,
+   roughness:.23,
+   clearcoat:1,
+   emissive:0x351321,
+   emissiveIntensity:.1
+  })
+ ];
+
+ // =========================================
+ // 2. HELIX PATH GENERATOR
+ // =========================================
+
+ function helixPoint(t,strand){
+
+  const angle=t*TAU*TURNS+
+   strand*Math.PI;
+
+  const y=t*HEIGHT-HEIGHT/2;
+
+  return [
+   Math.cos(angle)*RADIUS,
+   y,
+   Math.sin(angle)*RADIUS
+  ];
+ }
+
+ // =========================================
+ // 3. DOUBLE HELIX BACKBONE
+ // =========================================
+
+ const backbone=[];
+
  for(let strand=0;strand<2;strand++){
-  const pts=[];
-  for(let i=0;i<=450;i++){
-   const t=i/450*TAU*4+strand*Math.PI;
-   const y=i/450*7-3.5;
-   pts.push([Math.cos(t)*1.15,y,Math.sin(t)*1.15]);
+
+  const points=[];
+
+  for(let i=0;i<=SEGMENTS;i++){
+
+   points.push(
+    helixPoint(i/SEGMENTS,strand)
+   );
   }
-  const helix=lineTube(dna,pts,strand?C.cyan:C.rose,.055,500);
-  helix.userData.kind="helix";
+
+  const tube=lineTube(
+   dna,
+   points,
+   strand===0?C.cyan:C.rose,
+   .032,
+   600
+  );
+
+  tube.userData.kind="helix";
+  tube.userData.strand=strand;
+
+  backbone.push(tube);
  }
+
+ // =========================================
+ // 4. MOLECULAR BASE PAIRS
+ // =========================================
+
+ const rungs=[];
+
  for(let i=0;i<64;i++){
-  const t=i/64*TAU*4;
-  const y=i/64*7-3.5;
-  const rung=lineTube(dna,[
-   [Math.cos(t)*1.15,y,Math.sin(t)*1.15],
-   [Math.cos(t+Math.PI)*1.15,y,Math.sin(t+Math.PI)*1.15]
-  ],C.gold,.018,8);
+
+  const t=(i+.5)/64;
+
+  const p1=helixPoint(t,0);
+  const p2=helixPoint(t,1);
+
+  const midpoint=[
+   (p1[0]+p2[0])/2,
+   (p1[1]+p2[1])/2,
+   (p1[2]+p2[2])/2
+  ];
+
+  // Central molecular connection
+  const rung=lineTube(
+   dna,
+   [p1,midpoint,p2],
+   i%2===0?C.gold:C.cyan,
+   .014,
+   12
+  );
+
   rung.userData.kind="dnaRung";
+
+  // Molecular base pair nodes
+  const nodeA=sphere(
+   dna,
+   .045,
+   baseMaterials[i%2],
+   p1[0]*.64+midpoint[0]*.36,
+   p1[1],
+   p1[2]*.64+midpoint[2]*.36,
+   12
+  );
+
+  const nodeB=sphere(
+   dna,
+   .045,
+   baseMaterials[(i+1)%2],
+   p2[0]*.64+midpoint[0]*.36,
+   p2[1],
+   p2[2]*.64+midpoint[2]*.36,
+   12
+  );
+
+  rungs.push(rung);
  }
- addOrbiting(dna,18,2.1,C.cyan,.045,.7);
+
+ // =========================================
+ // 5. BACKBONE MOLECULAR JOINTS
+ // =========================================
+
+ for(let strand=0;strand<2;strand++){
+
+  for(let i=0;i<32;i++){
+
+   const t=i/32;
+
+   const p=helixPoint(t,strand);
+
+   const joint=sphere(
+    dna,
+    .052,
+    backboneMaterials[strand],
+    p[0],p[1],p[2],
+    12
+   );
+
+   joint.userData.kind="pulseCore";
+   joint.userData.phase=i*.2;
+  }
+ }
+
+ // =========================================
+ // 6. END TERMINATION
+ // =========================================
+
+ for(let strand=0;strand<2;strand++){
+
+  const top=helixPoint(1,strand);
+  const bottom=helixPoint(0,strand);
+
+  for(const p of [top,bottom]){
+
+   const cap=sphere(
+    dna,
+    .085,
+    backboneMaterials[strand],
+    p[0],p[1],p[2],
+    20
+   );
+
+   cap.userData.kind="pulseCore";
+  }
+ }
+
+ // =========================================
+ // 7. CENTRAL MOLECULAR AXIS
+ // =========================================
+
+ const axisPoints=[];
+
+ for(let i=0;i<=100;i++){
+
+  const y=i/100*HEIGHT-HEIGHT/2;
+
+  axisPoints.push([0,y,0]);
+ }
+
+ const axis=lineTube(
+  dna,
+  axisPoints,
+  C.gold,
+  .006,
+  120
+ );
+
+ axis.material.transparent=true;
+ axis.material.opacity=.25;
+
+ // =========================================
+ // 8. WORLD REFERENCES
+ // =========================================
+
+ dna.userData.backbone=backbone;
+ dna.userData.rungs=rungs;
+ dna.userData.kind="slowSpin";
+
 }
+
 
 /* 11 — IMPOSSIBLE ARCHITECTURE */
 function worldArchitecture(root){
