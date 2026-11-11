@@ -9343,31 +9343,455 @@ function worldPortal(root){
 }
 
 
+/* =========================================================
+   25 — THE FINAL CREATION
+   ULTIMATE COSMIC MASTERCLASS EDITION
+   ========================================================= */
 
-/* 25 — THE FINAL CREATION */
 function worldFinal(root){
+
  const finale=group(root);
- const center=sphere(finale,.55,materials.glow(C.gold),0,0,0,56);
+
+ // =====================================================
+ // 1. MATERIAL SYSTEM
+ // =====================================================
+
+ const goldMetal=new THREE.MeshPhysicalMaterial({
+  color:0xd9b568,
+  metalness:.96,
+  roughness:.19,
+  clearcoat:1,
+  clearcoatRoughness:.12
+ });
+
+ const darkMetal=new THREE.MeshStandardMaterial({
+  color:0x171521,
+  metalness:.94,
+  roughness:.25
+ });
+
+ const crystalGold=new THREE.MeshPhysicalMaterial({
+  color:0xeacb83,
+  emissive:0x71451a,
+  emissiveIntensity:.65,
+  metalness:.35,
+  roughness:.12,
+  transmission:.12,
+  thickness:1.4,
+  clearcoat:1
+ });
+
+ const crystalCyan=new THREE.MeshPhysicalMaterial({
+  color:0x6de5ef,
+  emissive:0x07576b,
+  emissiveIntensity:.7,
+  metalness:.35,
+  roughness:.1,
+  transmission:.16,
+  thickness:1.2,
+  clearcoat:1
+ });
+
+ const crystalViolet=new THREE.MeshPhysicalMaterial({
+  color:0x9c7ce9,
+  emissive:0x32136e,
+  emissiveIntensity:.7,
+  metalness:.3,
+  roughness:.12,
+  transmission:.14,
+  thickness:1.3,
+  clearcoat:1
+ });
+
+ const crystalRose=new THREE.MeshPhysicalMaterial({
+  color:0xe99bc9,
+  emissive:0x672348,
+  emissiveIntensity:.55,
+  metalness:.3,
+  roughness:.13,
+  transmission:.12,
+  thickness:1.2,
+  clearcoat:1
+ });
+
+ const crystalMaterials=[
+  crystalGold,
+  crystalCyan,
+  crystalViolet,
+  crystalRose
+ ];
+
+ const energyColors=[
+  C.gold,
+  C.cyan,
+  C.violet,
+  C.rose
+ ];
+
+ // =====================================================
+ // 2. CENTRAL CREATION CORE
+ // =====================================================
+
+ const centerGroup=group(finale);
+
+ const center=sphere(
+  centerGroup,
+  .55,
+  materials.glow(C.gold),
+  0,0,0,
+  56
+ );
+
  center.userData.kind="finalCore";
+
+ // Inner stellar nucleus
+
+ const nucleus=sphere(
+  centerGroup,
+  .23,
+  materials.glow(C.white),
+  0,0,0,
+  40
+ );
+
+ nucleus.userData.kind="finalCore";
+
+ // Golden transparent energy shell
+
+ const coreShell=mesh(
+  centerGroup,
+  new THREE.SphereGeometry(.72,48,32),
+  new THREE.MeshPhysicalMaterial({
+   color:0xf1ca78,
+   emissive:0x9d5817,
+   emissiveIntensity:.65,
+   metalness:.2,
+   roughness:.12,
+   transparent:true,
+   opacity:.2,
+   clearcoat:1,
+   side:THREE.DoubleSide
+  })
+ );
+
+ coreShell.userData.kind="finalCore";
+
+ // Inner geometric structure
+
+ const innerGeometry=mesh(
+  centerGroup,
+  new THREE.IcosahedronGeometry(.83,2),
+  new THREE.MeshBasicMaterial({
+   color:0xffd78a,
+   wireframe:true,
+   transparent:true,
+   opacity:.24,
+   depthWrite:false
+  })
+ );
+
+ innerGeometry.userData.kind="finalCore";
+
+ // =====================================================
+ // 3. EIGHT PRIMARY ORBITAL RINGS
+ // =====================================================
+
+ const mainRings=[];
+
  for(let layer=0;layer<8;layer++){
-  const ring=torus(finale,1.15+layer*.27,.022,
-   [C.gold,C.cyan,C.violet,C.rose][layer%4]);
-  ring.rotation.set(layer*.38,layer*.27,layer*.19);
+
+  const ring=torus(
+   finale,
+   1.15+layer*.27,
+   .022,
+   energyColors[layer%4]
+  );
+
+  ring.rotation.set(
+   layer*.38,
+   layer*.27,
+   layer*.19
+  );
+
   ring.userData.kind="finalRing";
   ring.userData.speed=.15+layer*.045;
+
+  mainRings.push(ring);
  }
+
+ // =====================================================
+ // 4. PRECISION METALLIC ORBITAL DETAILS
+ // =====================================================
+
+ for(let i=0;i<4;i++){
+
+  const ring=torus(
+   finale,
+   1.05+i*.48,
+   .045,
+   darkMetal
+  );
+
+  ring.rotation.set(
+   .2+i*.4,
+   .3+i*.5,
+   .15+i*.3
+  );
+
+  ring.userData.kind="finalRing";
+  ring.userData.speed=.12+i*.035;
+ }
+
+ // Fine golden orbital accents
+
+ for(let i=0;i<6;i++){
+
+  const accent=torus(
+   finale,
+   1.32+i*.29,
+   .009,
+   goldMetal
+  );
+
+  accent.rotation.set(
+   i*.24,
+   i*.37,
+   i*.18
+  );
+
+  accent.userData.kind="finalRing";
+  accent.userData.speed=.08+i*.025;
+ }
+
+ // =====================================================
+ // 5. FIFTY-FIVE FLOATING CREATION CRYSTALS
+ // =====================================================
+
  for(let i=0;i<55;i++){
+
   const a=i*2.399;
   const r=.5+i*.064;
-  const crystal=mesh(finale,new THREE.IcosahedronGeometry(rand(.08,.28),1),
-   materials.glow([C.gold,C.cyan,C.violet,C.rose][i%4]),
-   Math.cos(a)*r,Math.sin(a)*r,Math.sin(i*.55)*1.5);
+
+  const crystal=mesh(
+   finale,
+   new THREE.IcosahedronGeometry(
+    rand(.08,.28),
+    2
+   ),
+   crystalMaterials[i%4],
+   Math.cos(a)*r,
+   Math.sin(a)*r,
+   Math.sin(i*.55)*1.5
+  );
+
   crystal.userData.kind="finalCrystal";
   crystal.userData.phase=i*.2;
+
+  // Individual crystal orientation
+
+  crystal.rotation.set(
+   i*.31,
+   i*.47,
+   i*.23
+  );
  }
- particleCloud(finale,900,C.gold,7,.035);
- addFloatingDebris(finale,80,C.cyan,5);
+
+ // =====================================================
+ // 6. FLOATING LARGE CRYSTAL MONOLITHS
+ // =====================================================
+
+ const monolithPositions=[
+  [-2.7,1.7,0],
+  [2.7,1.7,0],
+  [-2.7,-1.7,0],
+  [2.7,-1.7,0],
+  [0,3.2,.4],
+  [0,-3.2,-.4],
+  [0,1.5,2.8],
+  [0,-1.5,-2.8]
+ ];
+
+ for(let i=0;i<monolithPositions.length;i++){
+
+  const p=monolithPositions[i];
+
+  const monolith=mesh(
+   finale,
+   new THREE.OctahedronGeometry(.28,2),
+   crystalMaterials[i%4]
+  );
+
+  monolith.position.set(
+   p[0],p[1],p[2]
+  );
+
+  monolith.rotation.set(
+   i*.45,
+   i*.7,
+   i*.25
+  );
+
+  monolith.userData.kind="finalCrystal";
+  monolith.userData.phase=i*.6;
+ }
+
+ // =====================================================
+ // 7. OUTER CREATION CAGE
+ // =====================================================
+
+ const cage=mesh(
+  finale,
+  new THREE.IcosahedronGeometry(3.45,2),
+  new THREE.MeshBasicMaterial({
+   color:0xd4af62,
+   wireframe:true,
+   transparent:true,
+   opacity:.065,
+   depthWrite:false
+  })
+ );
+
+ cage.userData.kind="finalRing";
+
+ const innerCage=mesh(
+  finale,
+  new THREE.OctahedronGeometry(3.05,2),
+  new THREE.MeshBasicMaterial({
+   color:0x7c68dc,
+   wireframe:true,
+   transparent:true,
+   opacity:.055,
+   depthWrite:false
+  })
+ );
+
+ innerCage.userData.kind="finalRing";
+
+ // =====================================================
+ // 8. ENERGY ARCS
+ // =====================================================
+
+ function createEnergyArc(radius,start,end,color){
+
+  const points=[];
+  const segments=100;
+
+  for(let i=0;i<=segments;i++){
+
+   const t=i/segments;
+   const angle=start+(end-start)*t;
+
+   points.push(
+    new THREE.Vector3(
+     Math.cos(angle)*radius,
+     Math.sin(angle)*radius,
+     Math.sin(angle*2)*.18
+    )
+   );
+  }
+
+  const curve=new THREE.CatmullRomCurve3(points);
+
+  const arc=mesh(
+   finale,
+   new THREE.TubeGeometry(
+    curve,
+    segments,
+    .012,
+    6,
+    false
+   ),
+   new THREE.MeshBasicMaterial({
+    color:color,
+    transparent:true,
+    opacity:.8
+   })
+  );
+
+  arc.userData.kind="finalRing";
+
+  return arc;
+ }
+
+ createEnergyArc(
+  2.3,0,Math.PI*1.5,C.gold
+ );
+
+ createEnergyArc(
+  2.55,Math.PI*.4,Math.PI*1.9,C.cyan
+ );
+
+ createEnergyArc(
+  2.8,Math.PI,Math.PI*2.5,C.violet
+ );
+
+ // =====================================================
+ // 9. GOLDEN PARTICLE ATMOSPHERE
+ // =====================================================
+
+ particleCloud(
+  finale,
+  900,
+  C.gold,
+  7,
+  .035
+ );
+
+ // =====================================================
+ // 10. COSMIC DEBRIS
+ // =====================================================
+
+ addFloatingDebris(
+  finale,
+  80,
+  C.cyan,
+  5
+ );
+
+ addFloatingDebris(
+  finale,
+  35,
+  C.violet,
+  4
+ );
+
+ // =====================================================
+ // 11. OUTER GOLDEN FRAME
+ // =====================================================
+
+ const outerFrame=torus(
+  finale,
+  3.8,
+  .018,
+  goldMetal
+ );
+
+ outerFrame.rotation.x=Math.PI/2.5;
+ outerFrame.userData.kind="finalRing";
+ outerFrame.userData.speed=.12;
+
+ const cyanFrame=torus(
+  finale,
+  3.95,
+  .012,
+  C.cyan
+ );
+
+ cyanFrame.rotation.y=Math.PI/3;
+ cyanFrame.userData.kind="finalRing";
+ cyanFrame.userData.speed=-.16;
+
+ // =====================================================
+ // 12. WORLD REFERENCES
+ // =====================================================
+
+ finale.userData.kind="finalCreation";
+ finale.userData.core=center;
+ finale.userData.rings=mainRings;
+
 }
+
+
 
 /* ---------- BUILDER REGISTRY ---------- */
 const BUILDERS=[
