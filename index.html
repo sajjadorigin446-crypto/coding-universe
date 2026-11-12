@@ -10576,7 +10576,10 @@ function prepareWorld(index){
  targetRotationY=0;
  cameraTargetX=0;
  cameraTargetY=0;
- cameraZoom=activeIndex===11?23:SETTINGS.defaultCameraDistance;
+ cameraZoom =
+ activeIndex===2 ? 12 :
+ activeIndex===11 ? 23 :
+ SETTINGS.defaultCameraDistance;
 
  activeWorld.camera.position.set(0,.2,cameraZoom);
  activeWorld.camera.lookAt(0,0,0);
