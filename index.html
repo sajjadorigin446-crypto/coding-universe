@@ -2666,68 +2666,188 @@ function worldMamunKingdom(root){
  pointLight(0xffe2a8,15,6,2,-3,15);
 
 
-// MAMUN FULL BODY PORTRAIT — FIXED VERSION
 
-const avatarSettings={
- file:"mamun-avatar.png",
- x:0,
- y:-1.55,
- z:1.15,
- height:3.6,
- rotationY:0,
- scale:1
-};
+/* ==========================================
+   MAMUN'S KINGDOM — FULL AVATAR SYSTEM
+   Image: mamun-avatar.png
+   ========================================== */
 
-const avatarLoader=new THREE.TextureLoader();
+function createMamunAvatar(kingdom) {
 
-avatarLoader.load(
- avatarSettings.file,
- function(texture){
+  // ---------- AVATAR SETTINGS ----------
+  const avatarSettings = {
+    file: "mamun-avatar.png",
 
-  texture.colorSpace=THREE.SRGBColorSpace;
-  texture.anisotropy=4;
+    // Position
+    x: 0,
+    y: -0.16,
+    z: 2.5,
 
-  const imageRatio=
-   texture.image.width/texture.image.height;
+    // Image dimensions
+    height: 3.6,
 
-  const height=
-   avatarSettings.height*avatarSettings.scale;
+    // Rotation
+    rotationY: 0,
 
-  const width=height*imageRatio;
+    // Scale
+    scale: 1,
 
-  const avatarMaterial=new THREE.MeshBasicMaterial({
-   map:texture,
-   transparent:true,
-   alphaTest:.02,
-   side:THREE.DoubleSide,
-   depthWrite:false
-  });
+    // Visibility
+    visible: true
+  };
 
-  const avatar=new THREE.Mesh(
-   new THREE.PlaneGeometry(width,height),
-   avatarMaterial
+  // ---------- REMOVE OLD AVATAR ----------
+  if (kingdom.userData.mamunAvatar) {
+    kingdom.remove(kingdom.userData.mamunAvatar);
+
+    kingdom.userData.mamunAvatar.geometry?.dispose();
+
+    if (kingdom.userData.mamunAvatar.material) {
+      kingdom.userData.mamunAvatar.material.dispose();
+    }
+  }
+
+  // ---------- LOAD IMAGE ----------
+  const loader = new THREE.TextureLoader();
+
+  loader.load(
+    avatarSettings.file,
+
+    function(texture) {
+
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.anisotropy = 4;
+
+      // Preserve original image ratio
+      const imageRatio =
+        texture.image.width / texture.image.height;
+
+      const avatarHeight =
+        avatarSettings.height * avatarSettings.scale;
+
+      const avatarWidth =
+        avatarHeight * imageRatio;
+
+      // ---------- MATERIAL ----------
+      const avatarMaterial = new THREE.MeshBasicMaterial({
+        map: texture,
+        transparent: true,
+        alphaTest: 0.02,
+        side: THREE.DoubleSide,
+
+        // Keep image visible above 3D objects
+        depthTest: false,
+        depthWrite: false,
+
+        // Preserve image brightness
+        toneMapped: false
+      });
+
+      // ---------- AVATAR PLANE ----------
+      const geometry = new THREE.PlaneGeometry(
+        avatarWidth,
+        avatarHeight
+      );
+
+      const avatar = new THREE.Mesh(
+        geometry,
+        avatarMaterial
+      );
+
+      // ---------- POSITION ----------
+      avatar.position.set(
+        avatarSettings.x,
+        avatarSettings.y,
+        avatarSettings.z
+      );
+
+      avatar.rotation.y = avatarSettings.rotationY;
+
+      // ---------- RENDER SETTINGS ----------
+      avatar.renderOrder = 9999;
+      avatar.frustumCulled = false;
+      avatar.visible = avatarSettings.visible;
+
+      // ---------- ADD TO KINGDOM ----------
+      kingdom.add(avatar);
+
+      // ---------- SAVE REFERENCES ----------
+      kingdom.userData.mamunAvatar = avatar;
+      kingdom.userData.avatarSettings = avatarSettings;
+
+      console.log("MAMUN AVATAR LOADED SUCCESSFULLY");
+
+    },
+
+    undefined,
+
+    function(error) {
+      console.error(
+        "MAMUN AVATAR IMAGE FAILED TO LOAD:",
+        error
+      );
+    }
   );
+}
 
-  avatar.position.set(
-   avatarSettings.x,
-   avatarSettings.y+height/2,
-   avatarSettings.z
-  );
+// ---------- INITIALIZE ----------
+createMamunAvatar(kingdom);
 
-  avatar.rotation.y=avatarSettings.rotationY;
-  avatar.renderOrder=3;
 
-  kingdom.add(avatar);
+/* ==========================================
+   AVATAR POSITION CONTROLS
+   ========================================== */
 
-  kingdom.userData.mamunAvatar=avatar;
-  kingdom.userData.avatarSettings=avatarSettings;
+function updateMamunAvatar(options = {}) {
 
- },
- undefined,
- function(error){
-  console.error("Avatar loading error:",error);
- }
-);
+  const avatar = kingdom.userData.mamunAvatar;
+
+  if (!avatar) return;
+
+  const settings = kingdom.userData.avatarSettings;
+
+  if (options.x !== undefined) {
+    avatar.position.x = settings.x = options.x;
+  }
+
+  if (options.y !== undefined) {
+    avatar.position.y = settings.y = options.y;
+  }
+
+  if (options.z !== undefined) {
+    avatar.position.z = settings.z = options.z;
+  }
+
+  if (options.height !== undefined) {
+
+    const texture = avatar.material.map;
+
+    const ratio =
+      texture.image.width / texture.image.height;
+
+    const newHeight = options.height;
+    const newWidth = newHeight * ratio;
+
+    avatar.geometry.dispose();
+
+    avatar.geometry = new THREE.PlaneGeometry(
+      newWidth,
+      newHeight
+    );
+
+    settings.height = newHeight;
+  }
+
+  if (options.rotationY !== undefined) {
+    avatar.rotation.y = settings.rotationY =
+      options.rotationY;
+  }
+
+  if (options.visible !== undefined) {
+    avatar.visible = settings.visible =
+      options.visible;
+  }
+}
 
 
  // ---------------------------------------------------------
