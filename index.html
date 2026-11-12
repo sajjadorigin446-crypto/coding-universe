@@ -614,7 +614,7 @@ $("music").volume=SETTINGS.musicVolume;
 const DATA=[
  ["Masterclass Cube","A living architecture of impossible geometry.","GEOMETRY",0xd7ae55],
  ["Masterclass Flower","A cosmic bloom unfolds through light and motion.","NATURE",0xe46da8],
- ["Infinite Knot","An endless ribbon twisting through impossible space.","GEOMETRY",0x9c76ff],
+ ["Mamun's Kingdom","The Creator's Realm — A Royal Dimension of MD Abdul Al Mamun.","FINALE",0xd4af62],
  ["Orbital Machine","An ancient celestial mechanism awakens.","TECHNOLOGY",0x4bc9df],
  ["Fractal Tree","A luminous branching universe grows in silence.","NATURE",0x55d99b],
  ["Liquid Dimension","A fluid world shaped by invisible forces.","ELEMENTS",0x258fe0],
@@ -2076,335 +2076,611 @@ function worldFlower(root){
 
 
 
+
 /* =========================================================
-   03 — INFINITE KNOT
-   MASTERCLASS DIMENSION EDITION
-   MAMUN CODING FANTASY
-========================================================= */
+   03 — MAMUN'S KINGDOM
+   THE CREATOR'S REALM | ULTRA REALISTIC MASTERCLASS
+   ========================================================= */
 
-function worldKnot(root){
+function worldMamunKingdom(root){
 
- const knot=group(root);
+ const kingdom=group(root);
+ kingdom.userData.kind="mamunKingdom";
 
- // ============================================
- // 01. MASTER ROTATION GROUP
- // ============================================
+ // ---------------------------------------------------------
+ // MATERIAL SYSTEM
+ // ---------------------------------------------------------
 
- const structure=group(knot);
- structure.userData.kind="slowSpin";
+ const gold=new THREE.MeshStandardMaterial({
+  color:0xd4af62,
+  metalness:.92,
+  roughness:.22,
+  emissive:0x674715,
+  emissiveIntensity:.22
+ });
 
- // ============================================
- // 02. FIVE INFINITE INTERWOVEN STRUCTURES
- // ============================================
+ const goldBright=new THREE.MeshStandardMaterial({
+  color:0xffdf91,
+  metalness:.95,
+  roughness:.16,
+  emissive:0xc58a28,
+  emissiveIntensity:.55
+ });
 
- const colors=[
-  C.gold,
-  C.violet,
-  C.cyan,
-  C.rose,
-  C.emerald
- ];
+ const marble=new THREE.MeshStandardMaterial({
+  color:0xd9d1c0,
+  metalness:.18,
+  roughness:.28
+ });
 
- const curves=[];
+ const darkStone=new THREE.MeshStandardMaterial({
+  color:0x171511,
+  metalness:.55,
+  roughness:.32
+ });
 
- for(let k=0;k<5;k++){
+ const royalBlack=new THREE.MeshStandardMaterial({
+  color:0x080807,
+  metalness:.72,
+  roughness:.23
+ });
 
-  const pts=[];
+ const glowMat=new THREE.MeshBasicMaterial({
+  color:0xffd47b
+ });
 
-  for(let i=0;i<=1000;i++){
+ // ---------------------------------------------------------
+ // LOCAL GEOMETRY HELPERS
+ // ---------------------------------------------------------
 
-   const t=i/1000*TAU*2;
-
-   const r=
-    1.5+
-    .5*Math.cos(5*t+k*.5)+
-    .08*Math.sin(11*t+k);
-
-   pts.push([
-    r*Math.cos(3*t+k*.25),
-    r*Math.sin(2*t+k*.25),
-    1.05*Math.sin(5*t+k*.8)
-   ]);
-  }
-
-  // Main metallic strand
-  const tube=lineTube(
-   structure,
-   pts,
-   colors[k],
-   .047,
-   1000
-  );
-
-  tube.userData.kind="slowSpin";
-
-  // Inner energy line
-  const inner=lineTube(
-   structure,
-   pts,
-   C.white,
-   .009,
-   1000
-  );
-
-  inner.userData.kind="slowSpin";
-
-  curves.push(pts);
+ function addMesh(parent,geometry,material,x=0,y=0,z=0){
+  const object=new THREE.Mesh(geometry,material);
+  object.position.set(x,y,z);
+  object.castShadow=true;
+  object.receiveShadow=true;
+  parent.add(object);
+  return object;
  }
 
- // ============================================
- // 03. SECONDARY INFINITY WEAVE
- // ============================================
-
- for(let k=0;k<3;k++){
-
-  const pts=[];
-
-  for(let i=0;i<=700;i++){
-
-   const t=i/700*TAU*2;
-
-   const r=1.9+.28*Math.sin(4*t+k);
-
-   pts.push([
-    r*Math.cos(2*t+k*.7),
-    r*Math.sin(3*t+k*.5),
-    .7*Math.cos(5*t+k)
-   ]);
-  }
-
-  const line=lineTube(
-   structure,
-   pts,
-   colors[(k+1)%5],
-   .012,
-   700
+ function box(parent,w,h,d,material,x,y,z){
+  return addMesh(
+   parent,
+   new THREE.BoxGeometry(w,h,d),
+   material,x,y,z
   );
-
-  line.userData.kind="slowSpin";
  }
 
- // ============================================
- // 04. CENTRAL ENERGY REACTOR
- // ============================================
+ function cylinder(parent,rt,rb,h,material,x,y,z,segments=48){
+  return addMesh(
+   parent,
+   new THREE.CylinderGeometry(rt,rb,h,segments),
+   material,x,y,z
+  );
+ }
 
- const reactor=group(structure);
+ function sphereLocal(parent,r,material,x,y,z){
+  return addMesh(
+   parent,
+   new THREE.SphereGeometry(r,32,24),
+   material,x,y,z
+  );
+ }
 
- const core=sphere(
-  reactor,.34,C.white,0,0,0
+ function torusLocal(parent,r,t,material,x=0,y=0,z=0){
+  return addMesh(
+   parent,
+   new THREE.TorusGeometry(r,t,12,100),
+   material,x,y,z
+  );
+ }
+
+ // ---------------------------------------------------------
+ // 1. ROYAL FOUNDATION
+ // ---------------------------------------------------------
+
+ const foundation=group(kingdom);
+
+ cylinder(
+  foundation,4.9,5.1,.35,darkStone,
+  0,-2.45,0,96
  );
 
- core.userData.kind="pulseCore";
-
- const coreGold=sphere(
-  reactor,.23,C.gold,0,0,0
+ cylinder(
+  foundation,4.65,4.85,.12,gold,
+  0,-2.22,0,96
  );
 
- coreGold.userData.kind="slowSpin";
-
- const coreViolet=sphere(
-  reactor,.13,C.violet,0,0,0
+ cylinder(
+  foundation,4.4,4.55,.12,marble,
+  0,-2.1,0,96
  );
 
- coreViolet.userData.kind="pulseCore";
+ torusLocal(
+  foundation,4.75,.035,goldBright,
+  0,-2.24,0
+ );
 
- // ============================================
- // 05. REACTOR CRYSTALS
- // ============================================
+ // Royal floor tiles
+ for(let x=-3;x<=3;x++){
+  for(let z=-3;z<=3;z++){
+   box(
+    foundation,.94,.035,.94,
+    (x+z)%2===0?marble:darkStone,
+    x*.98,-2.015,z*.98
+   );
+  }
+ }
+
+ // ---------------------------------------------------------
+ // 2. GRAND PALACE STAIRS
+ // ---------------------------------------------------------
+
+ for(let i=0;i<7;i++){
+  const width=4.8-i*.28;
+  const height=.13;
+
+  box(
+   kingdom,
+   width,height,.48,
+   i%2===0?marble:darkStone,
+   0,-1.94+i*.13,2.65+i*.42
+  );
+
+  box(
+   kingdom,
+   width,.035,.035,
+   goldBright,
+   0,-1.86+i*.13,2.41+i*.42
+  );
+ }
+
+ // ---------------------------------------------------------
+ // 3. ROYAL PALACE STRUCTURE
+ // ---------------------------------------------------------
+
+ // Main palace base
+ box(
+  kingdom,5.7,.55,3.5,
+  darkStone,0,-1.55,-.45
+ );
+
+ box(
+  kingdom,5.45,.12,3.3,
+  gold,0,-1.23,-.45
+ );
+
+ // Palace walls
+ box(
+  kingdom,5.1,2.65,.28,
+  marble,0,.12,-2.05
+ );
+
+ box(
+  kingdom,.28,2.65,3.8,
+  marble,-2.55,.12,-.2
+ );
+
+ box(
+  kingdom,.28,2.65,3.8,
+  marble,2.55,.12,-.2
+ );
+
+ // Rear wall gold decoration
+ for(let i=0;i<7;i++){
+  box(
+   kingdom,.035,2.15,.045,
+   gold,
+   -2.1+i*.7,.16,-1.88
+  );
+ }
+
+ // ---------------------------------------------------------
+ // 4. ROYAL PILLARS
+ // ---------------------------------------------------------
+
+ for(let side of [-1,1]){
+  for(let i=0;i<4;i++){
+
+   const x=side*(2.05);
+   const z=-1.45+i*.9;
+
+   cylinder(
+    kingdom,.16,.21,2.7,
+    marble,x,.05,z
+   );
+
+   cylinder(
+    kingdom,.25,.25,.13,
+    gold,x,-1.25,z
+   );
+
+   cylinder(
+    kingdom,.25,.25,.13,
+    gold,x,1.4,z
+   );
+
+   torusLocal(
+    kingdom,.18,.035,goldBright,
+    x,.3,z
+   );
+
+   torusLocal(
+    kingdom,.18,.035,goldBright,
+    x,.7,z
+   );
+  }
+ }
+
+ // ---------------------------------------------------------
+ // 5. ROYAL ROOF & GOLDEN CROWN
+ // ---------------------------------------------------------
+
+ const roof=box(
+  kingdom,6,.24,4.3,
+  darkStone,0,1.65,-.3
+ );
+
+ // Roof gold borders
+ box(
+  kingdom,6.1,.065,.07,
+  goldBright,0,1.77,-2.42
+ );
+
+ box(
+  kingdom,6.1,.065,.07,
+  goldBright,0,1.77,1.82
+ );
+
+ // Central crown structure
+ const crown=group(kingdom);
+ crown.position.set(0,2.15,-.3);
+
+ cylinder(
+  crown,.75,.9,.18,gold,
+  0,0,0
+ );
+
+ torusLocal(
+  crown,.78,.055,goldBright,
+  0,.13,0
+ );
 
  for(let i=0;i<8;i++){
+  const a=i/8*Math.PI*2;
 
-  const angle=i/8*TAU;
+  const spike=coneSpike(crown,a);
 
-  const crystal=sphere(
-   reactor,
-   .065,
-   colors[i%5],
-   Math.cos(angle)*.72,
-   Math.sin(angle)*.72,
-   Math.sin(angle*2)*.18
-  );
-
-  crystal.userData.kind="slowSpin";
+  spike.userData.kind="kingdomCrownSpike";
  }
 
- // ============================================
- // 06. ORBITAL ENERGY RINGS
- // ============================================
+ function coneSpike(parent,a){
+  const spike=addMesh(
+   parent,
+   new THREE.ConeGeometry(.13,.65,5),
+   goldBright,
+   Math.cos(a)*.65,.35,
+   Math.sin(a)*.65
+  );
 
- const orbit=group(knot);
+  spike.rotation.z=.12;
+  return spike;
+ }
 
- addRings(
-  orbit,
-  5,
-  2.7,
-  C.gold,
-  .012
+ sphereLocal(
+  crown,.23,glowMat,0,.65,0
  );
 
- addRings(
-  orbit,
-  4,
-  3.1,
-  C.violet,
-  .012
+ // ---------------------------------------------------------
+ // 6. THE ROYAL THRONE
+ // ---------------------------------------------------------
+
+ const throne=group(kingdom);
+ throne.position.set(0,-.95,-.95);
+
+ // Platform
+ box(
+  throne,2,.22,1.45,
+  gold,0,0,0
  );
 
- addRings(
-  orbit,
-  3,
-  3.45,
-  C.cyan,
-  .009
+ box(
+  throne,1.75,.16,1.2,
+  royalBlack,0,.17,0
  );
 
- orbit.userData.kind="slowSpin";
+ // Seat
+ box(
+  throne,1.25,.28,.85,
+  royalBlack,0,.4,.1
+ );
 
- // ============================================
- // 07. ORBITAL ENERGY NODES
- // ============================================
+ // Backrest
+ box(
+  throne,1.35,1.75,.22,
+  royalBlack,0,1.15,-.48
+ );
 
- const nodes=group(orbit);
+ box(
+  throne,1.1,1.48,.07,
+  gold,0,1.17,-.35
+ );
+
+ box(
+  throne,.91,1.28,.08,
+  royalBlack,0,1.17,-.29
+ );
+
+ // Golden throne borders
+ for(let side of [-1,1]){
+  cylinder(
+   throne,.11,.11,1.6,
+   goldBright,side*.68,1.15,-.47
+  );
+
+  sphereLocal(
+   throne,.16,goldBright,side*.68,2,-.47
+  );
+
+  box(
+   throne,.2,.75,.8,
+   gold,side*.78,.55,.05
+  );
+ }
+
+ // Crown emblem on throne
+ const emblem=torusLocal(
+  throne,.34,.045,goldBright,
+  0,1.25,-.2
+ );
+
+ emblem.rotation.x=Math.PI/2;
+
+ // ---------------------------------------------------------
+ // 7. PERSONAL PORTRAIT DISPLAY
+ // ---------------------------------------------------------
+
+ const portraitFrame=group(kingdom);
+ portraitFrame.position.set(0,.15,-2.23);
+
+ box(
+  portraitFrame,1.35,1.85,.16,
+  goldBright,0,0,0
+ );
+
+ box(
+  portraitFrame,1.23,1.73,.07,
+  royalBlack,0,0,.095
+ );
+
+ // Portrait image
+ const portraitMaterial=new THREE.MeshBasicMaterial({
+  color:0x30291d,
+  side:THREE.DoubleSide
+ });
+
+ const portrait=addMesh(
+  portraitFrame,
+  new THREE.PlaneGeometry(1.12,1.58),
+  portraitMaterial,
+  0,0,.14
+ );
+
+ // Uses your own portrait image.
+ // Place your image at: assets/mamun-avatar.png
+
+ const portraitLoader=new THREE.TextureLoader();
+
+ portraitLoader.load(
+  "assets/mamun-avatar.png",
+  function(texture){
+   texture.colorSpace=THREE.SRGBColorSpace;
+   portrait.material.map=texture;
+   portrait.material.color.set(0xffffff);
+   portrait.material.needsUpdate=true;
+  },
+  undefined,
+  function(){
+   console.warn("Portrait not found: assets/mamun-avatar.png");
+  }
+ );
+
+ // Frame highlights
+ for(let side of [-1,1]){
+  box(
+   portraitFrame,.045,1.85,.045,
+   goldBright,side*.67,0,.11
+  );
+ }
+
+ box(
+  portraitFrame,1.35,.045,.045,
+  goldBright,0,.92,.11
+ );
+
+ box(
+  portraitFrame,1.35,.045,.045,
+  goldBright,0,-.92,.11
+ );
+
+ // ---------------------------------------------------------
+ // 8. ROYAL WINDOWS
+ // ---------------------------------------------------------
+
+ const windowMat=new THREE.MeshPhysicalMaterial({
+  color:0x7a5421,
+  metalness:.7,
+  roughness:.15,
+  transparent:true,
+  opacity:.65,
+  emissive:0x8a5b1d,
+  emissiveIntensity:.35
+ });
+
+ for(let side of [-1,1]){
+  for(let i=0;i<3;i++){
+   const x=side*2.56;
+   const z=-1.35+i*1.1;
+
+   box(
+    kingdom,.055,1.15,.65,
+    gold,x,.3,z
+   );
+
+   box(
+    kingdom,.065,.95,.48,
+    windowMat,x+side*.04,.3,z
+   );
+  }
+ }
+
+ // ---------------------------------------------------------
+ // 9. FLOATING GOLDEN ORBS
+ // ---------------------------------------------------------
+
+ const orbs=[];
 
  for(let i=0;i<18;i++){
 
-  const angle=i/18*TAU;
+  const angle=i/18*Math.PI*2;
+  const radius=3.35+Math.sin(i*2.3)*.35;
 
-  const radius=2.9+(i%3)*.18;
-
-  const node=sphere(
-   nodes,
-   .045+(i%3)*.012,
-   colors[i%5],
+  const orb=sphereLocal(
+   kingdom,
+   .045+(i%3)*.018,
+   i%3===0?goldBright:glowMat,
    Math.cos(angle)*radius,
-   Math.sin(angle)*radius,
-   Math.sin(angle*2)*.3
-  );
-
-  node.userData.kind="slowSpin";
- }
-
- // ============================================
- // 08. ENERGY PARTICLE FIELD
- // ============================================
-
- particleCloud(
-  knot,
-  450,
-  C.gold,
-  4.2,
-  .025
- );
-
- particleCloud(
-  knot,
-  220,
-  C.violet,
-  3.6,
-  .018
- );
-
- particleCloud(
-  knot,
-  160,
-  C.cyan,
-  3.2,
-  .016
- );
-
- // ============================================
- // 09. FLOATING GOLDEN DEBRIS
- // ============================================
-
- addFloatingDebris(
-  knot,
-  65,
-  C.gold,
-  4.2
- );
-
- addFloatingDebris(
-  knot,
-  35,
-  C.violet,
-  3.5
- );
-
- // ============================================
- // 10. ENERGY ORBITAL SATELLITES
- // ============================================
-
- const satellites=group(knot);
-
- for(let i=0;i<12;i++){
-
-  const angle=i/12*TAU;
-
-  const radius=3.5;
-
-  const satellite=sphere(
-   satellites,
-   .055,
-   colors[i%5],
-   Math.cos(angle)*radius,
-   Math.sin(angle)*radius,
-   Math.sin(angle*3)*.5
-  );
-
-  satellite.userData.kind="pulseCore";
- }
-
- satellites.userData.kind="slowSpin";
-
- // ============================================
- // 11. OUTER DIMENSIONAL FRAME
- // ============================================
-
- const frame=group(knot);
-
- addRings(
-  frame,
-  3,
-  4.0,
-  C.gold,
-  .008
- );
-
- frame.userData.kind="slowSpin";
-
- // ============================================
- // 12. FLOATING ENERGY SPHERES
- // ============================================
-
- for(let i=0;i<24;i++){
-
-  const angle=i/24*TAU;
-
-  const radius=2.1+Math.sin(i*2)*.3;
-
-  const orb=sphere(
-   structure,
-   .025+(i%3)*.012,
-   colors[i%5],
-   Math.cos(angle)*radius,
-   Math.sin(angle*2)*1.5,
+   -1.1+(i%5)*.68,
    Math.sin(angle)*radius
   );
 
-  orb.userData.kind="pulseCore";
+  orb.userData.kind="kingdomOrb";
+  orb.userData.phase=i*.7;
+
+  orbs.push(orb);
  }
 
- // ============================================
- // 13. FINAL ANIMATION SETTINGS
- // ============================================
+ // ---------------------------------------------------------
+ // 10. FLOATING CROWN RINGS
+ // ---------------------------------------------------------
 
- structure.userData.kind="slowSpin";
- orbit.userData.kind="slowSpin";
- frame.userData.kind="slowSpin";
+ const rings=[];
 
- knot.userData.kind="slowSpin";
+ for(let i=0;i<3;i++){
+
+  const ring=torusLocal(
+   kingdom,
+   1.35+i*.42,
+   .018,
+   goldBright,
+   0,2.75+i*.2,0
+  );
+
+  ring.rotation.set(
+   .45+i*.32,
+   i*.75,
+   .2+i*.3
+  );
+
+  ring.userData.kind="kingdomRing";
+  ring.userData.speed=.12+i*.055;
+
+  rings.push(ring);
+ }
+
+ // ---------------------------------------------------------
+ // 11. ROYAL ENERGY LIGHTS
+ // ---------------------------------------------------------
+
+ light(kingdom,0xffd078,95,0,4,1,12);
+ light(kingdom,0xd4a44d,55,-4,1,2,10);
+ light(kingdom,0xffe1a0,55,4,1,-2,10);
+
+ // Golden floor lights
+ for(let i=0;i<8;i++){
+  const a=i/8*Math.PI*2;
+
+  sphereLocal(
+   kingdom,.055,glowMat,
+   Math.cos(a)*3.9,-1.92,
+   Math.sin(a)*3.9
+  );
+ }
+
+ // ---------------------------------------------------------
+ // 12. ROYAL PARTICLES
+ // ---------------------------------------------------------
+
+ const particleCount=450;
+ const positions=new Float32Array(particleCount*3);
+
+ for(let i=0;i<particleCount;i++){
+  const a=Math.random()*Math.PI*2;
+  const r=2+Math.random()*5;
+
+  positions[i*3]=Math.cos(a)*r;
+  positions[i*3+1]=-1.5+Math.random()*6;
+  positions[i*3+2]=Math.sin(a)*r;
+ }
+
+ const particleGeometry=new THREE.BufferGeometry();
+
+ particleGeometry.setAttribute(
+  "position",
+  new THREE.BufferAttribute(positions,3)
+ );
+
+ const particleMaterial=new THREE.PointsMaterial({
+  color:0xffd98c,
+  size:.035,
+  transparent:true,
+  opacity:.8,
+  blending:THREE.AdditiveBlending,
+  depthWrite:false
+ });
+
+ const particles=new THREE.Points(
+  particleGeometry,
+  particleMaterial
+ );
+
+ particles.userData.kind="kingdomParticles";
+ kingdom.add(particles);
+
+ // ---------------------------------------------------------
+ // 13. ANIMATION SYSTEM
+ // ---------------------------------------------------------
+
+ kingdom.userData.update=function(time,delta){
+
+  // Floating golden orbs
+  for(const orb of orbs){
+   const phase=orb.userData.phase;
+
+   orb.position.y+=Math.sin(time*1.2+phase)*.0009;
+  }
+
+  // Rotating royal rings
+  for(const ring of rings){
+   ring.rotation.y+=delta*ring.userData.speed;
+   ring.rotation.z+=delta*ring.userData.speed*.35;
+  }
+
+  // Crown subtle motion
+  crown.rotation.y=Math.sin(time*.3)*.08;
+
+  // Floating particle movement
+  particles.rotation.y=time*.025;
+
+  // Throne light breathing
+  goldBright.emissiveIntensity=
+   .38+Math.sin(time*1.5)*.12;
+ };
 
 }
+
+
+
+
 
 
 /* 04 — ORBITAL MACHINE */
@@ -9795,7 +10071,7 @@ function worldFinal(root){
 
 /* ---------- BUILDER REGISTRY ---------- */
 const BUILDERS=[
- worldCube,worldFlower,worldKnot,worldOrbital,worldTree,
+ worldCube,worldFlower,worldMamunKingdom,worldOrbital,worldTree,
  worldLiquid,worldButterfly,worldSpiral,worldCrystal,worldDNA,
  worldArchitecture,worldUniverse,worldAbyss,worldPendulum,
  worldSacred,worldPhoenix,worldBlackHole,worldWave,worldHeart,
@@ -10130,6 +10406,14 @@ function updateWorld(time,delta){
  root.traverse(object=>{
   const kind=object.userData.kind;
   const phase=object.userData.phase||0;
+   
+     if(
+   kind==="mamunKingdom" &&
+   typeof object.userData.update==="function"
+  ){
+   object.userData.update(time,delta);
+  }
+   
    // SOLAR SYSTEM — REAL-TIME PLANETARY MOTION
 if(kind==="solarOrbit"){
  object.rotation.y+=delta*(object.userData.orbitSpeed||.2);
@@ -10375,7 +10659,7 @@ if(kind==="asteroidBelt"){
 
   if(kind==="gravityBody"){
    const orbit=object.userData.orbit;
-   const a=orbit.angle+time*orbit.speed;!
+   const a=orbit.angle+time*orbit.speed;
    object.position.set(
     Math.cos(a)*orbit.radius,
     Math.sin(a*1.8+orbit.tilt)*orbit.radius*orbit.vertical,
