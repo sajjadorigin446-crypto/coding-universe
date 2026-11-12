@@ -2665,83 +2665,70 @@ function worldMamunKingdom(root){
  pointLight(0xd9a85b,18,-6,2,0,15);
  pointLight(0xffe2a8,15,6,2,-3,15);
 
- // ---------------------------------------------------------
- // 18. MAMUN PORTRAIT — ADJUSTABLE IMAGE
- // ---------------------------------------------------------
 
- const avatarSettings={
-  file:"mamun-avatar.png",
+// MAMUN FULL BODY PORTRAIT — FIXED VERSION
 
-  x:0,
-  y:-.65,
-  z:2.1,
+const avatarSettings={
+ file:"mamun-avatar.png",
+ x:0,
+ y:-1.55,
+ z:1.15,
+ height:3.6,
+ rotationY:0,
+ scale:1
+};
 
-  width:1.5,
-  height:2.6,
+const avatarLoader=new THREE.TextureLoader();
 
-  scale:1,
-  rotationY:0,
+avatarLoader.load(
+ avatarSettings.file,
+ function(texture){
 
-  visible:true
- };
+  texture.colorSpace=THREE.SRGBColorSpace;
+  texture.anisotropy=4;
 
- const avatarLoader=new THREE.TextureLoader();
+  const imageRatio=
+   texture.image.width/texture.image.height;
 
- avatarLoader.load(
-  avatarSettings.file,
+  const height=
+   avatarSettings.height*avatarSettings.scale;
 
-  function(texture){
+  const width=height*imageRatio;
 
-   texture.colorSpace=THREE.SRGBColorSpace;
-   texture.anisotropy=4;
+  const avatarMaterial=new THREE.MeshBasicMaterial({
+   map:texture,
+   transparent:true,
+   alphaTest:.02,
+   side:THREE.DoubleSide,
+   depthWrite:false
+  });
 
-   const ratio=texture.image.width/
-    texture.image.height;
+  const avatar=new THREE.Mesh(
+   new THREE.PlaneGeometry(width,height),
+   avatarMaterial
+  );
 
-   const height=avatarSettings.height*
-    avatarSettings.scale;
+  avatar.position.set(
+   avatarSettings.x,
+   avatarSettings.y+height/2,
+   avatarSettings.z
+  );
 
-   const width=height*ratio;
+  avatar.rotation.y=avatarSettings.rotationY;
+  avatar.renderOrder=3;
 
-   const avatarMaterial=new THREE.MeshBasicMaterial({
-    map:texture,
-    transparent:true,
-    alphaTest:.04,
-    side:THREE.DoubleSide,
-    depthWrite:false
-   });
+  kingdom.add(avatar);
 
-   const avatar=new THREE.Mesh(
-    new THREE.PlaneGeometry(width,height),
-    avatarMaterial
-   );
+  kingdom.userData.mamunAvatar=avatar;
+  kingdom.userData.avatarSettings=avatarSettings;
 
-   avatar.position.set(
-    avatarSettings.x,
-    avatarSettings.y,
-    avatarSettings.z
-   );
+ },
+ undefined,
+ function(error){
+  console.error("Avatar loading error:",error);
+ }
+);
 
-   avatar.rotation.y=avatarSettings.rotationY;
-   avatar.visible=avatarSettings.visible;
-   avatar.renderOrder=3;
-
-   kingdom.add(avatar);
-
-   // Accessible adjustment reference
-   kingdom.userData.mamunAvatar=avatar;
-   kingdom.userData.avatarSettings=avatarSettings;
-
-  },
-
-  undefined,
-
-  function(error){
-   console.warn(
-    "Mamun avatar could not load:",error
-   );
-  }
- );
 
  // ---------------------------------------------------------
  // 19. ANIMATION
