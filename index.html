@@ -2077,6 +2077,708 @@ function worldFlower(root){
 
 
 
+/* =========================================================
+   WORLD 03 — MAMUN'S KINGDOM
+   THE CREATOR'S REALM
+   REALISTIC ROYAL EMPIRE — MOBILE OPTIMIZED EDITION
+   ========================================================= */
+
+function worldMamunKingdom(root){
+
+ const kingdom=group(root);
+ kingdom.userData.kind="mamunKingdom";
+
+ // ---------------------------------------------------------
+ // 1. MATERIAL LIBRARY
+ // ---------------------------------------------------------
+
+ const mat={
+  obsidian:new THREE.MeshStandardMaterial({
+   color:0x090a0b,metalness:.65,roughness:.3
+  }),
+  blackMarble:new THREE.MeshStandardMaterial({
+   color:0x211d18,metalness:.4,roughness:.3
+  }),
+  stone:new THREE.MeshStandardMaterial({
+   color:0x777064,roughness:.88
+  }),
+  ivory:new THREE.MeshStandardMaterial({
+   color:0xcfc3aa,roughness:.5
+  }),
+  gold:new THREE.MeshStandardMaterial({
+   color:0xb68a3d,metalness:.85,roughness:.28,
+   emissive:0x38230b,emissiveIntensity:.16
+  }),
+  brightGold:new THREE.MeshStandardMaterial({
+   color:0xe6bd70,metalness:.9,roughness:.2,
+   emissive:0x604018,emissiveIntensity:.2
+  }),
+  darkGold:new THREE.MeshStandardMaterial({
+   color:0x60431e,metalness:.8,roughness:.35
+  }),
+  armor:new THREE.MeshStandardMaterial({
+   color:0x111111,metalness:.8,roughness:.28
+  }),
+  water:new THREE.MeshPhysicalMaterial({
+   color:0x46584d,metalness:.45,roughness:.18,
+   clearcoat:.8,clearcoatRoughness:.12
+  }),
+  glow:new THREE.MeshBasicMaterial({
+   color:0xffd88b
+  }),
+  foliage:new THREE.MeshStandardMaterial({
+   color:0x273323,roughness:.95
+  })
+ };
+
+ // ---------------------------------------------------------
+ // 2. GEOMETRY HELPERS
+ // ---------------------------------------------------------
+
+ function make(parent,geo,material,x=0,y=0,z=0){
+  const o=new THREE.Mesh(geo,material);
+  o.position.set(x,y,z);
+  o.castShadow=false;
+  o.receiveShadow=false;
+  parent.add(o);
+  return o;
+ }
+
+ function box(parent,w,h,d,material,x,y,z){
+  return make(parent,new THREE.BoxGeometry(w,h,d),
+   material,x,y,z);
+ }
+
+ function sphere(parent,r,material,x,y,z,sx=1,sy=1,sz=1){
+  const o=make(parent,
+   new THREE.SphereGeometry(r,20,14),
+   material,x,y,z);
+  o.scale.set(sx,sy,sz);
+  return o;
+ }
+
+ function cylinder(parent,top,bottom,h,material,x,y,z,n=24){
+  return make(parent,
+   new THREE.CylinderGeometry(top,bottom,h,n),
+   material,x,y,z);
+ }
+
+ function cone(parent,r,h,material,x,y,z,n=16){
+  return make(parent,
+   new THREE.ConeGeometry(r,h,n),
+   material,x,y,z);
+ }
+
+ function torus(parent,r,t,material,x=0,y=0,z=0){
+  return make(parent,
+   new THREE.TorusGeometry(r,t,8,48),
+   material,x,y,z);
+ }
+
+ function addInstanced(parent,geometry,material,items){
+  const mesh=new THREE.InstancedMesh(
+   geometry,material,items.length
+  );
+
+  const dummy=new THREE.Object3D();
+
+  items.forEach((item,i)=>{
+   dummy.position.set(item.x,item.y,item.z);
+   dummy.rotation.set(
+    item.rx||0,item.ry||0,item.rz||0
+   );
+   dummy.scale.set(
+    item.sx||1,item.sy||1,item.sz||1
+   );
+   dummy.updateMatrix();
+   mesh.setMatrixAt(i,dummy.matrix);
+  });
+
+  mesh.instanceMatrix.needsUpdate=true;
+  mesh.frustumCulled=true;
+  mesh.castShadow=false;
+  mesh.receiveShadow=false;
+  parent.add(mesh);
+  return mesh;
+ }
+
+ function pointLight(color,intensity,x,y,z,distance){
+  const light=new THREE.PointLight(
+   color,intensity,distance,2
+  );
+  light.position.set(x,y,z);
+  kingdom.add(light);
+  return light;
+ }
+
+ // ---------------------------------------------------------
+ // 3. LAND AND ROYAL ISLAND
+ // ---------------------------------------------------------
+
+ const land=box(
+  kingdom,42,.7,42,mat.stone,0,-2.8,0
+ );
+
+ const islandBase=cylinder(
+  kingdom,8.8,9.5,1.1,
+  mat.obsidian,0,-2.35,0,48
+ );
+
+ cylinder(kingdom,8.65,8.8,.12,
+  mat.gold,0,-1.78,0,48);
+
+ // Central royal ground
+ box(kingdom,13,.12,12,
+  mat.blackMarble,0,-1.68,0);
+
+ // ---------------------------------------------------------
+ // 4. DISTANT MOUNTAIN RANGE
+ // ---------------------------------------------------------
+
+ const mountainMaterial=new THREE.MeshStandardMaterial({
+  color:0x38372f,roughness:1
+ });
+
+ const mountainGeometry=new THREE.ConeGeometry(1,1,7);
+ const mountains=[];
+
+ for(let i=0;i<22;i++){
+  const a=i/22*Math.PI*2;
+  const radius=17+(i%3)*2;
+  const h=5+(i%5)*1.5;
+
+  mountains.push({
+   x:Math.cos(a)*radius,
+   y:-.5+h/2,
+   z:Math.sin(a)*radius,
+   sx:3+(i%3),
+   sy:h,
+   sz:3+(i%4)
+  });
+ }
+
+ addInstanced(
+  kingdom,mountainGeometry,mountainMaterial,mountains
+ );
+
+ // ---------------------------------------------------------
+ // 5. GRAND IMPERIAL PALACE PLATFORM
+ // ---------------------------------------------------------
+
+ box(kingdom,8.8,.65,7,
+  mat.obsidian,0,-1.25,-1);
+
+ box(kingdom,8.6,.12,6.8,
+  mat.gold,0,-.87,-1);
+
+ box(kingdom,8.3,.1,6.5,
+  mat.blackMarble,0,-.75,-1);
+
+ // Main palace body
+ box(kingdom,7,4.2,5,
+  mat.ivory,0,1.35,-1.5);
+
+ // Dark central facade
+ box(kingdom,5.8,3.5,.16,
+  mat.obsidian,0,1.25,1.04);
+
+ // Palace roof
+ box(kingdom,7.7,.28,5.7,
+  mat.gold,0,3.55,-1.5);
+
+ // Rear roof
+ box(kingdom,7.3,.18,5.4,
+  mat.blackMarble,0,3.76,-1.5);
+
+ // Central entrance
+ box(kingdom,2.15,2.65,.2,
+  mat.obsidian,0,.65,1.15);
+
+ // Entrance frame
+ for(const side of [-1,1]){
+  box(kingdom,.2,2.9,.3,
+   mat.brightGold,side*1.2,.7,1.2);
+ }
+ box(kingdom,2.55,.2,.3,
+  mat.brightGold,0,2.17,1.2);
+
+ // Main windows
+ const windowMaterial=new THREE.MeshStandardMaterial({
+  color:0x8b6b39,emissive:0x69471d,
+  emissiveIntensity:.4,metalness:.5,roughness:.2
+ });
+
+ for(const side of [-1,1]){
+  for(let i=0;i<3;i++){
+   const x=side*3.53;
+   const z=-2.8+i*1.25;
+
+   box(kingdom,.1,1.35,.68,
+    mat.gold,x,1.45,z);
+
+   box(kingdom,.12,1.15,.48,
+    windowMaterial,x+.06,1.45,z);
+  }
+ }
+
+ // ---------------------------------------------------------
+ // 6. ROYAL PILLARS
+ // ---------------------------------------------------------
+
+ const pillarItems=[];
+
+ for(const side of [-1,1]){
+  for(let i=0;i<5;i++){
+   pillarItems.push({
+    x:side*3.7,
+    y:.5,
+    z:-3.1+i*1.05
+   });
+  }
+ }
+
+ addInstanced(
+  kingdom,
+  new THREE.CylinderGeometry(.18,.23,2.7,12),
+  mat.ivory,
+  pillarItems
+ );
+
+ // Pillar gold capitals
+ const capitalItems=pillarItems.map(p=>({
+  x:p.x,y:1.9,z:p.z,sx:1.5,sy:.65,sz:1.5
+ }));
+
+ addInstanced(
+  kingdom,
+  new THREE.CylinderGeometry(.23,.23,.15,12),
+  mat.brightGold,
+  capitalItems
+ );
+
+ // ---------------------------------------------------------
+ // 7. ROYAL DOME
+ // ---------------------------------------------------------
+
+ const dome=group(kingdom);
+ dome.position.set(0,3.8,-1.5);
+
+ sphere(dome,1.5,mat.gold,0,.5,0,1,1.15,1);
+
+ sphere(dome,1.37,mat.blackMarble,
+  0,.53,.025,1,1.15,1);
+
+ torus(dome,1.48,.035,mat.brightGold,0,.35,0);
+
+ cylinder(dome,.12,.2,.5,
+  mat.brightGold,0,2.15,0);
+
+ cone(dome,.25,.75,
+  mat.gold,0,2.7,0);
+
+ sphere(dome,.1,mat.glow,0,3.1,0);
+
+ // ---------------------------------------------------------
+ // 8. FOUR ROYAL TOWERS
+ // ---------------------------------------------------------
+
+ const towerPositions=[
+  [-4.2,-3.8],[4.2,-3.8],
+  [-4.2,2.1],[4.2,2.1]
+ ];
+
+ for(const p of towerPositions){
+  const tower=group(kingdom);
+  tower.position.set(p[0],0,p[1]);
+
+  cylinder(tower,.62,.72,3.1,
+   mat.ivory,0,.65,0);
+
+  cylinder(tower,.77,.77,.18,
+   mat.gold,0,2.3,0);
+
+  sphere(tower,.68,mat.gold,
+   0,2.85,0,1,1.1,1);
+
+  cone(tower,.55,1.1,
+   mat.brightGold,0,3.8,0);
+
+  sphere(tower,.09,mat.glow,0,4.4,0);
+ }
+
+ // ---------------------------------------------------------
+ // 9. OUTER ROYAL CITY
+ // ---------------------------------------------------------
+
+ const cityPositions=[];
+
+ for(let i=0;i<32;i++){
+  const a=i/32*TAU;
+  const r=11+(i%4)*1.2;
+
+  cityPositions.push({
+   x:Math.cos(a)*r,
+   y:-.2,
+   z:Math.sin(a)*r,
+   sx:1.2+(i%3)*.4,
+   sy:1.5+(i%5)*.65,
+   sz:1.2+(i%2)*.4,
+   ry:-a
+  });
+ }
+
+ addInstanced(
+  kingdom,
+  new THREE.BoxGeometry(1,1,1),
+  mat.blackMarble,
+  cityPositions
+ );
+
+ // City rooftops
+ const roofItems=cityPositions.map(p=>({
+  x:p.x,y:p.y+p.sy*.5+.15,z:p.z,
+  sx:p.sx*1.08,sy:.25,sz:p.sz*1.08
+ }));
+
+ addInstanced(
+  kingdom,
+  new THREE.BoxGeometry(1,1,1),
+  mat.gold,
+  roofItems
+ );
+
+ // ---------------------------------------------------------
+ // 10. ROYAL BRIDGES AND ROADS
+ // ---------------------------------------------------------
+
+ box(kingdom,3,.2,14,
+  mat.blackMarble,0,-1.5,8);
+
+ box(kingdom,2.8,.06,13.8,
+  mat.gold,0,-1.37,8);
+
+ // Road borders
+ for(const side of [-1,1]){
+  box(kingdom,.09,.25,14,
+   mat.brightGold,side*1.55,-1.34,8);
+ }
+
+ // ---------------------------------------------------------
+ // 11. RIVER AND REFLECTING WATER
+ // ---------------------------------------------------------
+
+ const riverMaterial=mat.water;
+
+ const river=box(
+  kingdom,5,.08,24,riverMaterial,12,-1.9,1
+ );
+ river.rotation.y=-.18;
+
+ // River banks
+ for(const side of [-1,1]){
+  const bank=box(
+   kingdom,.55,.25,24,mat.stone,
+   12+side*2.7,-1.85,1
+  );
+  bank.rotation.y=-.18;
+ }
+
+ // ---------------------------------------------------------
+ // 12. ROYAL GARDENS — INSTANCED TREES
+ // ---------------------------------------------------------
+
+ const treePositions=[];
+ const trunkPositions=[];
+
+ for(let i=0;i<64;i++){
+  const a=i/64*TAU;
+  const r=8.5+(i%3)*.8;
+  const x=Math.cos(a)*r;
+  const z=Math.sin(a)*r;
+
+  treePositions.push({
+   x,y:-.25,z,
+   sx:.65+(i%3)*.08,
+   sy:1.1+(i%4)*.12,
+   sz:.65+(i%2)*.08
+  });
+
+  trunkPositions.push({
+   x,y:-1.25,z,
+   sx:.13,sy:.65,sz:.13
+  });
+ }
+
+ addInstanced(
+  kingdom,
+  new THREE.SphereGeometry(.65,10,8),
+  mat.foliage,
+  treePositions
+ );
+
+ addInstanced(
+  kingdom,
+  new THREE.CylinderGeometry(.12,.17,1,8),
+  mat.darkGold,
+  trunkPositions
+ );
+
+ // ---------------------------------------------------------
+ // 13. ROYAL THRONE HALL
+ // ---------------------------------------------------------
+
+ const hall=group(kingdom);
+ hall.position.set(0,-.7,-3.8);
+
+ box(hall,3,.3,2.2,
+  mat.gold,0,0,0);
+
+ box(hall,2.75,.2,2,
+  mat.obsidian,0,.2,0);
+
+ box(hall,1.65,.35,1.1,
+  mat.armor,0,.45,.3);
+
+ box(hall,1.8,2.2,.25,
+  mat.gold,0,1.55,-.6);
+
+ box(hall,1.55,1.95,.12,
+  mat.obsidian,0,1.55,-.43);
+
+ for(const side of [-1,1]){
+  box(hall,.24,.9,1,
+   mat.gold,side*.95,.6,.2);
+ }
+
+ torus(hall,.52,.035,
+  mat.brightGold,0,1.7,-.25);
+
+ sphere(hall,.12,mat.glow,0,1.7,-.17);
+
+ // ---------------------------------------------------------
+ // 14. FOUNTAIN
+ // ---------------------------------------------------------
+
+ const fountain=group(kingdom);
+ fountain.position.set(3.6,-1.65,4);
+
+ cylinder(fountain,.95,1.1,.22,
+  mat.ivory,0,0,0,32);
+
+ cylinder(fountain,.8,.85,.13,
+  mat.gold,0,.16,0,32);
+
+ cylinder(fountain,.72,.78,.1,
+  mat.water,0,.25,0,32);
+
+ cylinder(fountain,.2,.28,.65,
+  mat.marble||mat.ivory,0,.58,0,24);
+
+ cylinder(fountain,.34,.4,.12,
+  mat.gold,0,.95,0,24);
+
+ sphere(fountain,.28,mat.water,
+  0,1.1,0,1,.5,1);
+
+ const fountainRing=torus(
+  fountain,.48,.018,mat.brightGold,0,.98,0
+ );
+ fountainRing.rotation.x=Math.PI/2;
+
+ // ---------------------------------------------------------
+ // 15. ROYAL LANTERNS — INSTANCED
+ // ---------------------------------------------------------
+
+ const lanternPositions=[];
+
+ for(let i=0;i<24;i++){
+  const a=i/24*TAU;
+  const r=7.3;
+
+  lanternPositions.push({
+   x:Math.cos(a)*r,
+   y:-.45,
+   z:Math.sin(a)*r
+  });
+ }
+
+ addInstanced(
+  kingdom,
+  new THREE.CylinderGeometry(.065,.09,.75,8),
+  mat.darkGold,
+  lanternPositions
+ );
+
+ const lanternLights=addInstanced(
+  kingdom,
+  new THREE.SphereGeometry(.11,8,6),
+  mat.glow,
+  lanternPositions.map(p=>({
+   x:p.x,y:p.y+.45,z:p.z
+  }))
+ );
+
+ // ---------------------------------------------------------
+ // 16. GOLDEN PARTICLES — SINGLE POINT SYSTEM
+ // ---------------------------------------------------------
+
+ const particleCount=180;
+ const particlePositions=new Float32Array(
+  particleCount*3
+ );
+
+ for(let i=0;i<particleCount;i++){
+  const a=Math.random()*TAU;
+  const r=3+Math.random()*12;
+
+  particlePositions[i*3]=Math.cos(a)*r;
+  particlePositions[i*3+1]=Math.random()*7-1;
+  particlePositions[i*3+2]=Math.sin(a)*r;
+ }
+
+ const particleGeometry=new THREE.BufferGeometry();
+
+ particleGeometry.setAttribute(
+  "position",
+  new THREE.BufferAttribute(particlePositions,3)
+ );
+
+ const particleMaterial=new THREE.PointsMaterial({
+  color:0xe7bd70,
+  size:.035,
+  transparent:true,
+  opacity:.7,
+  depthWrite:false
+ });
+
+ const particles=new THREE.Points(
+  particleGeometry,particleMaterial
+ );
+
+ kingdom.add(particles);
+
+ // ---------------------------------------------------------
+ // 17. CINEMATIC LIGHTING
+ // ---------------------------------------------------------
+
+ pointLight(0xffd28a,35,0,5,4,22);
+ pointLight(0xd9a85b,18,-6,2,0,15);
+ pointLight(0xffe2a8,15,6,2,-3,15);
+
+ // ---------------------------------------------------------
+ // 18. MAMUN PORTRAIT — ADJUSTABLE IMAGE
+ // ---------------------------------------------------------
+
+ const avatarSettings={
+  file:"mamun-avatar.png",
+
+  x:0,
+  y:-.65,
+  z:2.1,
+
+  width:1.5,
+  height:2.6,
+
+  scale:1,
+  rotationY:0,
+
+  visible:true
+ };
+
+ const avatarLoader=new THREE.TextureLoader();
+
+ avatarLoader.load(
+  avatarSettings.file,
+
+  function(texture){
+
+   texture.colorSpace=THREE.SRGBColorSpace;
+   texture.anisotropy=4;
+
+   const ratio=texture.image.width/
+    texture.image.height;
+
+   const height=avatarSettings.height*
+    avatarSettings.scale;
+
+   const width=height*ratio;
+
+   const avatarMaterial=new THREE.MeshBasicMaterial({
+    map:texture,
+    transparent:true,
+    alphaTest:.04,
+    side:THREE.DoubleSide,
+    depthWrite:false
+   });
+
+   const avatar=new THREE.Mesh(
+    new THREE.PlaneGeometry(width,height),
+    avatarMaterial
+   );
+
+   avatar.position.set(
+    avatarSettings.x,
+    avatarSettings.y,
+    avatarSettings.z
+   );
+
+   avatar.rotation.y=avatarSettings.rotationY;
+   avatar.visible=avatarSettings.visible;
+   avatar.renderOrder=3;
+
+   kingdom.add(avatar);
+
+   // Accessible adjustment reference
+   kingdom.userData.mamunAvatar=avatar;
+   kingdom.userData.avatarSettings=avatarSettings;
+
+  },
+
+  undefined,
+
+  function(error){
+   console.warn(
+    "Mamun avatar could not load:",error
+   );
+  }
+ );
+
+ // ---------------------------------------------------------
+ // 19. ANIMATION
+ // ---------------------------------------------------------
+
+ kingdom.userData.update=function(time,delta){
+
+  const dt=Math.min(delta||0,.05);
+
+  // Palace dome slow rotation
+  dome.rotation.y=time*.018;
+
+  // Royal particles
+  particles.rotation.y=time*.012;
+
+  // Fountain shimmer
+  fountainRing.rotation.z+=dt*.15;
+
+  // Soft golden illumination
+  mat.brightGold.emissiveIntensity=
+   .18+Math.sin(time*.8)*.045;
+
+ };
+
+ // ---------------------------------------------------------
+ // 20. CLEANUP REFERENCES
+ // ---------------------------------------------------------
+
+ kingdom.userData.performance={
+  particleCount:particleCount,
+  instancedTrees:treePositions.length,
+  instancedLanterns:lanternPositions.length,
+  instancedCityBuildings:cityPositions.length
+ };
+
+}
+
 
 
 
